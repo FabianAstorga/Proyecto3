@@ -1,0 +1,95 @@
+<div class="min-h-dvh w-full bg-white text-slate-900 flex flex-col">
+
+
+  <header
+    class="w-full text-white shadow-md bg-no-repeat
+           [background-image:linear-gradient(90deg,#0A1A3A_0%,#1B3C86_58%,#FACC15_100%)]">
+    <div class="max-w-7xl mx-auto px-4 md:px-6 py-4 flex items-center justify-between">
+      <button routerLink="/"
+              class="rounded-full bg-white text-[#0A1A3A] font-semibold
+                     px-6 py-2 text-sm md:text-base shadow-md hover:shadow-lg
+                     hover:scale-105 active:scale-95 transition-all duration-200">
+        Volver al inicio
+      </button>
+      <div class="flex items-center gap-3">
+        <img src="/img/logo-uni.png" alt="Logo Universidad" class="h-10 w-auto" />
+        <h1 class="text-xl md:text-2xl font-bold tracking-tight text-white">
+          Personal Académico
+        </h1>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 w-full max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
+
+    <p class="mb-6 md:mb-8 text-lg md:text-xl font-semibold text-slate-700">
+      Directorio completo del cuerpo académico de la institución
+    </p>
+
+    
+
+    <section class="rounded-2xl border border-slate-200 bg-white p-4 md:p-5 shadow-sm mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-[1fr_auto_auto] gap-3">
+        <input [(ngModel)]="nombre" type="text" placeholder="Buscar por nombre / área / departamento"
+               class="w-full rounded-full px-5 py-3 text-base bg-white border border-slate-300 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-100" />
+        <button (click)="buscar()"
+                class="rounded-full px-6 py-3 text-base font-semibold bg-slate-900 text-white hover:brightness-110 active:scale-[0.98] transition">
+          Buscar
+        </button>
+        <button (click)="limpiar()"
+                class="rounded-full px-6 py-3 text-base font-semibold bg-white border border-slate-300 hover:bg-slate-50">
+          Limpiar
+        </button>
+      </div>
+    </section>
+
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+      <ng-container *ngFor="let a of academics()">
+        <article class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div class="flex items-start gap-4">
+            <div class="h-12 w-12 rounded-full bg-emerald-500/15 ring-1 ring-emerald-300 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                   class="h-6 w-6 text-emerald-700" fill="currentColor">
+                <path d="M12 3 1 8l11 5 9-4.09V17h2V8L12 3z"/>
+                <path d="M7 12.16V16c0 1.66 2.69 3 6 3s6-1.34 6-3v-3.84l-6 2.73-6-2.73z"/>
+              </svg>
+            </div>
+            <div class="flex-1">
+              <h3 class="text-lg font-semibold">{{ a.name }}</h3>
+              <div class="text-sm text-emerald-700 font-medium">{{ a.title }}</div>
+            </div>
+          </div>
+
+          <div class="mt-4 space-y-2 text-sm text-slate-700">
+            <div><span class="text-slate-500">Departamento:</span> {{ a.department }}</div>
+            <div><span class="text-slate-500">Área:</span> {{ a.area }}</div>
+            <div><span class="text-slate-500">Oficina:</span> {{ a.office }}</div>
+            <div class="break-words"><span class="text-slate-500">Email:</span> {{ a.email }}</div>
+            <div><span class="text-slate-500">Tel:</span> {{ a.phone }}</div>
+          </div>
+
+          <div class="mt-4 grid grid-cols-3 gap-3 text-center">
+            <div class="rounded-lg bg-slate-50 border border-slate-200 p-3">
+              <div class="text-xs text-slate-500">Grado</div>
+              <div class="font-semibold">{{ a.degree }}</div>
+            </div>
+            <div class="rounded-lg bg-slate-50 border border-slate-200 p-3">
+              <div class="text-xs text-slate-500">Experiencia</div>
+              <div class="font-semibold">{{ a.experienceYears }} años</div>
+            </div>
+            <div class="rounded-lg bg-slate-50 border border-slate-200 p-3">
+              <div class="text-xs text-slate-500">Publicaciones</div>
+              <div class="font-semibold">{{ a.publications }}</div>
+            </div>
+          </div>
+
+          <div class="mt-4 text-sm">
+            <div class="text-slate-500">Horario de Atención</div>
+            <div class="font-medium">{{ a.officeHours }}</div>
+          </div>
+        </article>
+      </ng-container>
+    </section>
+
+  </main>
+</div>

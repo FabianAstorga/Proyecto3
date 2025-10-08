@@ -1,0 +1,136 @@
+<div class="min-h-dvh w-full bg-white text-slate-900 flex flex-col">
+
+  <!-- Header con degradé (sin “línea”) -->
+  <header
+    class="w-full text-white shadow-md bg-no-repeat
+           [background-image:linear-gradient(90deg,#0A1A3A_0%,#1B3C86_58%,#FACC15_100%)]">
+    <div class="max-w-7xl mx-auto px-4 md:px-6 py-4 flex items-center justify-between">
+      <button routerLink="/"
+              class="rounded-full bg-white text-[#0A1A3A] font-semibold
+                     px-6 py-2 text-sm md:text-base shadow-md hover:shadow-lg
+                     hover:scale-105 active:scale-95 transition-all">
+        Volver al inicio
+      </button>
+      <div class="flex items-center gap-3">
+        <img src="/img/logo-uni.png" alt="Logo Universidad" class="h-10 w-auto" />
+        <h1 class="text-xl md:text-2xl font-bold tracking-tight text-white">Funcionarios</h1>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 w-full max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
+
+    <!-- Título / subtítulo -->
+    <div class="text-center mb-8">
+      <h2 class="text-2xl md:text-3xl font-semibold text-slate-900">Buscar funcionario</h2>
+      <p class="mt-1 text-slate-600">Filtra por nombre y/o cargo.</p>
+    </div>
+
+    <!-- Buscador -->
+    <section class="rounded-2xl border border-slate-200 bg-white p-4 md:p-5 shadow-sm mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto_auto] gap-3">
+        <input [(ngModel)]="nombre" placeholder="Nombre"
+               class="w-full rounded-full px-5 py-3 text-base bg-white border border-slate-300 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-100"/>
+        <input [(ngModel)]="cargo" placeholder="Cargo"
+               class="w-full rounded-full px-5 py-3 text-base bg-white border border-slate-300 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-100"/>
+        <button (click)="buscar()"
+                class="rounded-full px-6 py-3 text-base font-semibold bg-slate-900 text-white hover:brightness-110 active:scale-[0.98] transition">
+          Buscar
+        </button>
+        <button (click)="limpiar()"
+                class="rounded-full px-6 py-3 text-base font-semibold bg-white border border-slate-300 hover:bg-slate-50">
+          Limpiar
+        </button>
+      </div>
+    </section>
+
+    <!-- GRAN GRID (tabla responsiva) -->
+    <section class="rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div class="overflow-x-auto">
+        <table class="min-w-full border-separate [border-spacing:0]">
+          <!-- Header -->
+          <thead>
+            <tr class="text-left text-slate-600 text-sm">
+              <th class="sticky top-0 bg-slate-50/80 backdrop-blur px-4 py-3 border-b border-slate-200">Nombre</th>
+              <th class="sticky top-0 bg-slate-50/80 backdrop-blur px-4 py-3 border-b border-slate-200">Cargo</th>
+              <th class="sticky top-0 bg-slate-50/80 backdrop-blur px-4 py-3 border-b border-slate-200">Departamento</th>
+              <th class="sticky top-0 bg-slate-50/80 backdrop-blur px-4 py-3 border-b border-slate-200">Ubicación</th>
+              <th class="sticky top-0 bg-slate-50/80 backdrop-blur px-4 py-3 border-b border-slate-200">Oficina</th>
+              <th class="sticky top-0 bg-slate-50/80 backdrop-blur px-4 py-3 border-b border-slate-200">Email</th>
+              <th class="sticky top-0 bg-slate-50/80 backdrop-blur px-4 py-3 border-b border-slate-200">Teléfono</th>
+              <th class="sticky top-0 bg-slate-50/80 backdrop-blur px-4 py-3 border-b border-slate-200">Anexo</th>
+              <th class="sticky top-0 bg-slate-50/80 backdrop-blur px-4 py-3 border-b border-slate-200">Supervisor</th>
+              <th class="sticky top-0 bg-slate-50/80 backdrop-blur px-4 py-3 border-b border-slate-200">Desde</th>
+              <th class="sticky top-0 bg-slate-50/80 backdrop-blur px-4 py-3 border-b border-slate-200">Horario</th>
+              <th class="sticky top-0 bg-slate-50/80 backdrop-blur px-4 py-3 border-b border-slate-200">Estado</th>
+              <th class="sticky top-0 bg-slate-50/80 backdrop-blur px-4 py-3 border-b border-slate-200">Habilidades</th>
+              <th class="sticky top-0 bg-slate-50/80 backdrop-blur px-4 py-3 border-b border-slate-200 text-center">Acciones</th>
+            </tr>
+          </thead>
+
+          <!-- Body -->
+          <tbody class="text-sm">
+            <tr *ngFor="let p of results()" class="hover:bg-slate-50">
+              <td class="px-4 py-3 font-medium text-slate-900">{{ p.name }}</td>
+              <td class="px-4 py-3">{{ p.title }}</td>
+              <td class="px-4 py-3">{{ p.department }}</td>
+              <td class="px-4 py-3">{{ p.building }}, {{ p.floor }}</td>
+              <td class="px-4 py-3">{{ p.office }}</td>
+              <td class="px-4 py-3">
+                <a class="text-blue-700 hover:underline break-words" [href]="'mailto:' + p.email">{{ p.email }}</a>
+              </td>
+              <td class="px-4 py-3">
+                <a class="text-blue-700 hover:underline" [href]="'tel:' + normalizeTel(p.phone)">{{ p.phone }}</a>
+              </td>
+              <td class="px-4 py-3">{{ p.ext }}</td>
+              <td class="px-4 py-3">{{ p.supervisor }}</td>
+              <td class="px-4 py-3">{{ p.since }}</td>
+              <td class="px-4 py-3">{{ p.schedule }}</td>
+              <td class="px-4 py-3">
+                <span class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs ring-1"
+                      [ngClass]="statusClasses(p.status)">
+                  <span class="h-2 w-2 rounded-full"
+                        [ngClass]="{
+                          'bg-emerald-500': p.status === 'Disponible',
+                          'bg-amber-500'  : p.status === 'En reunión',
+                          'bg-slate-400'  : p.status === 'Fuera de oficina'
+                        }"></span>
+                  {{ p.status }}
+                </span>
+              </td>
+              <td class="px-4 py-3">
+                <div class="flex flex-wrap gap-2">
+                  <span *ngFor="let s of p.skills"
+                        class="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs text-slate-700">
+                    {{ s }}
+                  </span>
+                </div>
+              </td>
+              <td class="px-4 py-3">
+                <div class="flex items-center justify-center gap-2">
+                  <a [href]="'mailto:' + p.email"
+                     class="rounded-full border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium hover:bg-slate-50">Correo</a>
+                  <a [href]="'tel:' + normalizeTel(p.phone)"
+                     class="rounded-full border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium hover:bg-slate-50">Llamar</a>
+                  <a [href]="'https://wa.me/' + digits(p.phone)" target="_blank" rel="noopener"
+                     class="rounded-full border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium hover:bg-slate-50">WhatsApp</a>
+                  <button class="rounded-full bg-slate-900 text-white px-3 py-1.5 text-xs font-semibold hover:brightness-110">
+                    Ver ficha
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- vacío -->
+            <tr *ngIf="results().length === 0">
+              <td class="px-4 py-6 text-slate-500" colspan="14">
+                Sin resultados aún. Realiza una búsqueda.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+</div>
