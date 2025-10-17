@@ -1,4 +1,3 @@
-<!-- Hotbar superior (solo logo) -->
 <header class="w-full bg-[#0D1440] text-white">
   <div class="mx-auto max-w-7xl px-4 py-3 flex items-center">
     <div class="flex items-center gap-3">
@@ -10,33 +9,25 @@
   </div>
 </header>
 
-<!-- Sección con fondo borroso + overlay + card centrada -->
 <section class="relative min-h-[calc(100vh-56px)] overflow-hidden">
-  <!-- Fondo como imagen separada para aplicar blur sin afectar la card -->
   <img
     src="/mecanica.jpg"
     alt="Fondo"
     class="absolute inset-0 w-full h-full object-cover blur-sm scale-105"
   />
-  <!-- Overlay sutil para contraste -->
   <div class="absolute inset-0 bg-black/40"></div>
 
-  <!-- Contenido centrado -->
   <div class="relative z-10 max-w-7xl mx-auto px-4 py-10 lg:py-16">
     <div class="min-h-[60vh] flex items-center justify-center">
 
-      <!-- CARD blanca con header azul (mismo tono que la hotbar) -->
       <div class="w-full max-w-md rounded-2xl bg-white text-gray-900 shadow-2xl border border-black/5 overflow-hidden">
-        <!-- Header de la card -->
         <div class="bg-[#0D1440] text-white px-6 py-4 flex items-center gap-3">
           <img src="/logouta.png" alt="Logo UTA" class="h-7 w-auto" />
           <h1 class="text-lg md:text-xl font-semibold">Iniciar Sesión</h1>
         </div>
 
-        <!-- Cuerpo de la card -->
         <div class="p-6">
           <form class="space-y-5" [formGroup]="form" (ngSubmit)="submit()">
-            <!-- Email -->
             <div>
               <label for="email" class="block text-sm font-medium text-gray-700">Correo electrónico</label>
               <input
@@ -52,7 +43,6 @@
               </p>
             </div>
 
-            <!-- Password -->
             <div>
               <div class="flex items-center justify-between">
                 <label for="password" class="block text-sm font-medium text-gray-700">Contraseña</label>
@@ -74,7 +64,6 @@
                   class="absolute inset-y-0 right-0 px-3 text-gray-500 hover:text-gray-700"
                   aria-label="Mostrar/Ocultar contraseña"
                 >
-                  <!-- ojo -->
                   <svg *ngIf="!showPassword" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
                        class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/>
@@ -95,7 +84,6 @@
               </p>
             </div>
 
-            <!-- Remember -->
             <div class="flex items-center gap-2">
               <input
                 id="remember"
@@ -106,7 +94,6 @@
               <label for="remember" class="text-sm text-gray-700">Recordar</label>
             </div>
 
-            <!-- Submit -->
             <button
               type="submit"
               [disabled]="form.invalid"
@@ -118,14 +105,12 @@
               Acceder
             </button>
 
-            <!-- Divider social -->
             <div class="flex items-center gap-4 my-4">
               <div class="flex-1 border-t border-gray-200"></div>
               <span class="text-xs text-gray-500">o continuar con</span>
               <div class="flex-1 border-t border-gray-200"></div>
             </div>
 
-            <!-- Botón Google a ancho completo -->
             <button
               type="button"
               aria-label="Continuar con Google"
@@ -141,15 +126,11 @@
               Google
             </button>
 
-            <p class="mt-6 text-center text-sm text-gray-600">
-  ¿No tienes cuenta?
-  <a routerLink="/register" class="text-yellow-700 hover:text-yellow-600 font-medium">Crea una</a>
-</p>
+
 
           </form>
         </div>
       </div>
-      <!-- /CARD -->
     </div>
   </div>
 </section>

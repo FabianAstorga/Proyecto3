@@ -27,7 +27,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   private timerId: any;
 
   ngOnInit(): void {
-    // Pre-carga para evitar parpadeo
     this.images.forEach(src => { const img = new Image(); img.src = src; });
 
     this.timerId = setInterval(() => this.nextBackground(), this.intervalMs);
