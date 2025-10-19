@@ -11,7 +11,11 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./modules/login/login.component').then(m => m.LoginComponent)
   },
-  
+  {
+  path: 'horario',
+  loadComponent: () =>
+    import('./modules/schedule/schedule.component').then(m => m.ScheduleComponent)
+  },
   {
     path: 'perfil',
     loadComponent: () =>

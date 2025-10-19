@@ -1,12 +1,27 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router'; // 👈
+import { RouterLink } from '@angular/router';
+
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @Component({
   standalone: true,
   selector: 'app-login',
-  imports: [CommonModule, ReactiveFormsModule, RouterLink], // 👈
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterLink,
+    MatFormFieldModule,
+    MatInputModule,
+    MatIconModule,
+    MatButtonModule,
+    MatCheckboxModule
+  ],
   templateUrl: './login.component.html'
 })
 export class LoginComponent {
@@ -28,5 +43,7 @@ export class LoginComponent {
     console.log('Login data', this.form.value);
   }
 
-  get f() { return this.form.controls; }
+  get f() {
+    return this.form.controls;
+  }
 }

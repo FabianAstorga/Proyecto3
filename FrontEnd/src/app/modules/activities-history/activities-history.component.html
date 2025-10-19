@@ -1,1 +1,145 @@
-<p>activities-history works!</p>
+<app-layout [title]="'Académico'" [navItems]="navItems" [logoutLink]="'/login'">
+  <section class="max-w-7xl mx-auto px-6 py-8">
+
+    <!-- CARD ÚNICA: Título + Filtros + Lista -->
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6 overflow-hidden">
+      
+      <!-- Título -->
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h1 class="text-2xl md:text-3xl font-bold text-[#0D1440]">Historial de actividades</h1>
+      </div>
+
+      <!-- Filtros -->
+      <div class="p-4 md:p-5">
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+
+          <!-- Texto -->
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Buscar por texto</label>
+            <mat-form-field appearance="outline" class="w-full">
+              <input matInput placeholder="Escribe aquí..." [formControl]="filters.controls.q">
+            </mat-form-field>
+          </div>
+
+          <!-- Desde (angosto) -->
+          <div class="w-full md:w-40">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Desde</label>
+            <mat-form-field appearance="outline" class="w-full">
+              <input
+                matInput
+                [matDatepicker]="dpDesde"
+                placeholder="dd/mm/aaaa"
+                [formControl]="filters.controls.desde"
+                [readonly]="true"
+                (keydown)="$event.preventDefault()"
+                (paste)="$event.preventDefault()"
+                class="cursor-pointer"
+              />
+              <mat-datepicker #dpDesde></mat-datepicker>
+              <mat-datepicker-toggle matSuffix [for]="dpDesde"></mat-datepicker-toggle>
+            </mat-form-field>
+          </div>
+
+          <!-- Hasta (angosto) -->
+          <div class="w-full md:w-40">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Hasta</label>
+            <mat-form-field appearance="outline" class="w-full">
+              <input
+                matInput
+                [matDatepicker]="dpHasta"
+                placeholder="dd/mm/aaaa"
+                [formControl]="filters.controls.hasta"
+                [readonly]="true"
+                (keydown)="$event.preventDefault()"
+                (paste)="$event.preventDefault()"
+                class="cursor-pointer"
+              />
+              <mat-datepicker #dpHasta></mat-datepicker>
+              <mat-datepicker-toggle matSuffix [for]="dpHasta"></mat-datepicker-toggle>
+            </mat-form-field>
+          </div>
+
+          <!-- Estado (con colores) -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-select [formControl]="filters.controls.estado" placeholder="Todos">
+                <!-- Valor seleccionado con píldora -->
+                <mat-select-trigger>
+                  <span
+                    class="px-2 py-0.5 rounded-full border text-xs font-medium"
+                    [ngClass]="statusPillClass(estadoValue)"
+                  >
+                    {{ displayEstado(estadoValue) }}
+                  </span>
+                </mat-select-trigger>
+
+                <!-- Opciones -->
+                <mat-option [value]="">
+                  <span class="px-2 py-0.5 rounded-full border text-xs font-medium"
+                        [ngClass]="statusPillClass('')">Todos</span>
+                </mat-option>
+                <mat-option value="Aprobada">
+                  <span class="px-2 py-0.5 rounded-full border text-xs font-medium"
+                        [ngClass]="statusPillClass('Aprobada')">Aprobada</span>
+                </mat-option>
+                <mat-option value="Pendiente">
+                  <span class="px-2 py-0.5 rounded-full border text-xs font-medium"
+                        [ngClass]="statusPillClass('Pendiente')">Pendiente</span>
+                </mat-option>
+                <mat-option value="Rechazada">
+                  <span class="px-2 py-0.5 rounded-full border text-xs font-medium"
+                        [ngClass]="statusPillClass('Rechazada')">Rechazada</span>
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Botón limpiar -->
+        <div class="flex justify-end mt-2">
+          <button
+            type="button"
+            (click)="clearFilters()"
+            class="inline-flex items-center px-4 py-2 rounded-md border border-blue-600 text-blue-600 font-semibold hover:bg-blue-50"
+          >
+            Limpiar filtros
+          </button>
+        </div>
+      </div>
+
+      <!-- Lista (scroll si hay más de 5 actividades) -->
+      <div
+        class="rounded-b-xl bg-blue-50 transition-all"
+        [ngClass]="{ 'max-h-96 overflow-y-auto': filtered.length > 5 }"
+      >
+        <div *ngIf="filtered.length === 0" class="px-6 py-10 text-center text-sm text-gray-500">
+          No hay actividades que coincidan con los filtros.
+        </div>
+
+        <ul *ngIf="filtered.length > 0" class="divide-y divide-blue-100">
+          <li
+            *ngFor="let a of filtered; let i = index"
+            class="px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3"
+          >
+            <div class="min-w-0">
+              <div class="text-sm md:text-base font-semibold text-gray-900">
+                Actividad {{ i + 1 }} — {{ a.titulo }}
+              </div>
+              <div class="text-sm text-gray-700">
+                {{ a.detalle }} · {{ formatDMY(a.fecha) }} · {{ a.horas }} h
+              </div>
+            </div>
+
+            <span
+              class="text-xs px-2 py-1 rounded-full border self-start md:self-auto"
+              [ngClass]="statusPillClass(a.estado)"
+            >
+              {{ a.estado }}
+            </span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</app-layout>
