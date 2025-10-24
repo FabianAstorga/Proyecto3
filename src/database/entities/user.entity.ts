@@ -2,7 +2,6 @@
 import { 
   Entity, 
   PrimaryGeneratedColumn, 
-  OneToMany, 
   Column } from 'typeorm';
 
 @Entity('user')
