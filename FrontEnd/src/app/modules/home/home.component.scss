@@ -1,0 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
+
+:host {
+  display: block;
+  font-family: 'Montserrat', sans-serif;
+}
+
+section {
+  transition: background-image 1s ease-in-out;
+}
+
+button:focus {
+  outline: none;
+}
+.bg-white_50 {
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+.hotbar {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  overflow: hidden;
+
+  img {
+    max-height: 48px;
+    object-fit: contain;
+  }
+
+  button {
+    white-space: nowrap;
+  }
+}

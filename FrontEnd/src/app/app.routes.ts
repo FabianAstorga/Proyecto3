@@ -7,11 +7,6 @@ export const routes: Routes = [
       import('./modules/home/home.component').then(m => m.HomeComponent)
   },
   {
-    path: 'login',
-    loadComponent: () =>
-      import('./modules/login/login.component').then(m => m.LoginComponent)
-  },
-  {
   path: 'horario',
   loadComponent: () =>
     import('./modules/schedule/schedule.component').then(m => m.ScheduleComponent)
