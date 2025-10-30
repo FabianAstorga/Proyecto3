@@ -1,6 +1,19 @@
-import { Component, OnInit, OnDestroy, HostListener, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  HostListener,
+  ElementRef,
+  ViewChild,
+  AfterViewInit,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  Validators,
+  FormGroup,
+} from '@angular/forms';
 
 @Component({
   standalone: true,
@@ -9,29 +22,14 @@ import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angula
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
 })
-<<<<<<< HEAD
 export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('hotbar', { static: true }) hotbarRef!: ElementRef<HTMLElement>;
   hotbarH = 0;
 
-=======
-export class HomeComponent implements OnInit, OnDestroy {
->>>>>>> e17ab052 (feac: ningun cambio)
-  images: string[] = [
-    '/mecanica3.jpg',
-    '/mecanica2.jpg',
-<<<<<<< HEAD
-    '/mecanica.jpg'
-=======
-    '/MARSINO_ARQUITECTOS_LABIM_11L.png',
-    '/MARSINO_ARQUITECTOS_LABIM_18L.png',
-    '/MARSINO_ARQUITECTOS_LABIM_21L.png',
-    '/MARSINO_ARQUITECTOS_LABIM_24L.png',
->>>>>>> e17ab052 (feac: ningun cambio)
-  ];
+  images: string[] = ['/mecanica3.jpg', '/mecanica2.jpg', '/mecanica.jpg'];
   currentIndex = 0;
   currentBg = this.images[0];
-  private intervalMs = 6000;
+  intervalMs = 5000;
   private timerId: any;
 
   loginOpen = false;
@@ -42,21 +40,17 @@ export class HomeComponent implements OnInit, OnDestroy {
   constructor(private fb: FormBuilder) {}
 
   ngOnInit(): void {
-<<<<<<< HEAD
-    this.images.forEach(src => { const img = new Image(); img.src = src; });
-=======
     this.images.forEach((src) => {
       const img = new Image();
       img.src = src;
     });
 
->>>>>>> e17ab052 (feac: ningun cambio)
     this.timerId = setInterval(() => this.nextBackground(), this.intervalMs);
 
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      remember: [false]
+      remember: [false],
     });
   }
 
@@ -88,16 +82,24 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.currentBg = this.images[i];
   }
 
-  openLogin(): void { this.loginOpen = true; }
-  closeLogin(): void { this.loginOpen = false; }
-  toggleLogin(): void { this.loginOpen = !this.loginOpen; }
+  openLogin(): void {
+    this.loginOpen = true;
+  }
+  closeLogin(): void {
+    this.loginOpen = false;
+  }
+  toggleLogin(): void {
+    this.loginOpen = !this.loginOpen;
+  }
 
   @HostListener('document:keydown.escape')
   onEsc() {
     if (this.loginOpen) this.closeLogin();
   }
 
-  get f() { return this.form.controls; }
+  get f() {
+    return this.form.controls;
+  }
 
   submit(): void {
     if (this.form.invalid) {

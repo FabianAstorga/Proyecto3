@@ -1,9 +1,8 @@
-<<<<<<< HEAD
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap");
 
 :host {
   display: block;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
 }
 
 section {
@@ -34,89 +33,3 @@ button:focus {
     white-space: nowrap;
   }
 }
-=======
-/* Variables para colores y transiciones para fácil mantenimiento */
-:host {
-  --text-color: #ffffff;
-  --overlay-color: rgba(13, 20, 64, 0.6); // Usando el azul oscuro de tu paleta
-  --button-bg: #f59e0b; // Amarillo similar al de tu login
-  --button-hover-bg: #d97706;
-  --transition-duration: 1.5s;
-}
-
-/* Contenedor principal que ocupa toda la pantalla */
-.background-slider {
-  position: relative;
-  height: 100vh;
-  width: 100vw;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  transition: background-image var(--transition-duration) ease-in-out;
-  text-align: center;
-  color: var(--text-color);
-}
-
-/* Capa oscura para mejorar contraste */
-.overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: var(--overlay-color);
-  z-index: 1;
-}
-
-/* Contenido que se superpone a la capa de overlay */
-.content {
-  position: relative;
-  z-index: 2;
-  padding: 2rem;
-  max-width: 800px;
-}
-
-.header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.logo {
-  height: 4rem; /* 64px */
-}
-
-.main-title {
-  font-size: 2.25rem; /* 36px */
-  font-weight: 800;
-  letter-spacing: -0.025em;
-  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
-}
-
-.subtitle {
-  font-size: 1.125rem; /* 18px */
-  margin-bottom: 2.5rem;
-  opacity: 0.9;
-}
-
-.cta-button {
-  display: inline-block;
-  background-color: var(--button-bg);
-  color: #0d1440; /* Texto oscuro para contraste con el botón amarillo */
-  padding: 0.75rem 2rem;
-  border-radius: 0.5rem;
-  font-size: 1rem;
-  font-weight: 600;
-  text-decoration: none;
-  transition: background-color 0.3s ease;
-
-  &:hover {
-    background-color: var(--button-hover-bg);
-  }
-}
->>>>>>> e17ab052 (feac: ningun cambio)
