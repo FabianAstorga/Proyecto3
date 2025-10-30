@@ -7,16 +7,27 @@ import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angula
   selector: 'app-home',
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss']
+  styleUrls: ['./home.component.scss'],
 })
+<<<<<<< HEAD
 export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('hotbar', { static: true }) hotbarRef!: ElementRef<HTMLElement>;
   hotbarH = 0;
 
+=======
+export class HomeComponent implements OnInit, OnDestroy {
+>>>>>>> e17ab052 (feac: ningun cambio)
   images: string[] = [
     '/mecanica3.jpg',
     '/mecanica2.jpg',
+<<<<<<< HEAD
     '/mecanica.jpg'
+=======
+    '/MARSINO_ARQUITECTOS_LABIM_11L.png',
+    '/MARSINO_ARQUITECTOS_LABIM_18L.png',
+    '/MARSINO_ARQUITECTOS_LABIM_21L.png',
+    '/MARSINO_ARQUITECTOS_LABIM_24L.png',
+>>>>>>> e17ab052 (feac: ningun cambio)
   ];
   currentIndex = 0;
   currentBg = this.images[0];
@@ -31,7 +42,15 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(private fb: FormBuilder) {}
 
   ngOnInit(): void {
+<<<<<<< HEAD
     this.images.forEach(src => { const img = new Image(); img.src = src; });
+=======
+    this.images.forEach((src) => {
+      const img = new Image();
+      img.src = src;
+    });
+
+>>>>>>> e17ab052 (feac: ningun cambio)
     this.timerId = setInterval(() => this.nextBackground(), this.intervalMs);
 
     this.form = this.fb.group({
