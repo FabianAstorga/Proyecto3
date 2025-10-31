@@ -5,6 +5,8 @@
       <div class="flex items-center gap-3">
         <label class="text-sm font-medium text-gray-700">Semana:</label>
         <input
+          title="Seleccionar semana"
+          aria-label="Seleccionar semana"
           type="week"
           class="rounded-md border border-gray-300 px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-yellow-400"
           [value]="current"
@@ -23,14 +25,24 @@
     </div>
 
     <!-- Tabla de horario -->
-    <div class="bg-white rounded-2xl border border-blue-400 shadow-md overflow-hidden">
+    <div
+      class="bg-white rounded-2xl border border-blue-400 shadow-md overflow-hidden"
+    >
       <div class="overflow-x-auto">
-        <div class="grid w-full" [ngStyle]="{'grid-template-columns': '180px repeat(6, 1fr)'}">
+        <div
+          class="grid w-full"
+          [ngStyle]="{ 'grid-template-columns': '180px repeat(6, 1fr)' }"
+        >
           <!-- Encabezados -->
-          <div class="bg-[#EAF2FF] border border-gray-200 p-3 text-center font-semibold text-[#0D1440]">
+          <div
+            class="bg-[#EAF2FF] border border-gray-200 p-3 text-center font-semibold text-[#0D1440]"
+          >
             Bloque
           </div>
-          <div *ngFor="let d of days" class="bg-[#EAF2FF] border border-gray-200 p-3 text-center font-semibold text-[#0D1440]">
+          <div
+            *ngFor="let d of days"
+            class="bg-[#EAF2FF] border border-gray-200 p-3 text-center font-semibold text-[#0D1440]"
+          >
             {{ d.label }}
           </div>
 
@@ -39,11 +51,17 @@
             <!-- Columna izquierda -->
             <div
               class="border border-gray-200 p-3 text-center bg-gray-50 text-gray-800"
-              [ngClass]="{ 'bg-yellow-50 font-semibold text-gray-900': b.isLunch }"
+              [ngClass]="{
+                'bg-yellow-50 font-semibold text-gray-900': b.isLunch
+              }"
             >
               <div>{{ b.label }}</div>
-              <div class="text-[12px] text-gray-600" *ngIf="!b.isLunch">{{ b.code }}</div>
-              <div class="text-[12px] text-amber-700" *ngIf="b.isLunch">Almuerzo</div>
+              <div class="text-[12px] text-gray-600" *ngIf="!b.isLunch">
+                {{ b.code }}
+              </div>
+              <div class="text-[12px] text-amber-700" *ngIf="b.isLunch">
+                Almuerzo
+              </div>
             </div>
 
             <!-- Celdas -->
@@ -53,12 +71,22 @@
                 class="border border-gray-200 bg-white hover:bg-blue-50 transition cursor-pointer"
                 (click)="openEditor(d.key, bi)"
               >
-                <div class="h-24 flex items-center justify-center text-center px-2">
+                <div
+                  class="h-24 flex items-center justify-center text-center px-2"
+                >
                   <ng-container *ngIf="schedule[d.key][bi] as c; else empty">
                     <div>
-                      <div class="text-sm font-semibold text-[#0D1440] leading-tight">{{ c.title }}</div>
-                      <div class="text-xs text-gray-600" *ngIf="c.room">Sala: {{ c.room }}</div>
-                      <div class="text-[11px] text-gray-500" *ngIf="c.note">{{ c.note }}</div>
+                      <div
+                        class="text-sm font-semibold text-[#0D1440] leading-tight"
+                      >
+                        {{ c.title }}
+                      </div>
+                      <div class="text-xs text-gray-600" *ngIf="c.room">
+                        Sala: {{ c.room }}
+                      </div>
+                      <div class="text-[11px] text-gray-500" *ngIf="c.note">
+                        {{ c.note }}
+                      </div>
                     </div>
                   </ng-container>
                   <ng-template #empty>
@@ -71,7 +99,9 @@
             <!-- Fila almuerzo -->
             <ng-template #lunchRow>
               <div class="col-span-6 border border-gray-200">
-                <div class="h-16 bg-yellow-50 text-amber-800 font-medium flex items-center justify-center text-sm">
+                <div
+                  class="h-16 bg-yellow-50 text-amber-800 font-medium flex items-center justify-center text-sm"
+                >
                   <!-- Franja de almuerzo -->
                 </div>
               </div>
@@ -82,10 +112,13 @@
     </div>
 
     <!-- Editor inferior -->
-    <div *ngIf="selected" class="bg-white rounded-xl border border-gray-200 shadow p-4">
+    <div
+      *ngIf="selected"
+      class="bg-white rounded-xl border border-gray-200 shadow p-4"
+    >
       <div class="text-sm font-semibold text-gray-800 mb-3">
-  Editando: {{ selectedDayLabel() }} — {{ selectedBlockLabel() }}
-</div>
+        Editando: {{ selectedDayLabel() }} — {{ selectedBlockLabel() }}
+      </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
         <input

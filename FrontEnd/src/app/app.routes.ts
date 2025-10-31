@@ -7,7 +7,7 @@ export const routes: Routes = [
   {
     path: '',
     loadComponent: () =>
-      import('./modules/home/home.component').then(m => m.HomeComponent),
+      import('./modules/home/home.component').then((m) => m.HomeComponent),
   },
 
   // ============================
@@ -21,14 +21,16 @@ export const routes: Routes = [
       {
         path: 'perfil',
         loadComponent: () =>
-          import('./modules/funcionario/profile-home/profile-home.component')
-            .then(m => m.ProfileHomeComponent),
+          import(
+            './modules/funcionario/profile-home/profile-home.component'
+          ).then((m) => m.ProfileHomeComponent),
       },
       {
         path: 'horario',
         loadComponent: () =>
-          import('./modules/funcionario/schedule/schedule.component')
-            .then(m => m.ScheduleComponent),
+          import('./modules/funcionario/schedule/schedule.component').then(
+            (m) => m.ScheduleComponent
+          ),
       },
       {
         path: 'actividades',
@@ -37,14 +39,16 @@ export const routes: Routes = [
           {
             path: 'historial',
             loadComponent: () =>
-              import('./modules/funcionario/activities-history/activities-history.component')
-                .then(m => m.ActivitiesHistoryComponent),
+              import(
+                './modules/funcionario/activities-history/activities-history.component'
+              ).then((m) => m.ActivitiesHistoryComponent),
           },
           {
             path: 'nueva',
             loadComponent: () =>
-              import('./modules/funcionario/activity-new/activity-new.component')
-                .then(m => m.ActivityNewComponent),
+              import(
+                './modules/funcionario/activity-new/activity-new.component'
+              ).then((m) => m.ActivityNewComponent),
           },
         ],
       },
@@ -62,14 +66,16 @@ export const routes: Routes = [
       {
         path: 'perfil',
         loadComponent: () =>
-          import('./modules/secretaria/profile-home/profile-home.component')
-            .then(m => m.ProfileHomeComponent),
+          import(
+            './modules/secretaria/profile-home/profile-home.component'
+          ).then((m) => m.ProfileHomeComponent),
       },
       {
         path: 'horario',
         loadComponent: () =>
-          import('./modules/secretaria/schedule/schedule.component')
-            .then(m => m.ScheduleComponent),
+          import('./modules/secretaria/schedule/schedule.component').then(
+            (m) => m.ScheduleComponent
+          ),
       },
       {
         path: 'actividades',
@@ -78,14 +84,16 @@ export const routes: Routes = [
           {
             path: 'historial',
             loadComponent: () =>
-              import('./modules/secretaria/activities-history/activities-history.component')
-                .then(m => m.ActivitiesHistoryComponent),
+              import(
+                './modules/secretaria/activities-history/activities-history.component'
+              ).then((m) => m.ActivitiesHistoryComponent),
           },
           {
             path: 'nueva',
             loadComponent: () =>
-              import('./modules/secretaria/activity-new/activity-new.component')
-                .then(m => m.ActivityNewComponent),
+              import(
+                './modules/secretaria/activity-new/activity-new.component'
+              ).then((m) => m.ActivityNewComponent),
           },
         ],
       },
@@ -94,20 +102,23 @@ export const routes: Routes = [
       {
         path: 'gestionar-funcionario',
         loadComponent: () =>
-          import('./modules/secretaria/gestionar-funcionario/gestionar-funcionario.component')
-            .then(m => m.GestionarFuncionarioComponent),
+          import(
+            './modules/secretaria/gestionar-funcionario/gestionar-funcionario.component'
+          ).then((m) => m.GestionarFuncionarioComponent),
       },
       {
         path: 'gestiona-horario',
         loadComponent: () =>
-          import('./modules/secretaria/gestiona-horario/gestiona-horario.component')
-            .then(m => m.GestionaHorarioComponent),
+          import(
+            './modules/secretaria/gestiona-horario/gestiona-horario.component'
+          ).then((m) => m.GestionaHorarioComponent),
       },
       {
         path: 'gestionar-totem',
         loadComponent: () =>
-          import('./modules/secretaria/gestionar-totem/gestionar-totem.component')
-            .then(m => m.GestionarTotemComponent),
+          import(
+            './modules/secretaria/gestionar-totem/gestionar-totem.component'
+          ).then((m) => m.GestionarTotemComponent),
       },
     ],
   },
@@ -123,14 +134,16 @@ export const routes: Routes = [
       {
         path: 'perfil',
         loadComponent: () =>
-          import('./modules/director/profile-home/profile-home.component')
-            .then(m => m.ProfileHomeComponent),
+          import('./modules/director/profile-home/profile-home.component').then(
+            (m) => m.ProfileHomeComponent
+          ),
       },
       {
         path: 'horario',
         loadComponent: () =>
-          import('./modules/director/schedule/schedule.component')
-            .then(m => m.ScheduleComponent),
+          import('./modules/director/schedule/schedule.component').then(
+            (m) => m.ScheduleComponent
+          ),
       },
       {
         path: 'actividades',
@@ -139,14 +152,16 @@ export const routes: Routes = [
           {
             path: 'historial',
             loadComponent: () =>
-              import('./modules/director/activities-history/activities-history.component')
-                .then(m => m.ActivitiesHistoryComponent),
+              import(
+                './modules/director/activities-history/activities-history.component'
+              ).then((m) => m.ActivitiesHistoryComponent),
           },
           {
             path: 'nueva',
             loadComponent: () =>
-              import('./modules/director/activity-new/activity-new.component')
-                .then(m => m.ActivityNewComponent),
+              import(
+                './modules/director/activity-new/activity-new.component'
+              ).then((m) => m.ActivityNewComponent),
           },
         ],
       },
@@ -156,11 +171,23 @@ export const routes: Routes = [
   // ----------------------------
   // Compatibilidad (rutas “viejas”) -> funcionario
   // ----------------------------
-  { path: 'perfil',                 pathMatch: 'full', redirectTo: 'funcionario/perfil' },
-  { path: 'horario',                pathMatch: 'full', redirectTo: 'funcionario/horario' },
-  { path: 'actividades',            pathMatch: 'full', redirectTo: 'funcionario/actividades' },
-  { path: 'actividades/historial',  pathMatch: 'full', redirectTo: 'funcionario/actividades/historial' },
-  { path: 'actividades/nueva',      pathMatch: 'full', redirectTo: 'funcionario/actividades/nueva' },
+  { path: 'perfil', pathMatch: 'full', redirectTo: 'funcionario/perfil' },
+  { path: 'horario', pathMatch: 'full', redirectTo: 'funcionario/horario' },
+  {
+    path: 'actividades',
+    pathMatch: 'full',
+    redirectTo: 'funcionario/actividades',
+  },
+  {
+    path: 'actividades/historial',
+    pathMatch: 'full',
+    redirectTo: 'funcionario/actividades/historial',
+  },
+  {
+    path: 'actividades/nueva',
+    pathMatch: 'full',
+    redirectTo: 'funcionario/actividades/nueva',
+  },
 
   { path: '**', redirectTo: '' },
 ];

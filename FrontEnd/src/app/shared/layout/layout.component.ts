@@ -8,7 +8,7 @@ export type NavItem = { label: string; link: string };
   standalone: true,
   selector: 'app-layout',
   imports: [CommonModule, RouterLink],
-  templateUrl: './layout.component.html'
+  templateUrl: './layout.component.html',
 })
 export class LayoutComponent {
   /** Título de la hotbar (ej: "Académico") */
@@ -16,19 +16,18 @@ export class LayoutComponent {
 
   /** Ítems del menú lateral */
   @Input() navItems: NavItem[] = [
-  { label: 'Inicio perfil', link: '/perfil' },
-  { label: 'Agregar registro', link: '/actividades/nueva' },
-  { label: 'Horario', link: '/horario' },
-  { label: 'Historial', link: '/actividades/historial' },
-];
-
+    { label: 'Inicio perfil', link: '/perfil' },
+    { label: 'Agregar registro', link: '/actividades/nueva' },
+    { label: 'Horario', link: '/horario' },
+    { label: 'Historial', link: '/actividades/historial' },
+  ];
 
   /** A dónde apunta el botón de cerrar sesión */
   @Input() logoutLink = '/login';
 
   /** --- lógica de sidebar con transición suave --- */
-  isCollapsed = true;   // ancho (w-14 / w-72)
-  showMenu   = false;   // aparición de contenido (fade/slide)
+  isCollapsed = true; // ancho (w-14 / w-72)
+  showMenu = false; // aparición de contenido (fade/slide)
 
   private _showT?: any;
   private _hideT?: any;

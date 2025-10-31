@@ -4,11 +4,7 @@
   class="hotbar fixed top-0 left-0 right-0 z-50 bg-[#0D1440] text-white overflow-hidden shadow-md"
 >
   <div class="flex items-center justify-between w-full h-16 px-8">
-<<<<<<< HEAD
     <!-- Logo IZQUIERDA -->
-    <div class="flex-shrink-0">
-      <img src="/logo2.png" alt="Logo institucional" class="h-10 sm:h-12 w-auto object-contain select-none" />
-=======
     <div class="flex items-center gap-3">
       <img
         src="/logo2.png"
@@ -20,7 +16,6 @@
       >
         Registro de Actividades Curriculares
       </span>
->>>>>>> 8f688c5da37d8f57f9cdfbd46c386cc3388324f4
     </div>
 
     <nav class="flex items-center gap-2">
@@ -29,38 +24,12 @@
         class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-md text-sm bg-white text-gray-900 font-semibold shadow-sm hover:shadow hover:bg-gray-100 focus:outline-none focus:ring-2 ring-yellow-300 transition"
       >
         Ingresar
-<<<<<<< HEAD
-      </button>
-    </div>
-  </div>
-</header>
-
-<!-- HERO -->
-<section
-  class="relative flex flex-col justify-center text-left text-white overflow-hidden"
-  [ngStyle]="{
-  'min-height': 'calc(100vh - ' + hotbarH + 'px)',
-  'background-image': 'url(' + currentBg + ')',
-  'background-size': 'cover',
-  'background-position': 'center center',
-  'background-repeat': 'no-repeat'
-}"
-=======
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-4 w-4"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path d="M9 18l6-6-6-6" />
-        </svg>
       </a>
     </nav>
   </div>
 </header>
 
+<!-- HERO -->
 <section
   class="relative flex flex-col justify-center text-left text-white overflow-hidden"
   [ngStyle]="{
@@ -70,7 +39,6 @@
     'background-position': 'center center',
     'background-repeat': 'no-repeat'
   }"
->>>>>>> 8f688c5da37d8f57f9cdfbd46c386cc3388324f4
 >
   <div class="absolute inset-0 bg-black/50"></div>
 
@@ -82,7 +50,6 @@
       <span class="text">de actividades académicas</span>
     </h1>
   </div>
-<<<<<<< HEAD
 
   <!-- Indicadores -->
   <div class="absolute bottom-6 flex justify-center w-full gap-2 z-10">
@@ -90,6 +57,8 @@
       <button
         type="button"
         (click)="goToSlide(i)"
+        [attr.aria-label]="'Ir a la imagen ' + (i + 1)"
+        [title]="'Ir a la imagen ' + (i + 1)"
         [ngClass]="{
           'bg-white': currentIndex === i,
           'bg-white/50': currentIndex !== i
@@ -98,8 +67,6 @@
       ></button>
     </ng-container>
   </div>
-=======
->>>>>>> 8f688c5da37d8f57f9cdfbd46c386cc3388324f4
 </section>
 
 <!-- FOOTER -->
@@ -144,13 +111,9 @@
     role="dialog"
     aria-modal="true"
   >
-<<<<<<< HEAD
-    <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200">
-=======
     <div
       class="flex items-center justify-between px-4 py-3 border-b border-gray-200"
     >
->>>>>>> 8f688c5da37d8f57f9cdfbd46c386cc3388324f4
       <div class="flex items-center gap-2">
         <img src="/logodim.png" alt="Logo" class="h-8 w-auto" />
         <h2 class="text-base font-semibold text-gray-900">Iniciar sesión</h2>
@@ -168,13 +131,9 @@
     <div class="p-5">
       <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-5">
         <div>
-<<<<<<< HEAD
-          <label for="email" class="block text-sm font-medium text-gray-700">Correo electrónico</label>
-=======
           <label for="email" class="block text-sm font-medium text-gray-700"
             >Correo electrónico</label
           >
->>>>>>> 8f688c5da37d8f57f9cdfbd46c386cc3388324f4
           <input
             id="email"
             type="email"
@@ -186,13 +145,9 @@
         </div>
 
         <div>
-<<<<<<< HEAD
-          <label for="password" class="block text-sm font-medium text-gray-700">Contraseña</label>
-=======
           <label for="password" class="block text-sm font-medium text-gray-700"
             >Contraseña</label
           >
->>>>>>> 8f688c5da37d8f57f9cdfbd46c386cc3388324f4
           <input
             id="password"
             [type]="showPassword ? 'text' : 'password'"

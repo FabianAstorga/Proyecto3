@@ -8,17 +8,13 @@ import {
   AfterViewInit,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-<<<<<<< HEAD
-import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
-import { RouterLink } from '@angular/router';
-=======
 import {
   ReactiveFormsModule,
   FormBuilder,
   Validators,
   FormGroup,
 } from '@angular/forms';
->>>>>>> 8f688c5da37d8f57f9cdfbd46c386cc3388324f4
+import { RouterLink } from '@angular/router';
 
 @Component({
   standalone: true,
@@ -44,18 +40,10 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(private fb: FormBuilder) {}
 
   ngOnInit(): void {
-<<<<<<< HEAD
-    this.images.forEach(src => {
-      const img = new Image();
-      img.src = src;
-    });
-=======
     this.images.forEach((src) => {
       const img = new Image();
       img.src = src;
     });
-
->>>>>>> 8f688c5da37d8f57f9cdfbd46c386cc3388324f4
     this.timerId = setInterval(() => this.nextBackground(), this.intervalMs);
 
     this.form = this.fb.group({
