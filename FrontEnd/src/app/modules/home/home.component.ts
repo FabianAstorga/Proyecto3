@@ -1,11 +1,12 @@
 import { Component, OnInit, OnDestroy, HostListener, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 
 @Component({
   standalone: true,
   selector: 'app-home',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
@@ -13,25 +14,23 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('hotbar', { static: true }) hotbarRef!: ElementRef<HTMLElement>;
   hotbarH = 0;
 
-  images: string[] = [
-    '/mecanica3.jpg',
-    '/mecanica2.jpg',
-    '/mecanica.jpg'
-  ];
+  images: string[] = ['/mecanica3.jpg', '/mecanica2.jpg', '/mecanica.jpg'];
   currentIndex = 0;
   currentBg = this.images[0];
   private intervalMs = 6000;
   private timerId: any;
 
   loginOpen = false;
-
   form!: FormGroup;
   showPassword = false;
 
   constructor(private fb: FormBuilder) {}
 
   ngOnInit(): void {
-    this.images.forEach(src => { const img = new Image(); img.src = src; });
+    this.images.forEach(src => {
+      const img = new Image();
+      img.src = src;
+    });
     this.timerId = setInterval(() => this.nextBackground(), this.intervalMs);
 
     this.form = this.fb.group({

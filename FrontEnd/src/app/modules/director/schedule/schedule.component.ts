@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { LayoutComponent, NavItem } from '../../shared/layout/layout.component';
+import { LayoutComponent, NavItem } from '../../../shared/layout/layout.component';
 
 type Block = {
   label: string;   // "08:00 - 09:30"

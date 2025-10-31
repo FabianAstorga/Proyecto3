@@ -1,0 +1,131 @@
+<app-layout [title]="'Secretaría'">
+  <div class="min-h-screen" style="background-color:#F4F8FF;">
+    <section class="max-w-7xl mx-auto px-6 py-8 space-y-8">
+      <!-- Card formulario -->
+      <div class="bg-white rounded-2xl border border-blue-300 shadow-sm">
+        <div class="px-6 py-5 border-b border-gray-200">
+          <div class="flex items-center gap-3 justify-center">
+            <img src="/logodim.png" alt="Logo" class="h-10 w-auto" />
+            <h2 class="text-xl md:text-2xl font-bold text-[#0D1440]">
+              {{ modo === 'crear' ? 'Crear funcionario' : 'Editar funcionario' }}
+            </h2>
+          </div>
+        </div>
+
+        <form class="px-6 py-6 grid grid-cols-1 md:grid-cols-2 gap-5" [formGroup]="form" (ngSubmit)="modo==='crear' ? crear() : actualizar()">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Nombre</label>
+            <input class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400"
+                   formControlName="nombre" />
+            <p *ngIf="f['nombre'].touched && f['nombre'].invalid" class="text-xs text-red-600 mt-1">Obligatorio.</p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Apellidos</label>
+            <input class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400"
+                   formControlName="apellidos" />
+            <p *ngIf="f['apellidos'].touched && f['apellidos'].invalid" class="text-xs text-red-600 mt-1">Obligatorio.</p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Correo</label>
+            <input type="email" class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400"
+                   formControlName="correo" />
+            <p *ngIf="f['correo'].touched && f['correo'].invalid" class="text-xs text-red-600 mt-1">Correo inválido.</p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Teléfono</label>
+            <input class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400"
+                   formControlName="telefono" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Anexo</label>
+            <input class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400"
+                   formControlName="anexo" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">URL Horario</label>
+            <input class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400"
+                   formControlName="url_horario" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Foto (URL)</label>
+            <input class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400"
+                   formControlName="foto_url" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">RUT</label>
+            <input class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400"
+                   formControlName="rut" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Estado</label>
+            <select class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400"
+                    formControlName="estado">
+              <option *ngFor="let e of estados" [value]="e">{{ e }}</option>
+            </select>
+          </div>
+
+          <div class="md:col-span-2 flex flex-wrap gap-3 pt-2">
+            <button type="submit"
+                    class="px-5 py-2 rounded-md bg-yellow-400 text-[#0D1440] font-semibold hover:bg-yellow-300">
+              {{ modo === 'crear' ? 'Crear' : 'Actualizar' }}
+            </button>
+            <button type="button" (click)="resetForm()"
+                    class="px-5 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50">
+              Limpiar
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Tabla -->
+      <div class="bg-white rounded-2xl border border-blue-300 shadow-sm overflow-hidden">
+        <div class="px-6 py-4 font-semibold text-[#0D1440] border-b border-gray-200">
+          Funcionarios
+        </div>
+        <div class="overflow-x-auto">
+          <table class="min-w-full text-sm">
+            <thead class="bg-[#EAF2FF] text-[#0D1440]">
+              <tr>
+                <th class="px-4 py-2 text-left">Nombre</th>
+                <th class="px-4 py-2 text-left">Correo</th>
+                <th class="px-4 py-2">Estado</th>
+                <th class="px-4 py-2">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let u of usuarios()" class="border-t">
+                <td class="px-4 py-2">{{ u.nombre }} {{ u.apellidos }}</td>
+                <td class="px-4 py-2">{{ u.correo }}</td>
+                <td class="px-4 py-2 text-center">
+                  <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold"
+                        [ngClass]="u.estado==='Activo' ? 'bg-green-50 text-green-700 ring-1 ring-green-200' : 'bg-gray-100 text-gray-700 ring-1 ring-gray-300'">
+                    {{ u.estado }}
+                  </span>
+                </td>
+                <td class="px-4 py-2">
+                  <div class="flex gap-2 justify-center">
+                    <button class="px-3 py-1.5 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50"
+                            (click)="editar(u)">Editar</button>
+                    <button class="px-3 py-1.5 rounded-md bg-red-50 text-red-700 hover:bg-red-100"
+                            (click)="eliminar(u.id)">Eliminar</button>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="usuarios().length===0">
+                <td colspan="4" class="px-4 py-6 text-center text-gray-500">Sin registros</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </div>
+</app-layout>

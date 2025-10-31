@@ -11,7 +11,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule, DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE, NativeDateAdapter } from '@angular/material/core';
 import { MatSelectModule }     from '@angular/material/select';
 
-import { LayoutComponent } from '../../shared/layout/layout.component';
+import { LayoutComponent } from '../../../shared/layout/layout.component';
 
 type WeekFlags = { mon:boolean; tue:boolean; wed:boolean; thu:boolean; fri:boolean; sat:boolean; sun:boolean };
 

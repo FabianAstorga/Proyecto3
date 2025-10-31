@@ -1,0 +1,137 @@
+<app-layout [title]="'Secretaría'" [logoutLink]="'/login'">
+  <!-- Identidad -->
+  <div
+    class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 flex items-center justify-between gap-4"
+  >
+    <!-- Izquierda: avatar + nombre + correo -->
+    <div class="flex items-center gap-4 min-w-0">
+      <img [src]="user.photoUrl" (error)="onAvatarError($event)" alt="avatar"
+           class="h-16 w-16 md:h-20 md:w-20 rounded-full ring-2 ring-yellow-300 object-cover" />
+      <div class="min-w-0">
+        <div class="text-2xl md:text-3xl font-bold text-gray-900 truncate">
+          {{ user.firstName }} {{ user.lastName }}
+        </div>
+        <div class="text-sm md:text-base text-gray-700 truncate">{{ user.email }}</div>
+      </div>
+    </div>
+
+    <!-- Derecha: botón Detalles -->
+    <button
+      type="button"
+      (click)="openDetails()"
+      class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300
+             bg-white text-gray-900 font-semibold shadow-sm hover:bg-gray-50
+             focus:outline-none focus:ring-2 focus:ring-yellow-300 transition text-sm"
+      aria-haspopup="dialog"
+      aria-controls="dialog-descripcion-cargo"
+    >
+      Detalles
+    </button>
+  </div>
+
+  <!-- KPIs -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+    <div class="bg-green-100 rounded-xl border border-green-200 shadow-sm p-6 h-40
+                flex flex-col items-center justify-center text-center">
+      <div class="text-sm text-gray-700 font-semibold">Gestiones realizadas</div>
+      <div class="mt-2 text-3xl font-bold text-gray-900">{{ tasksCount }}</div>
+      <p class="mt-1 text-sm text-gray-700">Total acumulado</p>
+    </div>
+
+    <div class="bg-yellow-100 rounded-xl border border-yellow-200 shadow-sm p-6 h-40
+                flex flex-col items-center justify-center text-center">
+      <div class="text-sm text-gray-700 font-semibold">Notificaciones</div>
+      <div class="mt-2 text-3xl font-bold text-gray-900">{{ notificationLabel }}</div>
+      <p class="mt-1 text-sm text-gray-700">Pendientes por revisar</p>
+    </div>
+
+    <div class="bg-blue-100 rounded-xl border border-blue-200 shadow-sm p-6 h-40
+                flex flex-col items-center justify-center text-center">
+      <div class="text-sm text-gray-700 font-semibold">Última sesión</div>
+      <div class="mt-2 text-3xl font-bold text-gray-900">{{ lastSession }}</div>
+      <p class="mt-1 text-sm text-gray-700">Fecha y hora del último acceso</p>
+    </div>
+  </div>
+
+  <!-- Actividades recientes -->
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm mt-6">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h2 class="text-base font-semibold text-gray-900">Gestiones recientes</h2>
+    </div>
+
+    <!-- Caja azul ajustada sin borde -->
+    <div class="rounded-b-xl bg-blue-50 px-6 py-2 max-h-[400px] overflow-y-auto scrollbar-thin scrollbar-thumb-blue-400 scrollbar-track-blue-100">
+      <ul class="divide-y divide-blue-100">
+        <li *ngFor="let g of recent; let i = index"
+            class="py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <div class="min-w-0">
+            <div class="text-sm md:text-base font-semibold text-gray-900">
+              Gestión {{ i + 1 }} — {{ g.titulo }}
+            </div>
+            <div class="text-sm text-gray-700">
+              {{ g.detalle }} · {{ g.fecha }} · {{ g.duracion }} min
+            </div>
+          </div>
+
+          <span class="text-xs px-2 py-1 rounded-full border self-start md:self-auto"
+                [ngClass]="{
+                  'bg-emerald-500/10 text-emerald-700 border-emerald-300': g.estado === 'Completada',
+                  'bg-amber-500/10 text-amber-700 border-amber-300': g.estado === 'Pendiente',
+                  'bg-red-500/10 text-red-700 border-red-300': g.estado === 'Rechazada'
+                }">
+            {{ g.estado }}
+          </span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- MODAL: Descripción del cargo -->
+  <div
+    *ngIf="showDetails"
+    class="fixed inset-0 z-[100]"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="dialog-title"
+    id="dialog-descripcion-cargo"
+  >
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-black/40" (click)="closeDetails()"></div>
+
+    <!-- Panel -->
+    <div
+      class="relative mx-auto mt-24 w-[92%] max-w-2xl rounded-2xl bg-white shadow-xl border border-gray-200"
+      tabindex="-1"
+      (keydown.escape)="closeDetails()"
+    >
+      <!-- Encabezado amarillo -->
+      <div class="px-6 pt-5 pb-3 bg-yellow-400 rounded-t-2xl text-center">
+        <h3 id="dialog-title" class="text-xl md:text-2xl font-extrabold text-black tracking-wide">
+          Descripción del cargo
+        </h3>
+      </div>
+
+      <!-- Contenido -->
+      <div class="px-6 py-5">
+        <p class="text-sm text-gray-600 mb-4">
+          Rol y responsabilidades de la secretaria del departamento:
+        </p>
+        <ul class="list-disc pl-5 space-y-2 text-gray-700 text-sm md:text-base">
+          <li *ngFor="let punto of cargoDescripcion">{{ punto }}</li>
+        </ul>
+      </div>
+
+      <div class="px-6 pb-6">
+        <button
+          type="button"
+          (click)="closeDetails()"
+          class="w-full inline-flex items-center justify-center px-4 py-2.5 rounded-lg
+                 bg-blue-600 text-white font-semibold hover:bg-blue-700
+                 focus:outline-none focus:ring-4 ring-blue-200 transition"
+        >
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+</app-layout>
