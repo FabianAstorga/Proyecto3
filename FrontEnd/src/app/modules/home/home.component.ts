@@ -1,14 +1,31 @@
-import { Component, OnInit, OnDestroy, HostListener, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  HostListener,
+  ElementRef,
+  ViewChild,
+  AfterViewInit,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
+<<<<<<< HEAD
 import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+=======
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  Validators,
+  FormGroup,
+} from '@angular/forms';
+>>>>>>> 8f688c5da37d8f57f9cdfbd46c386cc3388324f4
 
 @Component({
   standalone: true,
   selector: 'app-home',
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss']
+  styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('hotbar', { static: true }) hotbarRef!: ElementRef<HTMLElement>;
@@ -17,7 +34,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   images: string[] = ['/mecanica3.jpg', '/mecanica2.jpg', '/mecanica.jpg'];
   currentIndex = 0;
   currentBg = this.images[0];
-  private intervalMs = 6000;
+  intervalMs = 5000;
   private timerId: any;
 
   loginOpen = false;
@@ -27,16 +44,24 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(private fb: FormBuilder) {}
 
   ngOnInit(): void {
+<<<<<<< HEAD
     this.images.forEach(src => {
       const img = new Image();
       img.src = src;
     });
+=======
+    this.images.forEach((src) => {
+      const img = new Image();
+      img.src = src;
+    });
+
+>>>>>>> 8f688c5da37d8f57f9cdfbd46c386cc3388324f4
     this.timerId = setInterval(() => this.nextBackground(), this.intervalMs);
 
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      remember: [false]
+      remember: [false],
     });
   }
 
@@ -68,16 +93,24 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     this.currentBg = this.images[i];
   }
 
-  openLogin(): void { this.loginOpen = true; }
-  closeLogin(): void { this.loginOpen = false; }
-  toggleLogin(): void { this.loginOpen = !this.loginOpen; }
+  openLogin(): void {
+    this.loginOpen = true;
+  }
+  closeLogin(): void {
+    this.loginOpen = false;
+  }
+  toggleLogin(): void {
+    this.loginOpen = !this.loginOpen;
+  }
 
   @HostListener('document:keydown.escape')
   onEsc() {
     if (this.loginOpen) this.closeLogin();
   }
 
-  get f() { return this.form.controls; }
+  get f() {
+    return this.form.controls;
+  }
 
   submit(): void {
     if (this.form.invalid) {

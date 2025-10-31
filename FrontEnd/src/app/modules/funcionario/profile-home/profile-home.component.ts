@@ -15,7 +15,7 @@ type Activity = {
   standalone: true,
   selector: 'app-profile-home',
   imports: [CommonModule, RouterLink, LayoutComponent],
-  templateUrl: './profile-home.component.html'
+  templateUrl: './profile-home.component.html',
 })
 export class ProfileHomeComponent {
   user = {
@@ -23,7 +23,7 @@ export class ProfileHomeComponent {
     lastName: 'Pinto',
     email: 'cesar.pinto.castillo@alumnos.uta.cl',
     role: 'Académico',
-    photoUrl: '/usuario(1).png'
+    photoUrl: '/usuario(1).png',
   };
 
   activitiesCount = 8;
@@ -31,13 +31,55 @@ export class ProfileHomeComponent {
   lastSession = '2025-10-16 14:22';
 
   recent: Activity[] = [
-    { fecha: '2025-10-15', titulo: 'Taller de CAD', detalle: 'Modelado 3D', estado: 'Aprobada', horas: 4 },
-    { fecha: '2025-10-10', titulo: 'Seminario de Materiales', detalle: 'Compósitos avanzados', estado: 'Pendiente', horas: 2 },
-    { fecha: '2025-10-05', titulo: 'Voluntariado Feria UTA', detalle: 'Apoyo logístico', estado: 'Aprobada', horas: 5 },
-    { fecha: '2025-10-12', titulo: 'Capacitación Docente', detalle: 'Uso de plataformas virtuales', estado: 'Aprobada', horas: 3 },
-    { fecha: '2025-10-09', titulo: 'Reunión de Facultad', detalle: 'Presentación de proyectos de investigación', estado: 'Pendiente', horas: 2 },
-    { fecha: '2025-10-03', titulo: 'Evaluación Parcial', detalle: 'Aplicación de prueba a estudiantes de Ingeniería', estado: 'Aprobada', horas: 6 },
-    { fecha: '2025-09-29', titulo: 'Asesoría Académica', detalle: 'Orientación a nuevos alumnos de primer año', estado: 'Rechazada', horas: 1 }
+    {
+      fecha: '2025-10-15',
+      titulo: 'Taller de CAD',
+      detalle: 'Modelado 3D',
+      estado: 'Aprobada',
+      horas: 4,
+    },
+    {
+      fecha: '2025-10-10',
+      titulo: 'Seminario de Materiales',
+      detalle: 'Compósitos avanzados',
+      estado: 'Pendiente',
+      horas: 2,
+    },
+    {
+      fecha: '2025-10-05',
+      titulo: 'Voluntariado Feria UTA',
+      detalle: 'Apoyo logístico',
+      estado: 'Aprobada',
+      horas: 5,
+    },
+    {
+      fecha: '2025-10-12',
+      titulo: 'Capacitación Docente',
+      detalle: 'Uso de plataformas virtuales',
+      estado: 'Aprobada',
+      horas: 3,
+    },
+    {
+      fecha: '2025-10-09',
+      titulo: 'Reunión de Facultad',
+      detalle: 'Presentación de proyectos de investigación',
+      estado: 'Pendiente',
+      horas: 2,
+    },
+    {
+      fecha: '2025-10-03',
+      titulo: 'Evaluación Parcial',
+      detalle: 'Aplicación de prueba a estudiantes de Ingeniería',
+      estado: 'Aprobada',
+      horas: 6,
+    },
+    {
+      fecha: '2025-09-29',
+      titulo: 'Asesoría Académica',
+      detalle: 'Orientación a nuevos alumnos de primer año',
+      estado: 'Rechazada',
+      horas: 1,
+    },
   ];
 
   // Modal
@@ -54,11 +96,15 @@ export class ProfileHomeComponent {
     'Participar en comités, consejos de escuela y actividades de vinculación con el medio.',
     'Mantener la gestión documental en los sistemas institucionales (actas, notas, evidencias).',
     'Cumplir con la normativa académica, reglamentos internos y políticas de calidad.',
-    'Promover un ambiente de respeto, inclusión y aprendizaje activo en el aula.'
+    'Promover un ambiente de respeto, inclusión y aprendizaje activo en el aula.',
   ];
 
-  openDetails() { this.showDetails = true; }
-  closeDetails() { this.showDetails = false; }
+  openDetails() {
+    this.showDetails = true;
+  }
+  closeDetails() {
+    this.showDetails = false;
+  }
 
   onAvatarError(e: Event) {
     (e.target as HTMLImageElement).src = '/avatar.png';
