@@ -5,7 +5,11 @@
       <div class="bg-white rounded-2xl border border-blue-300 shadow-sm">
         <div class="px-6 py-5 border-b border-gray-200">
           <div class="flex items-center gap-3 justify-center">
-            <img src="/logodim.png" alt="Logo" class="h-10 w-auto" />
+            <img
+              src="/logodim.png"
+              alt="Logo Departamento DIM"
+              class="h-10 w-auto"
+            />
             <h2 class="text-xl md:text-2xl font-bold text-[#0D1440]">
               {{
                 modo === "crear" ? "Crear funcionario" : "Editar funcionario"
@@ -19,11 +23,14 @@
           [formGroup]="form"
           (ngSubmit)="modo === 'crear' ? crear() : actualizar()"
         >
+          <!-- Nombre -->
           <div>
-            <label class="block text-sm font-medium text-gray-700"
-              >Nombre</label
-            >
+            <label for="nombre" class="block text-sm font-medium text-gray-700">
+              Nombre
+            </label>
             <input
+              id="nombre"
+              placeholder="Ingrese el nombre"
               class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400"
               formControlName="nombre"
             />
@@ -35,11 +42,17 @@
             </p>
           </div>
 
+          <!-- Apellidos -->
           <div>
-            <label class="block text-sm font-medium text-gray-700"
-              >Apellidos</label
+            <label
+              for="apellidos"
+              class="block text-sm font-medium text-gray-700"
             >
+              Apellidos
+            </label>
             <input
+              id="apellidos"
+              placeholder="Ingrese los apellidos"
               class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400"
               formControlName="apellidos"
             />
@@ -51,12 +64,15 @@
             </p>
           </div>
 
+          <!-- Correo -->
           <div>
-            <label class="block text-sm font-medium text-gray-700"
-              >Correo</label
-            >
+            <label for="correo" class="block text-sm font-medium text-gray-700">
+              Correo
+            </label>
             <input
+              id="correo"
               type="email"
+              placeholder="ejemplo@uta.cl"
               class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400"
               formControlName="correo"
             />
@@ -68,57 +84,87 @@
             </p>
           </div>
 
+          <!-- Teléfono -->
           <div>
-            <label class="block text-sm font-medium text-gray-700"
-              >Teléfono</label
+            <label
+              for="telefono"
+              class="block text-sm font-medium text-gray-700"
             >
+              Teléfono
+            </label>
             <input
+              id="telefono"
+              placeholder="Ej: +56 9 1234 5678"
               class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400"
               formControlName="telefono"
             />
           </div>
 
+          <!-- Anexo -->
           <div>
-            <label class="block text-sm font-medium text-gray-700">Anexo</label>
+            <label for="anexo" class="block text-sm font-medium text-gray-700">
+              Anexo
+            </label>
             <input
+              id="anexo"
+              placeholder="Ej: 1234"
               class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400"
               formControlName="anexo"
             />
           </div>
 
+          <!-- URL Horario -->
           <div>
-            <label class="block text-sm font-medium text-gray-700"
-              >URL Horario</label
+            <label
+              for="url_horario"
+              class="block text-sm font-medium text-gray-700"
             >
+              URL Horario
+            </label>
             <input
+              id="url_horario"
+              placeholder="https://..."
               class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400"
               formControlName="url_horario"
             />
           </div>
 
+          <!-- Foto URL -->
           <div>
-            <label class="block text-sm font-medium text-gray-700"
-              >Foto (URL)</label
+            <label
+              for="foto_url"
+              class="block text-sm font-medium text-gray-700"
             >
+              Foto (URL)
+            </label>
             <input
+              id="foto_url"
+              placeholder="https://imagen-perfil.jpg"
               class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400"
               formControlName="foto_url"
             />
           </div>
 
+          <!-- RUT -->
           <div>
-            <label class="block text-sm font-medium text-gray-700">RUT</label>
+            <label for="rut" class="block text-sm font-medium text-gray-700">
+              RUT
+            </label>
             <input
+              id="rut"
+              placeholder="Ej: 12.345.678-9"
               class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400"
               formControlName="rut"
             />
           </div>
 
+          <!-- Estado -->
           <div>
-            <label class="block text-sm font-medium text-gray-700"
-              >Estado</label
-            >
+            <label for="estado" class="block text-sm font-medium text-gray-700">
+              Estado
+            </label>
             <select
+              id="estado"
               class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400"
               formControlName="estado"
             >
@@ -126,6 +172,7 @@
             </select>
           </div>
 
+          <!-- Botones -->
           <div class="md:col-span-2 flex flex-wrap gap-3 pt-2">
             <button
               type="submit"

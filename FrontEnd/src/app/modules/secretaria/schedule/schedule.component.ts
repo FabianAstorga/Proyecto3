@@ -25,24 +25,6 @@ type Cell = { title: string; room?: string; note?: string } | null;
 export class ScheduleComponent {
   secretariaNavItems = SECRETARIA_NAV_ITEMS;
 
-  /** Rol y menú para la vista de Secretaría */
-  userRole: string = 'secretaria';
-  navItems: NavItem[] = [
-    { label: 'Inicio', link: '/secretaria/perfil' },
-    {
-      label: 'Gestionar Funcionarios',
-      link: '/secretaria/gestionar-funcionario',
-    },
-    {
-      label: 'Gestionar Horarios',
-      link: '/secretaria/gestiona-horario',
-    },
-    {
-      label: 'Validar Actividades',
-      link: '/secretaria/actividades/historial',
-    },
-  ];
-
   // Bloques con formato solicitado
   blocks: Block[] = [
     { label: '08:00 - 09:30', code: '(1 - 2)' },

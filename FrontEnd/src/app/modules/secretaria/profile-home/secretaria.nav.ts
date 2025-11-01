@@ -5,7 +5,7 @@ export const SECRETARIA_NAV_ITEMS: NavItem[] = [
   { label: 'Agregar registro', link: '/secretaria/actividades/nueva' },
   { label: 'Horario', link: '/secretaria/horario' },
   { label: 'Historial', link: '/secretaria/actividades/historial' },
-  { label: 'Gestión Horarios', link: '/secretaria/gestiona-horario' },
+  { label: 'Gestión Calendario', link: '/secretaria/gestionar-calendario' },
   { label: 'Gestión Funcionarios', link: '/secretaria/gestionar-funcionario' },
-  { label: 'Gestión Tótem', link: '/secretaria/gestionar-totem' },
+  { label: 'Gestión Salas', link: '/secretaria/gestionar-salas' },
 ];

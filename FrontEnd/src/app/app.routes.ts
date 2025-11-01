@@ -111,20 +111,20 @@ export const routes: Routes = [
 
       // 5. GESTIÓN HORARIO (Carga el Layout + Contenido)
       {
-        path: 'gestiona-horario',
+        path: 'gestionar-calendario',
         loadComponent: () =>
           import(
-            './modules/secretaria/gestiona-horario/gestiona-horario.component'
-          ).then((m) => m.GestionaHorarioComponent),
+            './modules/secretaria/gestionar-calendario/gestionar-calendario.component'
+          ).then((m) => m.GestionarCalendarioComponent),
       },
 
       // 6. GESTIÓN TÓTEM (Carga el Layout + Contenido)
       {
-        path: 'gestionar-totem',
+        path: 'gestionar-salas',
         loadComponent: () =>
           import(
-            './modules/secretaria/gestionar-totem/gestionar-totem.component'
-          ).then((m) => m.GestionarTotemComponent),
+            './modules/secretaria/gestionar-salas/gestionar-salas.component'
+          ).then((m) => m.GestionarSalasComponent),
       },
 
       // Redirección inicial (si navegan solo a /secretaria)

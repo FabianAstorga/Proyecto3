@@ -33,11 +33,11 @@ function mondayOfISOWeek(iso: string) {
 
 @Component({
   standalone: true,
-  selector: 'app-gestiona-horario',
+  selector: 'app-gestionar-calendario',
   imports: [CommonModule, FormsModule, LayoutComponent],
-  templateUrl: './gestiona-horario.component.html',
+  templateUrl: './gestionar-calendario.component.html',
 })
-export class GestionaHorarioComponent {
+export class GestionarCalendarioComponent {
   secretariaNavItems = SECRETARIA_NAV_ITEMS;
   // Semana actual (ISO week)
   current = weekKey(new Date());
