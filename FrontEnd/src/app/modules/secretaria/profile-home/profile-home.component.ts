@@ -9,7 +9,7 @@ import { switchMap, of } from 'rxjs';
 import {
   LayoutComponent,
   NavItem,
-} from '../../../shared/layout/layout.component';
+} from '../../../components/layout/layout.component';
 import { SECRETARIA_NAV_ITEMS } from './secretaria.nav';
 
 type Gestion = {

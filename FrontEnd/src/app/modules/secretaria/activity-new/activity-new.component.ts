@@ -22,7 +22,7 @@ import {
 } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 
-import { LayoutComponent } from '../../../shared/layout/layout.component';
+import { LayoutComponent } from '../../../components/layout/layout.component';
 import { SECRETARIA_NAV_ITEMS } from '../profile-home/secretaria.nav';
 
 type WeekFlags = {

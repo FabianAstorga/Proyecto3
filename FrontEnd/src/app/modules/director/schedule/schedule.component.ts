@@ -4,7 +4,7 @@ import { RouterLink } from '@angular/router';
 import {
   LayoutComponent,
   NavItem,
-} from '../../../shared/layout/layout.component';
+} from '../../../components/layout/layout.component';
 
 type Block = {
   label: string; // "08:00 - 09:30"

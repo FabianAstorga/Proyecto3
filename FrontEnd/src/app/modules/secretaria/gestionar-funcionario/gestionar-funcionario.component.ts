@@ -6,7 +6,7 @@ import {
   Validators,
   FormGroup,
 } from '@angular/forms';
-import { LayoutComponent } from '../../../shared/layout/layout.component';
+import { LayoutComponent } from '../../../components/layout/layout.component';
 import { SECRETARIA_NAV_ITEMS } from '../profile-home/secretaria.nav';
 
 type Usuario = {

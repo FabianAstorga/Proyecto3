@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { LayoutComponent } from '../../../shared/layout/layout.component';
+import { LayoutComponent } from '../../../components/layout/layout.component';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { User } from '../../../models/user.model';
 import { Activity } from '../../../models/activity.model';

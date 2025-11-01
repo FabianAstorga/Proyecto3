@@ -4,7 +4,7 @@ import { RouterLink } from '@angular/router';
 import {
   LayoutComponent,
   NavItem,
-} from '../../../shared/layout/layout.component';
+} from '../../../components/layout/layout.component';
 import { SECRETARIA_NAV_ITEMS } from '../profile-home/secretaria.nav';
 
 type Block = {

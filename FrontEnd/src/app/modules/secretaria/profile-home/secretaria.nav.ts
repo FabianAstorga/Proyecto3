@@ -1,4 +1,4 @@
-import { NavItem } from '../../../shared/layout/layout.component';
+import { NavItem } from '../../../components/layout/layout.component';
 
 export const SECRETARIA_NAV_ITEMS: NavItem[] = [
   { label: 'Inicio perfil', link: '/secretaria/perfil' },
