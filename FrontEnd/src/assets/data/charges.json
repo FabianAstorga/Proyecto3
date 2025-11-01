@@ -1,0 +1,47 @@
+[
+  {
+    "role": "Director",
+    "descripcion": [
+      "Dirigir y coordinar las actividades académicas, administrativas y financieras del departamento.",
+      "Supervisar el cumplimiento de los planes de docencia, investigación y vinculación con el medio.",
+      "Revisar y aprobar los informes de gestión de las distintas áreas y programas.",
+      "Promover el desarrollo profesional del cuerpo académico y administrativo.",
+      "Coordinar con la Facultad y la Universidad la planificación estratégica del departamento.",
+      "Representar al departamento en reuniones, comités y actos oficiales.",
+      "Fomentar la calidad, innovación y mejora continua en los procesos internos.",
+      "Gestionar los recursos humanos, materiales y presupuestarios asignados.",
+      "Velar por el cumplimiento de la normativa universitaria y ética institucional.",
+      "Impulsar proyectos que fortalezcan la imagen y posicionamiento del departamento."
+    ]
+  },
+  {
+    "role": "Funcionario",
+    "descripcion": [
+      "Atender consultas del público y de estudiantes de manera eficiente y cordial.",
+      "Gestionar y archivar documentación administrativa del departamento.",
+      "Coordinar y mantener actualizados los registros de actividades y reportes internos.",
+      "Apoyar la logística de eventos académicos y administrativos.",
+      "Colaborar con otros departamentos y equipos para asegurar el flujo de información.",
+      "Cumplir con los procedimientos y normas institucionales de manera responsable.",
+      "Emitir reportes y respaldos cuando sean requeridos por la dirección.",
+      "Mantener la confidencialidad y el orden de los documentos institucionales.",
+      "Supervisar el uso adecuado de los sistemas administrativos y tecnológicos.",
+      "Velar por el cumplimiento de plazos y requerimientos internos."
+    ]
+  },
+  {
+    "role": "Secretaria",
+    "descripcion": [
+      "Apoyar la gestión administrativa y académica del departamento.",
+      "Coordinar reuniones, actas y documentación oficial del área.",
+      "Atender consultas de estudiantes, docentes y público general.",
+      "Registrar y mantener actualizados los horarios y salas asignadas.",
+      "Gestionar el flujo de información entre dirección, docentes y funcionarios.",
+      "Colaborar en la organización de eventos académicos y de vinculación.",
+      "Supervisar el uso y estado del sistema de registro de actividades.",
+      "Emitir reportes y respaldos administrativos cuando sean requeridos.",
+      "Mantener la confidencialidad y orden de los documentos institucionales.",
+      "Velar por el cumplimiento de plazos y requerimientos administrativos."
+    ]
+  }
+]

@@ -1,0 +1,92 @@
+[
+  {
+    "id": 1,
+    "firstName": "Rodrigo",
+    "lastName": "Salazar Díaz",
+    "email": "rodrigo.salazar@uta.cl",
+    "role": "Director",
+    "password": "123",
+    "photoUrl": "/usuario(1).png"
+  },
+  {
+    "id": 2,
+    "firstName": "María",
+    "lastName": "González Pérez",
+    "email": "maria.gonzalez@uta.cl",
+    "role": "Secretaria",
+    "password": "123",
+    "photoUrl": "/usuario(2).png"
+  },
+  {
+    "id": 3,
+    "firstName": "Carlos",
+    "lastName": "Fuentes Rojas",
+    "email": "carlos.fuentes@uta.cl",
+    "role": "Funcionario",
+    "password": "123",
+    "photoUrl": "/usuario(3).png"
+  },
+  {
+    "id": 4,
+    "firstName": "Ana",
+    "lastName": "Torres López",
+    "email": "ana.torres@uta.cl",
+    "role": "Secretaria",
+    "password": "123",
+    "photoUrl": "/usuario(4).png"
+  },
+  {
+    "id": 5,
+    "firstName": "Javier",
+    "lastName": "Martínez Silva",
+    "email": "javier.martinez@uta.cl",
+    "role": "Funcionario",
+    "password": "123",
+    "photoUrl": "/usuario(5).png"
+  },
+  {
+    "id": 6,
+    "firstName": "Valentina",
+    "lastName": "Ramírez Ortega",
+    "email": "valentina.ramirez@uta.cl",
+    "role": "Secretaria",
+    "password": "123",
+    "photoUrl": "/usuario(6).png"
+  },
+  {
+    "id": 7,
+    "firstName": "Luis",
+    "lastName": "Gutiérrez Vargas",
+    "email": "luis.gutierrez@uta.cl",
+    "role": "Funcionario",
+    "password": "123",
+    "photoUrl": "/usuario(7).png"
+  },
+  {
+    "id": 8,
+    "firstName": "Carolina",
+    "lastName": "López Méndez",
+    "email": "carolina.lopez@uta.cl",
+    "role": "Secretaria",
+    "password": "123",
+    "photoUrl": "/usuario(8).png"
+  },
+  {
+    "id": 9,
+    "firstName": "Andrés",
+    "lastName": "Paredes Salinas",
+    "email": "andres.paredes@uta.cl",
+    "role": "Funcionario",
+    "password": "123",
+    "photoUrl": "/usuario(9).png"
+  },
+  {
+    "id": 10,
+    "firstName": "Patricia",
+    "lastName": "Vargas Hidalgo",
+    "email": "patricia.vargas@uta.cl",
+    "role": "Director",
+    "password": "123",
+    "photoUrl": "/usuario(10).png"
+  }
+]

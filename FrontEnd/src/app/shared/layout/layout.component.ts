@@ -11,9 +11,6 @@ export type NavItem = { label: string; link: string };
   templateUrl: './layout.component.html',
 })
 export class LayoutComponent {
-  /** Título de la hotbar (ej: "Académico") */
-  @Input() title = 'Académico';
-
   /** Ítems del menú lateral */
   @Input() navItems: NavItem[] = [
     { label: 'Inicio perfil', link: '/perfil' },
@@ -42,5 +39,11 @@ export class LayoutComponent {
     this.showMenu = false;
     clearTimeout(this._showT);
     this._hideT = setTimeout(() => (this.isCollapsed = true), 180);
+  }
+
+  // Nuevo método para manejar el cierre de sesión
+  onLogout() {
+    console.log('Cerrando sesión, navegando a:', this.logoutLink);
+    // Aquí iría la lógica real de logout (limpiar token, etc.)
   }
 }

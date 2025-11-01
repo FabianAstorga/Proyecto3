@@ -1,7 +1,13 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  Validators,
+  FormGroup,
+} from '@angular/forms';
 import { LayoutComponent } from '../../../shared/layout/layout.component';
+import { SECRETARIA_NAV_ITEMS } from '../profile-home/secretaria.nav';
 
 type Usuario = {
   id: number;
@@ -21,20 +27,32 @@ type Usuario = {
   selector: 'app-gestionar-funcionario',
   imports: [CommonModule, ReactiveFormsModule, LayoutComponent],
   templateUrl: './gestionar-funcionario.component.html',
-  styleUrls: ['./gestionar-funcionario.component.scss']
+  styleUrls: ['./gestionar-funcionario.component.scss'],
 })
 export class GestionarFuncionarioComponent {
+  // iMPORTAR NAV SECRETARIA
+  secretariaNavItems = SECRETARIA_NAV_ITEMS;
   // listado demo en memoria
   usuarios = signal<Usuario[]>([
     {
-      id: 1, nombre: 'María', apellidos: 'Navarrete Bustamante', correo: 'mnavarrete@uta.cl',
-      telefono: '+56 58 220 5282', anexo: '35282', url_horario: 'https://intranet/horario/mnavarrete',
-      estado: 'Activo'
+      id: 1,
+      nombre: 'María',
+      apellidos: 'Navarrete Bustamante',
+      correo: 'mnavarrete@uta.cl',
+      telefono: '+56 58 220 5282',
+      anexo: '35282',
+      url_horario: 'https://intranet/horario/mnavarrete',
+      estado: 'Activo',
     },
     {
-      id: 2, nombre: 'Luis', apellidos: 'Araya Tapia', correo: 'laraya@uta.cl',
-      telefono: '+56 58 220 4010', anexo: '34010', estado: 'Inactivo'
-    }
+      id: 2,
+      nombre: 'Luis',
+      apellidos: 'Araya Tapia',
+      correo: 'laraya@uta.cl',
+      telefono: '+56 58 220 4010',
+      anexo: '34010',
+      estado: 'Inactivo',
+    },
   ]);
 
   private idSeq = 3;
@@ -55,26 +73,40 @@ export class GestionarFuncionarioComponent {
       url_horario: [''],
       foto_url: [''],
       rut: [''],
-      estado: ['Activo', Validators.required]
+      estado: ['Activo', Validators.required],
     });
   }
 
-  get f() { return this.form.controls; }
+  get f() {
+    return this.form.controls;
+  }
 
   resetForm() {
     this.form.reset({
-      nombre: '', apellidos: '', correo: '',
-      telefono: '', anexo: '', url_horario: '', foto_url: '', rut: '',
-      estado: 'Activo'
+      nombre: '',
+      apellidos: '',
+      correo: '',
+      telefono: '',
+      anexo: '',
+      url_horario: '',
+      foto_url: '',
+      rut: '',
+      estado: 'Activo',
     });
     this.modo = 'crear';
     this.editId = null;
   }
 
   crear() {
-    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
-    const nuevo: Usuario = { id: this.idSeq++, ...(this.form.value as Omit<Usuario, 'id'>) };
-    this.usuarios.update(list => [nuevo, ...list]);
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+    const nuevo: Usuario = {
+      id: this.idSeq++,
+      ...(this.form.value as Omit<Usuario, 'id'>),
+    };
+    this.usuarios.update((list) => [nuevo, ...list]);
     this.resetForm();
   }
 
@@ -85,15 +117,23 @@ export class GestionarFuncionarioComponent {
   }
 
   actualizar() {
-    if (this.form.invalid || this.editId == null) { this.form.markAllAsTouched(); return; }
-    const updated = { id: this.editId, ...(this.form.value as Omit<Usuario, 'id'>) } as Usuario;
-    this.usuarios.update(list => list.map(x => x.id === this.editId ? updated : x));
+    if (this.form.invalid || this.editId == null) {
+      this.form.markAllAsTouched();
+      return;
+    }
+    const updated = {
+      id: this.editId,
+      ...(this.form.value as Omit<Usuario, 'id'>),
+    } as Usuario;
+    this.usuarios.update((list) =>
+      list.map((x) => (x.id === this.editId ? updated : x))
+    );
     this.resetForm();
   }
 
   eliminar(id: number) {
     if (!confirm('¿Eliminar funcionario?')) return;
-    this.usuarios.update(list => list.filter(u => u.id !== id));
+    this.usuarios.update((list) => list.filter((u) => u.id !== id));
     if (this.editId === id) this.resetForm();
   }
 }

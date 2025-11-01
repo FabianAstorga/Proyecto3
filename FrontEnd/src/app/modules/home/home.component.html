@@ -1,96 +1,49 @@
-<!-- HEADER -->
-<header
-  #hotbar
-  class="hotbar fixed top-0 left-0 right-0 z-50 bg-[#0D1440] text-white overflow-hidden shadow-md"
->
-  <div class="flex items-center justify-between w-full h-16 px-8">
-    <!-- Logo IZQUIERDA -->
-    <div class="flex items-center gap-3">
-      <img
-        src="/logo2.png"
-        alt="Logo institucional"
-        class="h-8 w-auto select-none"
-      />
-      <span
-        class="hidden sm:inline text-sm font-medium tracking-wide opacity-90"
-      >
-        Registro de Actividades Curriculares
-      </span>
-    </div>
-
-    <nav class="flex items-center gap-2">
-      <a
-        (click)="toggleLogin()"
-        class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-md text-sm bg-white text-gray-900 font-semibold shadow-sm hover:shadow hover:bg-gray-100 focus:outline-none focus:ring-2 ring-yellow-300 transition"
-      >
-        Ingresar
-      </a>
-    </nav>
-  </div>
-</header>
-
 <!-- HERO -->
 <section
-  class="relative flex flex-col justify-center text-left text-white overflow-hidden"
+  class="relative flex flex-col justify-center text-left text-white overflow-hidden transition-all duration-700"
   [ngStyle]="{
-    'min-height': 'calc(100vh - ' + hotbarH + 'px)',
+    'min-height': '100vh',
     'background-image': 'url(' + currentBg + ')',
     'background-size': 'cover',
     'background-position': 'center center',
     'background-repeat': 'no-repeat'
   }"
 >
-  <div class="absolute inset-0 bg-black/50"></div>
+  <div
+    class="absolute inset-0 bg-gradient-to-t from-[#0D1440]/80 to-[#0D1440]/30"
+  ></div>
 
-  <div class="relative z-10 px-8 sm:px-16 max-w-5xl">
+  <div
+    class="relative z-10 px-8 sm:px-16 max-w-4xl py-20 sm:py-0 animate-fadeIn"
+  >
     <h1
-      class="text-4xl sm:text-6xl font-bold leading-tight mb-6 tracking-tight"
+      class="text-4xl sm:text-6xl font-bold leading-tight mb-6 tracking-tight drop-shadow-lg"
     >
       Sistema de registros<br />
-      <span class="text">de actividades académicas</span>
+      <span class="text-yellow-400">de actividades académicas</span>
     </h1>
-  </div>
 
-  <!-- Indicadores -->
-  <div class="absolute bottom-6 flex justify-center w-full gap-2 z-10">
-    <ng-container *ngFor="let img of images; let i = index">
-      <button
-        type="button"
-        (click)="goToSlide(i)"
-        [attr.aria-label]="'Ir a la imagen ' + (i + 1)"
-        [title]="'Ir a la imagen ' + (i + 1)"
-        [ngClass]="{
-          'bg-white': currentIndex === i,
-          'bg-white/50': currentIndex !== i
-        }"
-        class="w-3 h-3 rounded-full transition"
-      ></button>
-    </ng-container>
+    <p class="text-base sm:text-lg text-gray-100 max-w-xl opacity-90 mb-8">
+      Optimiza y centraliza la gestión de las actividades curriculares del
+      Departamento de Ingeniería Mecánica.
+    </p>
+
+    <a
+      (click)="toggleLogin()"
+      class="inline-block bg-yellow-400 hover:bg-yellow-300 text-[#0D1440] font-semibold px-6 py-3 rounded-md shadow-md transition"
+    >
+      Iniciar sesión
+    </a>
   </div>
 </section>
 
-<!-- FOOTER -->
-<footer
-  class="bg-white text-gray-700 border-t border-gray-200 py-6 text-center"
->
-  <div class="max-w-5xl mx-auto px-4">
-    <p class="font-semibold text-lg mb-1">
-      Departamento de Ingeniería Mecánica - Facultad de Ingeniería
-    </p>
-    <p class="text-sm">
-      Universidad de Tarapacá, Av. 18 de Septiembre 2222, Arica, Chile
-    </p>
-    <p class="text-sm">Teléfono: +56 58 220 5282 | dim&#64;gestion.uta.cl</p>
-    <p class="text-xs text-gray-500 mt-2">
-      © 2025 Universidad de Tarapacá - Todos los derechos reservados
-    </p>
-  </div>
-</footer>
+<!-- FOOTER OCULTO -->
+<app-footer></app-footer>
 
 <!-- SLIDE LOGIN -->
 <div
   class="fixed left-0 right-0 bottom-0 z-40"
-  [style.top.px]="hotbarH"
+  [style.top.px]="0"
   [class.pointer-events-none]="!loginOpen"
   aria-hidden="true"
 >
@@ -104,96 +57,91 @@
     (click)="closeLogin()"
   ></div>
 
+  <!-- SLIDE LOGIN COMO TARJETA CENTRADA -->
   <div
-    class="absolute right-0 top-0 h-full w-full sm:w-[420px] bg-white shadow-2xl transform transition-transform duration-300 will-change-transform"
-    [ngClass]="loginOpen ? 'translate-x-0' : 'translate-x-full'"
-    (click)="$event.stopPropagation()"
-    role="dialog"
-    aria-modal="true"
+    class="fixed inset-0 z-50 flex items-center justify-center px-4"
+    [class.pointer-events-none]="!loginOpen"
+    aria-hidden="true"
   >
+    <!-- FONDO OSCURO -->
     <div
-      class="flex items-center justify-between px-4 py-3 border-b border-gray-200"
+      class="absolute inset-0 transition-opacity duration-300 bg-black/40 backdrop-blur-sm"
+      [ngClass]="loginOpen ? 'opacity-100' : 'opacity-0'"
+      (click)="closeLogin()"
+    ></div>
+
+    <!-- TARJETA DE LOGIN -->
+    <div
+      class="relative bg-white rounded-2xl shadow-2xl max-w-md w-full transform transition-all duration-500 scale-95"
+      [ngClass]="loginOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95'"
+      (click)="$event.stopPropagation()"
+      role="dialog"
+      aria-modal="true"
     >
-      <div class="flex items-center gap-2">
-        <img src="/logodim.png" alt="Logo" class="h-8 w-auto" />
-        <h2 class="text-base font-semibold text-gray-900">Iniciar sesión</h2>
-      </div>
-      <button
-        type="button"
-        (click)="closeLogin()"
-        class="p-2 rounded hover:bg-gray-100 focus:outline-none focus:ring-2 ring-yellow-300"
-        aria-label="Cerrar panel de login"
+      <!-- CABECERA -->
+      <div
+        class="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-yellow-400 to-yellow-300 rounded-t-2xl"
       >
-        ✕
-      </button>
-    </div>
-
-    <div class="p-5">
-      <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-5">
-        <div>
-          <label for="email" class="block text-sm font-medium text-gray-700"
-            >Correo electrónico</label
-          >
-          <input
-            id="email"
-            type="email"
-            formControlName="email"
-            placeholder="tu@correo.com"
-            class="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 text-gray-900"
-            autocomplete="username"
-          />
+        <div class="flex items-center gap-3">
+          <img src="/logodim.png" alt="Logo" class="h-10 w-auto" />
+          <h2 class="text-lg font-semibold text-gray-900">Iniciar sesión</h2>
         </div>
-
-        <div>
-          <label for="password" class="block text-sm font-medium text-gray-700"
-            >Contraseña</label
-          >
-          <input
-            id="password"
-            [type]="showPassword ? 'text' : 'password'"
-            formControlName="password"
-            placeholder="••••••••"
-            class="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 text-gray-900"
-            autocomplete="current-password"
-          />
-        </div>
-
         <button
-          type="submit"
-          [disabled]="form.invalid"
-          class="w-full bg-[#FACC15] hover:bg-yellow-400 text-[#0D1440] rounded-md px-4 py-2 font-semibold"
+          type="button"
+          (click)="closeLogin()"
+          class="p-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 ring-yellow-400 transition"
+          aria-label="Cerrar panel de login"
         >
-          Acceder
+          ✕
         </button>
+      </div>
 
-        <!-- Acceso rápido demo -->
-        <div class="mt-6 pt-4 border-t border-gray-200">
-          <div class="text-xs uppercase tracking-wide text-gray-500 mb-3">
-            Acceso demo rápido
+      <!-- FORMULARIO -->
+      <div class="p-8 space-y-6">
+        <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-5">
+          <!-- EMAIL -->
+          <div class="flex flex-col">
+            <label for="email" class="text-sm font-semibold text-gray-700 mb-1">
+              Correo electrónico
+            </label>
+            <input
+              id="email"
+              type="email"
+              formControlName="email"
+              placeholder="tu@correo.com"
+              class="w-full rounded-lg border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 text-gray-900 transition"
+              autocomplete="username"
+            />
           </div>
 
-          <a
-            routerLink="/funcionario/perfil"
-            class="block w-full text-center rounded-md px-4 py-2 font-semibold bg-blue-600 hover:bg-blue-700 text-white mb-2"
-          >
-            Funcionario
-          </a>
+          <!-- PASSWORD -->
+          <div class="flex flex-col">
+            <label
+              for="password"
+              class="text-sm font-semibold text-gray-700 mb-1"
+            >
+              Contraseña
+            </label>
+            <input
+              id="password"
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="••••••••"
+              class="w-full rounded-lg border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 text-gray-900 transition"
+              autocomplete="current-password"
+            />
+          </div>
 
-          <a
-            routerLink="/secretaria/perfil"
-            class="block w-full text-center rounded-md px-4 py-2 font-semibold bg-blue-600 hover:bg-blue-700 text-white mb-2"
+          <!-- BOTÓN ACCEDER -->
+          <button
+            type="submit"
+            [disabled]="form.invalid"
+            class="w-full bg-yellow-400 hover:bg-yellow-300 text-[#0D1440] rounded-lg px-4 py-3 font-semibold shadow-lg transition transform hover:scale-105"
           >
-            Secretaría
-          </a>
-
-          <a
-            routerLink="/director/perfil"
-            class="block w-full text-center rounded-md px-4 py-2 font-semibold bg-blue-600 hover:bg-blue-700 text-white"
-          >
-            Director
-          </a>
-        </div>
-      </form>
+            Acceder
+          </button>
+        </form>
+      </div>
     </div>
   </div>
 </div>

@@ -1,4 +1,4 @@
-<app-layout [title]="'Secretaría'" [logoutLink]="'/login'">
+<app-layout [navItems]="secretariaNavItems" logoutLink="/login">
   <!-- Identidad -->
   <div
     class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 flex items-center justify-between gap-4"
@@ -6,17 +6,16 @@
     <!-- Izquierda: avatar + nombre + correo -->
     <div class="flex items-center gap-4 min-w-0">
       <img
-        [src]="user.photoUrl"
-        (error)="onAvatarError($event)"
+        [src]="user!.photoUrl"
         alt="avatar"
         class="h-16 w-16 md:h-20 md:w-20 rounded-full ring-2 ring-yellow-300 object-cover"
       />
       <div class="min-w-0">
         <div class="text-2xl md:text-3xl font-bold text-gray-900 truncate">
-          {{ user.firstName }} {{ user.lastName }}
+          {{ user!.firstName }} {{ user!.lastName }}
         </div>
         <div class="text-sm md:text-base text-gray-700 truncate">
-          {{ user.email }}
+          {{ user!.email }}
         </div>
       </div>
     </div>
@@ -64,40 +63,6 @@
     </div>
   </div>
 
-  <!-- Accesos directos -->
-  <div class="mt-6">
-    <h2 class="text-base font-semibold text-gray-900 mb-3">Accesos directos</h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      <a
-        routerLink="/secretaria/gestionar-funcionario"
-        class="block p-4 bg-white rounded-xl border border-gray-200 shadow-sm hover:border-blue-400 hover:ring-1 hover:ring-blue-400 transition-all"
-      >
-        <h3 class="font-semibold text-gray-900">Gestionar Funcionarios</h3>
-        <p class="text-sm text-gray-600 mt-1">
-          Administra los perfiles y roles de los funcionarios.
-        </p>
-      </a>
-      <a
-        routerLink="/secretaria/gestiona-horario"
-        class="block p-4 bg-white rounded-xl border border-gray-200 shadow-sm hover:border-blue-400 hover:ring-1 hover:ring-blue-400 transition-all"
-      >
-        <h3 class="font-semibold text-gray-900">Gestionar Horarios</h3>
-        <p class="text-sm text-gray-600 mt-1">
-          Asigna y modifica los horarios del personal académico.
-        </p>
-      </a>
-      <a
-        routerLink="/secretaria/actividades/historial"
-        class="block p-4 bg-white rounded-xl border border-gray-200 shadow-sm hover:border-blue-400 hover:ring-1 hover:ring-blue-400 transition-all"
-      >
-        <h3 class="font-semibold text-gray-900">Validar Actividades</h3>
-        <p class="text-sm text-gray-600 mt-1">
-          Revisa y aprueba las actividades registradas por los funcionarios.
-        </p>
-      </a>
-    </div>
-  </div>
-
   <!-- Actividades recientes -->
   <div class="bg-white rounded-xl border border-gray-200 shadow-sm mt-6">
     <div class="px-6 py-4 border-b border-gray-200">
@@ -110,15 +75,16 @@
     >
       <ul class="divide-y divide-blue-100">
         <li
-          *ngFor="let g of recent; let i = index"
+          *ngFor="let activity of recent; let i = index"
           class="py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3"
         >
           <div class="min-w-0">
             <div class="text-sm md:text-base font-semibold text-gray-900">
-              Gestión {{ i + 1 }} — {{ g.titulo }}
+              Gestión {{ i + 1 }} — {{ activity.titulo }}
             </div>
             <div class="text-sm text-gray-700">
-              {{ g.detalle }} · {{ g.fecha }} · {{ g.duracion }} min
+              {{ activity.detalle }} · {{ activity.fecha }} ·
+              {{ activity.horas }} h
             </div>
           </div>
 
@@ -126,14 +92,14 @@
             class="text-xs px-2 py-1 rounded-full border self-start md:self-auto"
             [ngClass]="{
               'bg-emerald-500/10 text-emerald-700 border-emerald-300':
-                g.estado === 'Completada',
+                getGestionState(activity.estado) === 'Completada',
               'bg-amber-500/10 text-amber-700 border-amber-300':
-                g.estado === 'Pendiente',
+                getGestionState(activity.estado) === 'Pendiente',
               'bg-red-500/10 text-red-700 border-red-300':
-                g.estado === 'Rechazada'
+                getGestionState(activity.estado) === 'Rechazada'
             }"
           >
-            {{ g.estado }}
+            {{ getGestionState(activity.estado) }}
           </span>
         </li>
       </ul>

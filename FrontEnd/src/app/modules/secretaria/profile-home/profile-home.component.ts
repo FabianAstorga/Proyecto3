@@ -1,7 +1,16 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
-import { LayoutComponent } from '../../../shared/layout/layout.component';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { User } from '../../../models/user.model';
+import { Activity } from '../../../models/activity.model';
+import { Cargo } from '../../../models/charge.model';
+import { switchMap, of } from 'rxjs';
+import {
+  LayoutComponent,
+  NavItem,
+} from '../../../shared/layout/layout.component';
+import { SECRETARIA_NAV_ITEMS } from './secretaria.nav';
 
 type Gestion = {
   fecha: string;
@@ -14,90 +23,97 @@ type Gestion = {
 @Component({
   standalone: true,
   selector: 'app-profile-home',
-  imports: [CommonModule, RouterLink, LayoutComponent],
+  imports: [CommonModule, RouterLink, LayoutComponent, HttpClientModule],
   templateUrl: './profile-home.component.html',
 })
-export class ProfileHomeComponent {
-  user = {
-    firstName: 'María',
-    lastName: 'Rojas Pérez',
-    email: 'maria.rojas@uta.cl',
-    role: 'Secretaría',
-    photoUrl: '/usuario(1).png',
-  };
+export class ProfileHomeComponent implements OnInit {
+  // Inicializar vacío para que se llene dinámicamente
+  user: User | undefined;
 
   tasksCount = 27;
   notificationLabel = '2 nuevas';
   lastSession = '2025-10-30 09:48';
 
-  recent: Gestion[] = [
-    {
-      fecha: '2025-10-30',
-      titulo: 'Gestión de horario docente',
-      detalle: 'Actualización de bloques académicos',
-      estado: 'Completada',
-      duracion: 45,
-    },
-    {
-      fecha: '2025-10-29',
-      titulo: 'Registro de actividad académica',
-      detalle: 'Ingreso de informes de asistencia',
-      estado: 'Completada',
-      duracion: 30,
-    },
-    {
-      fecha: '2025-10-28',
-      titulo: 'Actualización de totem informativo',
-      detalle: 'Carga de noticias y horarios',
-      estado: 'Pendiente',
-      duracion: 25,
-    },
-    {
-      fecha: '2025-10-27',
-      titulo: 'Revisión de documentación docente',
-      detalle: 'Control de actas y registros firmados',
-      estado: 'Completada',
-      duracion: 60,
-    },
-    {
-      fecha: '2025-10-26',
-      titulo: 'Coordinación con Dirección',
-      detalle: 'Preparación de reunión mensual',
-      estado: 'Pendiente',
-      duracion: 35,
-    },
-    {
-      fecha: '2025-10-25',
-      titulo: 'Atención a estudiantes',
-      detalle: 'Recepción de solicitudes académicas',
-      estado: 'Completada',
-      duracion: 50,
-    },
-    {
-      fecha: '2025-10-23',
-      titulo: 'Actualización de correos masivos',
-      detalle: 'Envío de recordatorios administrativos',
-      estado: 'Rechazada',
-      duracion: 20,
-    },
-  ];
+  recent: Activity[] = [];
+  cargoDescripcion: string[] = [];
 
   // Modal
   showDetails = false;
 
-  // Simulación de datos del backend
-  cargoDescripcion: string[] = [
-    'Apoyar la gestión administrativa y académica del departamento.',
-    'Coordinar reuniones, actas y documentación oficial del área.',
-    'Atender consultas de estudiantes, docentes y público general.',
-    'Registrar y mantener actualizados los horarios y salas asignadas.',
-    'Gestionar el flujo de información entre dirección, docentes y funcionarios.',
-    'Colaborar en la organización de eventos académicos y de vinculación.',
-    'Supervisar el uso y estado del sistema de registro de actividades.',
-    'Emitir reportes y respaldos administrativos cuando sean requeridos.',
-    'Mantener la confidencialidad y orden de los documentos institucionales.',
-    'Velar por el cumplimiento de plazos y requerimientos administrativos.',
-  ];
+  get secretariaNavItems(): NavItem[] {
+    const userId = this.user?.id || 0; // Obtiene el ID real o 0 si no está cargado
+    const items = [...SECRETARIA_NAV_ITEMS];
+
+    // Busca el ítem del perfil
+    const perfilItem = items.find((item) => item.label === 'Inicio perfil');
+
+    if (perfilItem) {
+      // Reemplaza el placeholder :id con el valor real
+      perfilItem.link = `/secretaria/perfil/${userId}`;
+    }
+
+    return items;
+  }
+
+  constructor(private http: HttpClient, private route: ActivatedRoute) {}
+
+  ngOnInit() {
+    this.route.paramMap
+      .pipe(
+        switchMap((params) => {
+          const id = params.get('id');
+          if (id) {
+            return this.http.get<User[]>('/assets/data/users.json').pipe(
+              switchMap((users) => {
+                this.user = users.find((u) => u.id === +id);
+                return of(this.user);
+              })
+            );
+          }
+          return of(undefined);
+        })
+      )
+      .subscribe(() => {
+        // Al asignar this.user, el getter se actualizará automáticamente la próxima vez que el DOM lo pida.
+        if (this.user) {
+          this.loadActivities();
+          this.loadCargos();
+        }
+      });
+  }
+
+  loadActivities() {
+    this.http.get<Activity[]>('/assets/data/activities.json').subscribe({
+      next: (activities) => {
+        if (this.user) {
+          this.recent = activities.filter((a) => a.userId === this.user?.id);
+          this.tasksCount = this.recent.length;
+        }
+      },
+      error: (err) => console.error('Error cargando actividades:', err),
+    });
+  }
+
+  loadCargos() {
+    this.http.get<Cargo[]>('/assets/data/charges.json').subscribe({
+      next: (cargos) => {
+        if (this.user) {
+          const cargo = cargos.find((c) => c.role === this.user?.role);
+          this.cargoDescripcion = cargo ? cargo.descripcion : [];
+        }
+      },
+      error: (err) => console.error('Error cargando cargos:', err),
+    });
+  }
+
+  getGestionState(estado: Activity['estado']): Gestion['estado'] {
+    const map: Record<Activity['estado'], Gestion['estado']> = {
+      Aprobada: 'Completada',
+      Pendiente: 'Pendiente',
+      Rechazada: 'Rechazada',
+    };
+    return map[estado];
+  }
 
   openDetails() {
     this.showDetails = true;
@@ -107,6 +123,7 @@ export class ProfileHomeComponent {
   }
 
   onAvatarError(e: Event) {
+    // Si la URL de la foto falla, usa una imagen de avatar predeterminada
     (e.target as HTMLImageElement).src = '/avatar.png';
   }
 }

@@ -16,10 +16,8 @@ export const routes: Routes = [
   {
     path: 'funcionario',
     children: [
-      { path: '', pathMatch: 'full', redirectTo: 'perfil' },
-
       {
-        path: 'perfil',
+        path: 'perfil/:id',
         loadComponent: () =>
           import(
             './modules/funcionario/profile-home/profile-home.component'
@@ -56,20 +54,22 @@ export const routes: Routes = [
   },
 
   // ============================
-  // Área SECRETARÍA
+  // Área SECRETARÍA (Adaptada para Layout cargado en cada componente)
   // ============================
   {
     path: 'secretaria',
+    // La ruta principal /secretaria redirige al perfil con el ID.
     children: [
-      { path: '', pathMatch: 'full', redirectTo: 'perfil' },
-
+      // 1. PERFIL (Inicio - Carga el Layout + Contenido)
       {
-        path: 'perfil',
+        path: 'perfil/:id',
         loadComponent: () =>
           import(
             './modules/secretaria/profile-home/profile-home.component'
           ).then((m) => m.ProfileHomeComponent),
       },
+
+      // 2. HORARIO (Carga el Layout + Contenido)
       {
         path: 'horario',
         loadComponent: () =>
@@ -77,6 +77,8 @@ export const routes: Routes = [
             (m) => m.ScheduleComponent
           ),
       },
+
+      // 3. RUTAS DE ACTIVIDADES (Carga el Layout + Contenido)
       {
         path: 'actividades',
         children: [
@@ -98,7 +100,7 @@ export const routes: Routes = [
         ],
       },
 
-      // ---- GESTIONAR (fuera de actividades)
+      // 4. GESTIÓN FUNCIONARIO (Carga el Layout + Contenido)
       {
         path: 'gestionar-funcionario',
         loadComponent: () =>
@@ -106,6 +108,8 @@ export const routes: Routes = [
             './modules/secretaria/gestionar-funcionario/gestionar-funcionario.component'
           ).then((m) => m.GestionarFuncionarioComponent),
       },
+
+      // 5. GESTIÓN HORARIO (Carga el Layout + Contenido)
       {
         path: 'gestiona-horario',
         loadComponent: () =>
@@ -113,6 +117,8 @@ export const routes: Routes = [
             './modules/secretaria/gestiona-horario/gestiona-horario.component'
           ).then((m) => m.GestionaHorarioComponent),
       },
+
+      // 6. GESTIÓN TÓTEM (Carga el Layout + Contenido)
       {
         path: 'gestionar-totem',
         loadComponent: () =>
@@ -120,6 +126,9 @@ export const routes: Routes = [
             './modules/secretaria/gestionar-totem/gestionar-totem.component'
           ).then((m) => m.GestionarTotemComponent),
       },
+
+      // Redirección inicial (si navegan solo a /secretaria)
+      { path: '', pathMatch: 'full', redirectTo: 'perfil/0' }, // Usar un ID por defecto
     ],
   },
 
@@ -129,10 +138,8 @@ export const routes: Routes = [
   {
     path: 'director',
     children: [
-      { path: '', pathMatch: 'full', redirectTo: 'perfil' },
-
       {
-        path: 'perfil',
+        path: 'perfil/:id',
         loadComponent: () =>
           import('./modules/director/profile-home/profile-home.component').then(
             (m) => m.ProfileHomeComponent
@@ -166,27 +173,6 @@ export const routes: Routes = [
         ],
       },
     ],
-  },
-
-  // ----------------------------
-  // Compatibilidad (rutas “viejas”) -> funcionario
-  // ----------------------------
-  { path: 'perfil', pathMatch: 'full', redirectTo: 'funcionario/perfil' },
-  { path: 'horario', pathMatch: 'full', redirectTo: 'funcionario/horario' },
-  {
-    path: 'actividades',
-    pathMatch: 'full',
-    redirectTo: 'funcionario/actividades',
-  },
-  {
-    path: 'actividades/historial',
-    pathMatch: 'full',
-    redirectTo: 'funcionario/actividades/historial',
-  },
-  {
-    path: 'actividades/nueva',
-    pathMatch: 'full',
-    redirectTo: 'funcionario/actividades/nueva',
   },
 
   { path: '**', redirectTo: '' },

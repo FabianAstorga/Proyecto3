@@ -1,7 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { LayoutComponent } from '../../../shared/layout/layout.component';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { User } from '../../../models/user.model';
+import { Activity } from '../../../models/activity.model';
+import { Cargo } from '../../../models/charge.model';
+import { switchMap, of } from 'rxjs';
 
 type Report = {
   fecha: string;
@@ -13,52 +18,88 @@ type Report = {
 @Component({
   standalone: true,
   selector: 'app-profile-home',
-  imports: [CommonModule, RouterLink, LayoutComponent],
-  templateUrl: './profile-home.component.html'
+  imports: [CommonModule, RouterLink, LayoutComponent, HttpClientModule],
+  templateUrl: './profile-home.component.html',
 })
-export class ProfileHomeComponent {
-  user = {
-    firstName: 'Rodrigo',
-    lastName: 'Salazar Díaz',
-    email: 'rodrigo.salazar@uta.cl',
-    role: 'Director',
-    photoUrl: '/usuario(1).png'
-  };
+export class ProfileHomeComponent implements OnInit {
+  user: User | undefined;
 
   reportsReviewed = 14;
   notificationLabel = '3 pendientes';
   lastSession = '2025-10-31 10:15';
 
-  recent: Report[] = [
-    { fecha: '2025-10-30', titulo: 'Informe mensual de actividades', detalle: 'Consolidado general del departamento', estado: 'Aprobado' },
-    { fecha: '2025-10-29', titulo: 'Evaluación académica docente', detalle: 'Revisión de desempeño 2° semestre', estado: 'En revisión' },
-    { fecha: '2025-10-28', titulo: 'Propuesta de nuevo equipamiento', detalle: 'Solicitud de recursos laboratorio', estado: 'Aprobado' },
-    { fecha: '2025-10-26', titulo: 'Revisión de asistencia académica', detalle: 'Control administrativo mensual', estado: 'Aprobado' },
-    { fecha: '2025-10-25', titulo: 'Informe de vinculación con el medio', detalle: 'Actividades con empresas colaboradoras', estado: 'Rechazado' },
-    { fecha: '2025-10-24', titulo: 'Revisión de carga docente', detalle: 'Ajustes por licencias y reemplazos', estado: 'En revisión' },
-    { fecha: '2025-10-23', titulo: 'Seguimiento de prácticas profesionales', detalle: 'Informe consolidado de estudiantes', estado: 'Aprobado' }
-  ];
+  recent: Activity[] = [];
+  cargoDescripcion: string[] = [];
 
   // Modal
   showDetails = false;
 
-  cargoDescripcion: string[] = [
-    'Dirigir y coordinar las actividades académicas, administrativas y financieras del departamento.',
-    'Supervisar el cumplimiento de los planes de docencia, investigación y vinculación con el medio.',
-    'Revisar y aprobar los informes de gestión de las distintas áreas y programas.',
-    'Promover el desarrollo profesional del cuerpo académico y administrativo.',
-    'Coordinar con la Facultad y la Universidad la planificación estratégica del departamento.',
-    'Representar al departamento en reuniones, comités y actos oficiales.',
-    'Fomentar la calidad, innovación y mejora continua en los procesos internos.',
-    'Gestionar los recursos humanos, materiales y presupuestarios asignados.',
-    'Velar por el cumplimiento de la normativa universitaria y ética institucional.',
-    'Impulsar proyectos que fortalezcan la imagen y posicionamiento del departamento.'
-  ];
+  constructor(private http: HttpClient, private route: ActivatedRoute) {}
 
-  openDetails() { this.showDetails = true; }
-  closeDetails() { this.showDetails = false; }
+  ngOnInit() {
+    this.route.paramMap
+      .pipe(
+        switchMap((params) => {
+          const id = params.get('id');
+          if (id) {
+            return this.http.get<User[]>('/assets/data/users.json').pipe(
+              switchMap((users) => {
+                this.user = users.find((u) => u.id === +id);
+                return of(this.user);
+              })
+            );
+          }
+          return of(undefined);
+        })
+      )
+      .subscribe(() => {
+        if (this.user) {
+          this.loadActivities();
+          this.loadCargos();
+        }
+      });
+  }
+
+  loadActivities() {
+    this.http.get<Activity[]>('/assets/data/activities.json').subscribe({
+      next: (activities) => {
+        if (this.user) {
+          this.recent = activities.filter((a) => a.userId === this.user?.id);
+        }
+      },
+      error: (err) => console.error('Error cargando actividades:', err),
+    });
+  }
+
+  loadCargos() {
+    this.http.get<Cargo[]>('/assets/data/charges.json').subscribe({
+      next: (cargos) => {
+        if (this.user) {
+          const cargo = cargos.find((c) => c.role === this.user?.role);
+          this.cargoDescripcion = cargo ? cargo.descripcion : [];
+        }
+      },
+      error: (err) => console.error('Error cargando cargos:', err),
+    });
+  }
+
+  openDetails() {
+    this.showDetails = true;
+  }
+  closeDetails() {
+    this.showDetails = false;
+  }
 
   onAvatarError(e: Event) {
     (e.target as HTMLImageElement).src = '/avatar.png';
+  }
+
+  getReportState(estado: Activity['estado']): Report['estado'] {
+    const map: Record<Activity['estado'], Report['estado']> = {
+      Aprobada: 'Aprobado',
+      Pendiente: 'En revisión',
+      Rechazada: 'Rechazado',
+    };
+    return map[estado];
   }
 }

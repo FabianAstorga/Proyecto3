@@ -1,14 +1,18 @@
-<app-layout [title]="'Académico'" [navItems]="navItems" [logoutLink]="'/login'">
+<app-layout [navItems]="secretariaNavItems" logoutLink="/login">
   <section class="w-full px-8 py-10">
     <!-- Card principal (solo borde azul, sin título) -->
-    <div class="bg-white rounded-2xl border border-blue-400 shadow-md overflow-hidden">
+    <div
+      class="bg-white rounded-2xl border border-blue-400 shadow-md overflow-hidden"
+    >
       <div class="overflow-x-auto">
         <div
           class="grid w-full"
-          [ngStyle]="{'grid-template-columns': '180px repeat(6, 1fr)'}"
+          [ngStyle]="{ 'grid-template-columns': '180px repeat(6, 1fr)' }"
         >
           <!-- Encabezados -->
-          <div class="bg-[#EAF2FF] border border-gray-200 p-3 text-center font-semibold text-[#0D1440]">
+          <div
+            class="bg-[#EAF2FF] border border-gray-200 p-3 text-center font-semibold text-[#0D1440]"
+          >
             Bloque
           </div>
           <div
@@ -28,8 +32,12 @@
               }"
             >
               <div>{{ b.label }}</div>
-              <div class="text-[12px] text-gray-600" *ngIf="!b.isLunch">{{ b.code }}</div>
-              <div class="text-[12px] text-amber-700" *ngIf="b.isLunch">Almuerzo</div>
+              <div class="text-[12px] text-gray-600" *ngIf="!b.isLunch">
+                {{ b.code }}
+              </div>
+              <div class="text-[12px] text-amber-700" *ngIf="b.isLunch">
+                Almuerzo
+              </div>
             </div>
 
             <!-- Celdas por día -->
@@ -38,9 +46,7 @@
                 *ngFor="let d of days"
                 class="border border-gray-200 bg-white hover:bg-blue-50 transition"
               >
-                <div
-                  class="h-24 flex items-center justify-center text-center"
-                >
+                <div class="h-24 flex items-center justify-center text-center">
                   <ng-container
                     [ngTemplateOutlet]="cellTpl"
                     [ngTemplateOutletContext]="{ c: schedule[d.key][bi] }"
@@ -54,9 +60,7 @@
               <div class="col-span-6 border border-gray-200">
                 <div
                   class="h-16 bg-yellow-50 text-amber-800 font-medium flex items-center justify-center text-sm"
-                >
-                  
-                </div>
+                ></div>
               </div>
             </ng-template>
           </ng-container>

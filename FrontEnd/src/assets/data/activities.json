@@ -1,0 +1,802 @@
+[
+  {
+    "fecha": "2025-10-15",
+    "titulo": "Taller de CAD",
+    "detalle": "Modelado 3D avanzado en SolidWorks",
+    "estado": "Aprobada",
+    "horas": 4,
+    "userId": 1
+  },
+  {
+    "fecha": "2025-10-10",
+    "titulo": "Seminario de Materiales",
+    "detalle": "Presentación de Compósitos avanzados y sus aplicaciones",
+    "estado": "Pendiente",
+    "horas": 2,
+    "userId": 1
+  },
+  {
+    "fecha": "2025-10-05",
+    "titulo": "Voluntariado Feria UTA",
+    "detalle": "Apoyo logístico y coordinación de stands",
+    "estado": "Aprobada",
+    "horas": 5,
+    "userId": 1
+  },
+  {
+    "fecha": "2025-09-28",
+    "titulo": "Reunión de Dirección",
+    "detalle": "Planificación estratégica del semestre",
+    "estado": "Aprobada",
+    "horas": 3,
+    "userId": 1
+  },
+  {
+    "fecha": "2025-09-20",
+    "titulo": "Capacitación en Liderazgo",
+    "detalle": "Curso de gestión de equipos de alto rendimiento",
+    "estado": "Aprobada",
+    "horas": 8,
+    "userId": 1
+  },
+  {
+    "fecha": "2025-09-12",
+    "titulo": "Entrevista a Postulantes",
+    "detalle": "Selección de nuevos funcionarios para el área",
+    "estado": "Aprobada",
+    "horas": 4,
+    "userId": 1
+  },
+  {
+    "fecha": "2025-09-01",
+    "titulo": "Desarrollo de Propuesta",
+    "detalle": "Elaboración de proyecto de mejoramiento curricular",
+    "estado": "Pendiente",
+    "horas": 7,
+    "userId": 1
+  },
+  {
+    "fecha": "2025-08-25",
+    "titulo": "Supervisión de Laboratorios",
+    "detalle": "Inspección de equipos y normas de seguridad",
+    "estado": "Aprobada",
+    "horas": 2,
+    "userId": 1
+  },
+  {
+    "fecha": "2025-08-18",
+    "titulo": "Jornada de Innovación",
+    "detalle": "Participación como panelista en evento de I+D",
+    "estado": "Aprobada",
+    "horas": 6,
+    "userId": 1
+  },
+  {
+    "fecha": "2025-08-10",
+    "titulo": "Acreditación Institucional",
+    "detalle": "Revisión de informes y documentación requerida",
+    "estado": "Aprobada",
+    "horas": 5,
+    "userId": 1
+  },
+  {
+    "fecha": "2025-10-03",
+    "titulo": "Evaluación Parcial",
+    "detalle": "Aplicación de prueba a estudiantes de Ingeniería Civil",
+    "estado": "Aprobada",
+    "horas": 6,
+    "userId": 2
+  },
+  {
+    "fecha": "2025-10-14",
+    "titulo": "Gestión de Correspondencia",
+    "detalle": "Clasificación y envío de documentos oficiales",
+    "estado": "Aprobada",
+    "horas": 3,
+    "userId": 2
+  },
+  {
+    "fecha": "2025-10-08",
+    "titulo": "Preparación de Actas",
+    "detalle": "Transcripción de actas de la última reunión de Consejo",
+    "estado": "Aprobada",
+    "horas": 4,
+    "userId": 2
+  },
+  {
+    "fecha": "2025-09-30",
+    "titulo": "Organización de Archivos",
+    "detalle": "Digitalización de archivos históricos del departamento",
+    "estado": "Pendiente",
+    "horas": 5,
+    "userId": 2
+  },
+  {
+    "fecha": "2025-09-22",
+    "titulo": "Recepción de Visitas",
+    "detalle": "Atención y coordinación de agenda de un profesor visitante",
+    "estado": "Aprobada",
+    "horas": 2,
+    "userId": 2
+  },
+  {
+    "fecha": "2025-09-15",
+    "titulo": "Actualización de Base de Datos",
+    "detalle": "Ingreso de nuevos datos de contacto de personal",
+    "estado": "Aprobada",
+    "horas": 4,
+    "userId": 2
+  },
+  {
+    "fecha": "2025-09-05",
+    "titulo": "Compra de Suministros",
+    "detalle": "Elaboración de solicitud de compra de material de oficina",
+    "estado": "Aprobada",
+    "horas": 3,
+    "userId": 2
+  },
+  {
+    "fecha": "2025-08-28",
+    "titulo": "Asistencia a Seminario",
+    "detalle": "Apoyo en el registro de participantes en un seminario interno",
+    "estado": "Aprobada",
+    "horas": 6,
+    "userId": 2
+  },
+  {
+    "fecha": "2025-08-20",
+    "titulo": "Coordinación de Viajes",
+    "detalle": "Reserva de pasajes y alojamiento para personal en misión",
+    "estado": "Aprobada",
+    "horas": 5,
+    "userId": 2
+  },
+  {
+    "fecha": "2025-08-12",
+    "titulo": "Soporte Documental",
+    "detalle": "Revisión de formatos de documentos institucionales",
+    "estado": "Aprobada",
+    "horas": 2,
+    "userId": 2
+  },
+  {
+    "fecha": "2025-10-16",
+    "titulo": "Mantenimiento de Redes",
+    "detalle": "Revisión y configuración de switches en el laboratorio 5",
+    "estado": "Aprobada",
+    "horas": 4,
+    "userId": 3
+  },
+  {
+    "fecha": "2025-10-11",
+    "titulo": "Soporte Técnico a Usuarios",
+    "detalle": "Atención de tickets de problemas de software",
+    "estado": "Aprobada",
+    "horas": 7,
+    "userId": 3
+  },
+  {
+    "fecha": "2025-10-07",
+    "titulo": "Inventario de Equipos",
+    "detalle": "Conteo físico y etiquetado de computadores",
+    "estado": "Aprobada",
+    "horas": 5,
+    "userId": 3
+  },
+  {
+    "fecha": "2025-09-29",
+    "titulo": "Instalación de Software",
+    "detalle": "Despliegue de nuevo sistema operativo en 20 PCs",
+    "estado": "Aprobada",
+    "horas": 8,
+    "userId": 3
+  },
+  {
+    "fecha": "2025-09-24",
+    "titulo": "Seguridad Informática",
+    "detalle": "Revisión de políticas de firewall y antivirus",
+    "estado": "Pendiente",
+    "horas": 3,
+    "userId": 3
+  },
+  {
+    "fecha": "2025-09-17",
+    "titulo": "Capacitación en Ciberseguridad",
+    "detalle": "Asistencia a charla sobre protección de datos",
+    "estado": "Aprobada",
+    "horas": 2,
+    "userId": 3
+  },
+  {
+    "fecha": "2025-09-08",
+    "titulo": "Migración de Servidor",
+    "detalle": "Traslado de datos a un nuevo servidor de backups",
+    "estado": "Aprobada",
+    "horas": 6,
+    "userId": 3
+  },
+  {
+    "fecha": "2025-09-01",
+    "titulo": "Documentación de Procesos",
+    "detalle": "Creación de manuales de uso para el nuevo sistema de gestión",
+    "estado": "Aprobada",
+    "horas": 4,
+    "userId": 3
+  },
+  {
+    "fecha": "2025-08-25",
+    "titulo": "Configuración de Impresoras",
+    "detalle": "Instalación y prueba de impresoras en el ala B",
+    "estado": "Aprobada",
+    "horas": 3,
+    "userId": 3
+  },
+  {
+    "fecha": "2025-08-19",
+    "titulo": "Monitoreo de Sistema",
+    "detalle": "Revisión de logs y rendimiento del sistema académico",
+    "estado": "Aprobada",
+    "horas": 5,
+    "userId": 3
+  },
+  {
+    "fecha": "2025-10-17",
+    "titulo": "Recepción de Postulaciones",
+    "detalle": "Clasificación de currículums para el llamado a concurso",
+    "estado": "Aprobada",
+    "horas": 4,
+    "userId": 4
+  },
+  {
+    "fecha": "2025-10-12",
+    "titulo": "Agenda de Reuniones",
+    "detalle": "Coordinación de la agenda del Director para la semana siguiente",
+    "estado": "Aprobada",
+    "horas": 3,
+    "userId": 4
+  },
+  {
+    "fecha": "2025-10-09",
+    "titulo": "Preparación de Informes",
+    "detalle": "Compilación de datos para el informe mensual de gestión",
+    "estado": "Aprobada",
+    "horas": 5,
+    "userId": 4
+  },
+  {
+    "fecha": "2025-10-02",
+    "titulo": "Atención Telefónica",
+    "detalle": "Manejo de llamadas y consultas externas sobre matrículas",
+    "estado": "Aprobada",
+    "horas": 7,
+    "userId": 4
+  },
+  {
+    "fecha": "2025-09-26",
+    "titulo": "Revisión de Contratos",
+    "detalle": "Verificación de la documentación de nuevos docentes",
+    "estado": "Pendiente",
+    "horas": 4,
+    "userId": 4
+  },
+  {
+    "fecha": "2025-09-18",
+    "titulo": "Organización de Evento",
+    "detalle": "Apoyo en la logística del 'Día del Egresado' UTA",
+    "estado": "Aprobada",
+    "horas": 6,
+    "userId": 4
+  },
+  {
+    "fecha": "2025-09-11",
+    "titulo": "Digitalización de Documentos",
+    "detalle": "Escaneo y archivo digital de expedientes de estudiantes",
+    "estado": "Aprobada",
+    "horas": 8,
+    "userId": 4
+  },
+  {
+    "fecha": "2025-09-04",
+    "titulo": "Gestión de Materiales",
+    "detalle": "Distribución de material didáctico a los departamentos",
+    "estado": "Aprobada",
+    "horas": 3,
+    "userId": 4
+  },
+  {
+    "fecha": "2025-08-27",
+    "titulo": "Manejo de Caja Chica",
+    "detalle": "Rendición de cuentas de gastos menores del mes",
+    "estado": "Aprobada",
+    "horas": 2,
+    "userId": 4
+  },
+  {
+    "fecha": "2025-08-20",
+    "titulo": "Actualización de Directorios",
+    "detalle": "Verificación y corrección de la lista de contactos internos",
+    "estado": "Aprobada",
+    "horas": 5,
+    "userId": 4
+  },
+  {
+    "fecha": "2025-10-18",
+    "titulo": "Diseño de Infografías",
+    "detalle": "Creación de material visual para campaña de difusión",
+    "estado": "Aprobada",
+    "horas": 6,
+    "userId": 5
+  },
+  {
+    "fecha": "2025-10-13",
+    "titulo": "Actualización Web",
+    "detalle": "Subida de noticias y eventos a la página del departamento",
+    "estado": "Aprobada",
+    "horas": 4,
+    "userId": 5
+  },
+  {
+    "fecha": "2025-10-08",
+    "titulo": "Soporte en Sala de Clases",
+    "detalle": "Asistencia técnica a profesores con equipos de proyección",
+    "estado": "Aprobada",
+    "horas": 3,
+    "userId": 5
+  },
+  {
+    "fecha": "2025-10-01",
+    "titulo": "Edición de Videos",
+    "detalle": "Montaje de video promocional de la carrera",
+    "estado": "Pendiente",
+    "horas": 5,
+    "userId": 5
+  },
+  {
+    "fecha": "2025-09-25",
+    "titulo": "Administración de Redes Sociales",
+    "detalle": "Creación y programación de contenido para Twitter y Facebook",
+    "estado": "Aprobada",
+    "horas": 4,
+    "userId": 5
+  },
+  {
+    "fecha": "2025-09-16",
+    "titulo": "Fotografía de Evento",
+    "detalle": "Registro fotográfico de la ceremonia de premiación",
+    "estado": "Aprobada",
+    "horas": 2,
+    "userId": 5
+  },
+  {
+    "fecha": "2025-09-10",
+    "titulo": "Mantenimiento de Blog",
+    "detalle": "Revisión y publicación de artículos en el blog institucional",
+    "estado": "Aprobada",
+    "horas": 3,
+    "userId": 5
+  },
+  {
+    "fecha": "2025-09-03",
+    "titulo": "Asistencia en Streaming",
+    "detalle": "Soporte técnico para la transmisión en vivo de una conferencia",
+    "estado": "Aprobada",
+    "horas": 6,
+    "userId": 5
+  },
+  {
+    "fecha": "2025-08-26",
+    "titulo": "Creación de Banners",
+    "detalle": "Diseño de publicidad digital para el portal UTA",
+    "estado": "Aprobada",
+    "horas": 5,
+    "userId": 5
+  },
+  {
+    "fecha": "2025-08-19",
+    "titulo": "Consulta de Diseño",
+    "detalle": "Reunión con el equipo de comunicaciones sobre línea gráfica",
+    "estado": "Aprobada",
+    "horas": 2,
+    "userId": 5
+  },
+  {
+    "fecha": "2025-10-19",
+    "titulo": "Archivo de Documentos",
+    "detalle": "Organización física y digital de documentos de tesorería",
+    "estado": "Aprobada",
+    "horas": 5,
+    "userId": 6
+  },
+  {
+    "fecha": "2025-10-14",
+    "titulo": "Tramitación de Viáticos",
+    "detalle": "Preparación de formularios y seguimiento de pago de viáticos",
+    "estado": "Aprobada",
+    "horas": 4,
+    "userId": 6
+  },
+  {
+    "fecha": "2025-10-10",
+    "titulo": "Manejo de Central Telefónica",
+    "detalle": "Gestión de llamadas entrantes y derivación a departamentos",
+    "estado": "Aprobada",
+    "horas": 7,
+    "userId": 6
+  },
+  {
+    "fecha": "2025-10-03",
+    "titulo": "Preparación de Reunión",
+    "detalle": "Reserva de sala y preparación de material para reunión de jefes",
+    "estado": "Aprobada",
+    "horas": 2,
+    "userId": 6
+  },
+  {
+    "fecha": "2025-09-27",
+    "titulo": "Registro de Asistencia",
+    "detalle": "Control y reporte de la asistencia del personal del área",
+    "estado": "Pendiente",
+    "horas": 3,
+    "userId": 6
+  },
+  {
+    "fecha": "2025-09-20",
+    "titulo": "Actualización de Inventario",
+    "detalle": "Ingreso de nuevos activos fijos al sistema de inventario",
+    "estado": "Aprobada",
+    "horas": 6,
+    "userId": 6
+  },
+  {
+    "fecha": "2025-09-15",
+    "titulo": "Redacción de Oficios",
+    "detalle": "Elaboración de oficios internos para coordinación académica",
+    "estado": "Aprobada",
+    "horas": 4,
+    "userId": 6
+  },
+  {
+    "fecha": "2025-09-08",
+    "titulo": "Coordinación de Tareas",
+    "detalle": "Seguimiento de las tareas asignadas al equipo de secretarias",
+    "estado": "Aprobada",
+    "horas": 5,
+    "userId": 6
+  },
+  {
+    "fecha": "2025-09-01",
+    "titulo": "Revisión de Gastos",
+    "detalle": "Verificación y aprobación de rendiciones de gastos menores",
+    "estado": "Aprobada",
+    "horas": 3,
+    "userId": 6
+  },
+  {
+    "fecha": "2025-08-26",
+    "titulo": "Recepción y Despacho",
+    "detalle": "Manejo de la paquetería y correspondencia de la oficina",
+    "estado": "Aprobada",
+    "horas": 2,
+    "userId": 6
+  },
+  {
+    "fecha": "2025-10-20",
+    "titulo": "Auditoría de Procesos",
+    "detalle": "Revisión del cumplimiento de protocolos de calidad ISO 9001",
+    "estado": "Aprobada",
+    "horas": 8,
+    "userId": 7
+  },
+  {
+    "fecha": "2025-10-15",
+    "titulo": "Capacitación en Software",
+    "detalle": "Instrucción al personal sobre el uso de la nueva plataforma SIGE",
+    "estado": "Aprobada",
+    "horas": 5,
+    "userId": 7
+  },
+  {
+    "fecha": "2025-10-10",
+    "titulo": "Análisis de Datos",
+    "detalle": "Generación de estadísticas de rendimiento académico del semestre",
+    "estado": "Aprobada",
+    "horas": 6,
+    "userId": 7
+  },
+  {
+    "fecha": "2025-10-05",
+    "titulo": "Desarrollo de Informes",
+    "detalle": "Elaboración de informe de sustentabilidad institucional",
+    "estado": "Pendiente",
+    "horas": 7,
+    "userId": 7
+  },
+  {
+    "fecha": "2025-09-29",
+    "titulo": "Reunión de Proyectos",
+    "detalle": "Coordinación con equipo externo para el proyecto FONDAP",
+    "estado": "Aprobada",
+    "horas": 4,
+    "userId": 7
+  },
+  {
+    "fecha": "2025-09-23",
+    "titulo": "Manejo de Crisis",
+    "detalle": "Simulacro y capacitación en protocolos de emergencia",
+    "estado": "Aprobada",
+    "horas": 3,
+    "userId": 7
+  },
+  {
+    "fecha": "2025-09-16",
+    "titulo": "Evaluación de Proveedores",
+    "detalle": "Análisis de ofertas y calidad de servicio de empresas de limpieza",
+    "estado": "Aprobada",
+    "horas": 5,
+    "userId": 7
+  },
+  {
+    "fecha": "2025-09-09",
+    "titulo": "Gestión Ambiental",
+    "detalle": "Monitoreo del consumo energético en los edificios principales",
+    "estado": "Aprobada",
+    "horas": 2,
+    "userId": 7
+  },
+  {
+    "fecha": "2025-09-02",
+    "titulo": "Análisis Presupuestario",
+    "detalle": "Revisión de la ejecución presupuestaria del segundo trimestre",
+    "estado": "Aprobada",
+    "horas": 6,
+    "userId": 7
+  },
+  {
+    "fecha": "2025-08-27",
+    "titulo": "Investigación de Mercado",
+    "detalle": "Estudio sobre las tendencias educativas en la región",
+    "estado": "Aprobada",
+    "horas": 4,
+    "userId": 7
+  },
+  {
+    "fecha": "2025-10-21",
+    "titulo": "Inventario de Biblioteca",
+    "detalle": "Etiquetado y registro de nuevos libros de la colección",
+    "estado": "Aprobada",
+    "horas": 8,
+    "userId": 8
+  },
+  {
+    "fecha": "2025-10-16",
+    "titulo": "Atención a Estudiantes",
+    "detalle": "Resolución de dudas sobre horarios y salas de clase",
+    "estado": "Aprobada",
+    "horas": 5,
+    "userId": 8
+  },
+  {
+    "fecha": "2025-10-11",
+    "titulo": "Revisión de Correos",
+    "detalle": "Gestión de la bandeja de entrada y respuesta de consultas generales",
+    "estado": "Aprobada",
+    "horas": 4,
+    "userId": 8
+  },
+  {
+    "fecha": "2025-10-04",
+    "titulo": "Preparación de Salones",
+    "detalle": "Coordinación de limpieza y disposición de mobiliario para eventos",
+    "estado": "Aprobada",
+    "horas": 3,
+    "userId": 8
+  },
+  {
+    "fecha": "2025-09-28",
+    "titulo": "Recepción de Documentos",
+    "detalle": "Acuso de recibo y registro de solicitudes de licencia médica",
+    "estado": "Pendiente",
+    "horas": 2,
+    "userId": 8
+  },
+  {
+    "fecha": "2025-09-21",
+    "titulo": "Soporte a Profesores",
+    "detalle": "Asistencia con la impresión y encuadernación de material didáctico",
+    "estado": "Aprobada",
+    "horas": 6,
+    "userId": 8
+  },
+  {
+    "fecha": "2025-09-14",
+    "titulo": "Gestión de Horarios",
+    "detalle": "Elaboración de la propuesta de horarios de clases del próximo semestre",
+    "estado": "Aprobada",
+    "horas": 7,
+    "userId": 8
+  },
+  {
+    "fecha": "2025-09-07",
+    "titulo": "Organización de Carpetas",
+    "detalle": "Creación de nuevas carpetas para el archivo de proyectos de investigación",
+    "estado": "Aprobada",
+    "horas": 4,
+    "userId": 8
+  },
+  {
+    "fecha": "2025-08-30",
+    "titulo": "Compra de Pasajes",
+    "detalle": "Gestión de reservas de vuelos nacionales e internacionales",
+    "estado": "Aprobada",
+    "horas": 5,
+    "userId": 8
+  },
+  {
+    "fecha": "2025-08-23",
+    "titulo": "Revisión de Solicitudes",
+    "detalle": "Análisis de solicitudes de becas y ayudas estudiantiles",
+    "estado": "Aprobada",
+    "horas": 3,
+    "userId": 8
+  },
+  {
+    "fecha": "2025-10-22",
+    "titulo": "Codificación de Datos",
+    "detalle": "Ingreso de encuestas de satisfacción estudiantil al sistema",
+    "estado": "Aprobada",
+    "horas": 6,
+    "userId": 9
+  },
+  {
+    "fecha": "2025-10-17",
+    "titulo": "Soporte en Evento Deportivo",
+    "detalle": "Apoyo en la organización de la maratón UTA",
+    "estado": "Aprobada",
+    "horas": 7,
+    "userId": 9
+  },
+  {
+    "fecha": "2025-10-12",
+    "titulo": "Mantenimiento de Áreas Verdes",
+    "detalle": "Supervisión de trabajos de jardinería y paisajismo",
+    "estado": "Aprobada",
+    "horas": 4,
+    "userId": 9
+  },
+  {
+    "fecha": "2025-10-06",
+    "titulo": "Revisión de Infraestructura",
+    "detalle": "Inspección de daños y necesidades de reparación en el campus",
+    "estado": "Pendiente",
+    "horas": 5,
+    "userId": 9
+  },
+  {
+    "fecha": "2025-09-30",
+    "titulo": "Gestión de Bodega",
+    "detalle": "Inventario y reordenamiento del stock de insumos de limpieza",
+    "estado": "Aprobada",
+    "horas": 3,
+    "userId": 9
+  },
+  {
+    "fecha": "2025-09-23",
+    "titulo": "Traslado de Mobiliario",
+    "detalle": "Movilización de mesas y sillas para una conferencia",
+    "estado": "Aprobada",
+    "horas": 2,
+    "userId": 9
+  },
+  {
+    "fecha": "2025-09-17",
+    "titulo": "Soporte en Laboratorio",
+    "detalle": "Asistencia en el montaje de equipos para prácticas de física",
+    "estado": "Aprobada",
+    "horas": 8,
+    "userId": 9
+  },
+  {
+    "fecha": "2025-09-10",
+    "titulo": "Control de Acceso",
+    "detalle": "Supervisión del registro de ingreso en el edificio central",
+    "estado": "Aprobada",
+    "horas": 5,
+    "userId": 9
+  },
+  {
+    "fecha": "2025-09-03",
+    "titulo": "Revisión de Extintores",
+    "detalle": "Verificación de fechas de vencimiento y presión de extintores",
+    "estado": "Aprobada",
+    "horas": 3,
+    "userId": 9
+  },
+  {
+    "fecha": "2025-08-28",
+    "titulo": "Limpieza Profunda",
+    "detalle": "Coordinación de la limpieza general del auditorio principal",
+    "estado": "Aprobada",
+    "horas": 4,
+    "userId": 9
+  },
+  {
+    "fecha": "2025-10-23",
+    "titulo": "Comité de Ética",
+    "detalle": "Presidencia y moderación de la sesión mensual del comité",
+    "estado": "Aprobada",
+    "horas": 4,
+    "userId": 10
+  },
+  {
+    "fecha": "2025-10-18",
+    "titulo": "Reunión de Rectoría",
+    "detalle": "Presentación de avances en la internacionalización de programas",
+    "estado": "Aprobada",
+    "horas": 3,
+    "userId": 10
+  },
+  {
+    "fecha": "2025-10-13",
+    "titulo": "Alianza Estratégica",
+    "detalle": "Negociación de convenio con universidad extranjera (Brasil)",
+    "estado": "Aprobada",
+    "horas": 6,
+    "userId": 10
+  },
+  {
+    "fecha": "2025-10-07",
+    "titulo": "Jornada de Planificación",
+    "detalle": "Dirección de la jornada de planificación de nuevos magísteres",
+    "estado": "Aprobada",
+    "horas": 8,
+    "userId": 10
+  },
+  {
+    "fecha": "2025-09-30",
+    "titulo": "Evaluación de Desempeño",
+    "detalle": "Revisión de resultados y feedback a subdirectores",
+    "estado": "Aprobada",
+    "horas": 5,
+    "userId": 10
+  },
+  {
+    "fecha": "2025-09-24",
+    "titulo": "Conferencia Magistral",
+    "detalle": "Discurso de apertura en la Conferencia de Energías Renovables",
+    "estado": "Aprobada",
+    "horas": 2,
+    "userId": 10
+  },
+  {
+    "fecha": "2025-09-17",
+    "titulo": "Redacción de Políticas",
+    "detalle": "Elaboración de la nueva política de investigación y desarrollo",
+    "estado": "Pendiente",
+    "horas": 7,
+    "userId": 10
+  },
+  {
+    "fecha": "2025-09-10",
+    "titulo": "Visita a Campus",
+    "detalle": "Inspección de obras de construcción en el nuevo edificio de postgrado",
+    "estado": "Aprobada",
+    "horas": 4,
+    "userId": 10
+  },
+  {
+    "fecha": "2025-09-03",
+    "titulo": "Gestión Financiera",
+    "detalle": "Aprobación de presupuesto anual para la unidad",
+    "estado": "Aprobada",
+    "horas": 3,
+    "userId": 10
+  },
+  {
+    "fecha": "2025-08-28",
+    "titulo": "Taller de Innovación",
+    "detalle": "Participación activa en taller para promover la creatividad en la gestión",
+    "estado": "Aprobada",
+    "horas": 6,
+    "userId": 10
+  }
+]
