@@ -3,7 +3,7 @@
     <div class="bg-white border border-gray-200 rounded-2xl shadow-lg p-8">
       <div class="text-center mb-6">
         <h2 class="text-3xl font-extrabold text-[#0D1440]">
-          ⚙️ Crear/Editar Sala
+          Crear/Editar Sala
         </h2>
         <p class="text-gray-500 mt-1">
           Ingrese los atributos de la nueva sala para su registro.
@@ -147,13 +147,18 @@
                 o haz click para seleccionar.
               </p>
 
+              <label for="fileInput" class="sr-only">Subir imagen</label>
               <input
                 #fileInput
+                id="fileInput"
                 type="file"
                 accept="image/*"
                 (change)="handleFileInput($event)"
                 class="hidden"
               />
+              <button type="button" (click)="fileInput.click()">
+                Seleccionar archivo
+              </button>
 
               <div *ngIf="selectedMapFile" class="mt-2 relative">
                 <button

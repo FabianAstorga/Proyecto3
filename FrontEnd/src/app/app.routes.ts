@@ -69,15 +69,6 @@ export const routes: Routes = [
           ).then((m) => m.ProfileHomeComponent),
       },
 
-      // 2. HORARIO (Carga el Layout + Contenido)
-      {
-        path: 'horario',
-        loadComponent: () =>
-          import('./modules/secretaria/schedule/schedule.component').then(
-            (m) => m.ScheduleComponent
-          ),
-      },
-
       // 3. RUTAS DE ACTIVIDADES (Carga el Layout + Contenido)
       {
         path: 'actividades',
@@ -160,15 +151,8 @@ export const routes: Routes = [
             path: 'historial',
             loadComponent: () =>
               import(
-                './modules/director/activities-history/activities-history.component'
-              ).then((m) => m.ActivitiesHistoryComponent),
-          },
-          {
-            path: 'nueva',
-            loadComponent: () =>
-              import(
-                './modules/director/activity-new/activity-new.component'
-              ).then((m) => m.ActivityNewComponent),
+                './modules/director/historial-funcionario/historial-funcionario.component'
+              ).then((m) => m.HistorialFuncionarioComponent),
           },
         ],
       },

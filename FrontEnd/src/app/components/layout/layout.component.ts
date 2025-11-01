@@ -15,7 +15,6 @@ export class LayoutComponent {
   @Input() navItems: NavItem[] = [
     { label: 'Inicio perfil', link: '/perfil' },
     { label: 'Agregar registro', link: '/actividades/nueva' },
-    { label: 'Horario', link: '/horario' },
     { label: 'Historial', link: '/actividades/historial' },
   ];
 
