@@ -1,18 +1,13 @@
 <app-layout [navItems]="secretariaNavItems" logoutLink="/login">
   <section class="w-full px-8 py-10 space-y-4">
-    <!-- Selector de semana + acciones -->
+    <!-- Encabezado de semana -->
     <div class="flex flex-wrap items-center justify-between gap-4">
       <div class="flex items-center gap-3">
-        <label class="text-sm font-medium text-gray-700">Semana:</label>
-        <input
-          title="Seleccionar semana"
-          aria-label="Seleccionar semana"
-          type="week"
-          class="rounded-md border border-gray-300 px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-          [value]="current"
-          (change)="onWeekChange($event)"
-        />
-        <div class="text-sm text-gray-600">({{ weekLabel() }})</div>
+        <span class="text-sm font-medium text-gray-700">Semana:</span>
+        <span class="text-base font-semibold text-[#0D1440]">
+          {{ weekIsoLabel() }}
+        </span>
+        <span class="text-sm text-gray-600">({{ weekLabel() }})</span>
       </div>
 
       <button
@@ -68,29 +63,44 @@
             <ng-container *ngIf="!b.isLunch; else lunchRow">
               <div
                 *ngFor="let d of days"
-                class="border border-gray-200 bg-white hover:bg-blue-50 transition cursor-pointer"
-                (click)="openEditor(d.key, bi)"
+                class="border border-gray-200 bg-white hover:bg-blue-50 transition cursor-text"
+                (click)="startInlineEdit(d.key, bi)"
               >
-                <div
-                  class="h-24 flex items-center justify-center text-center px-2"
-                >
-                  <ng-container *ngIf="schedule[d.key][bi] as c; else empty">
-                    <div>
-                      <div
-                        class="text-sm font-semibold text-[#0D1440] leading-tight"
-                      >
-                        {{ c.title }}
-                      </div>
-                      <div class="text-xs text-gray-600" *ngIf="c.room">
-                        Sala: {{ c.room }}
-                      </div>
-                      <div class="text-[11px] text-gray-500" *ngIf="c.note">
-                        {{ c.note }}
-                      </div>
-                    </div>
+                <div class="h-24 flex items-center justify-center text-center px-2">
+                  <!-- Edición inline -->
+                  <ng-container
+                    *ngIf="
+                      editingInline &&
+                      editingInline.day === d.key &&
+                      editingInline.bi === bi;
+                      else displayMode
+                    "
+                  >
+                    <input
+                      type="text"
+                      [(ngModel)]="editingInline.value"
+                      (keydown)="onInlineKeydown($event)"
+                      (blur)="commitInlineEdit()"
+                      placeholder="Escribe el título y Enter…"
+                      class="w-[95%] rounded-md border border-blue-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                      autofocus
+                    />
                   </ng-container>
-                  <ng-template #empty>
-                    <div class="text-[11px] text-gray-400">—</div>
+
+                  <!-- Modo visual -->
+                  <ng-template #displayMode>
+                    <ng-container *ngIf="schedule[d.key][bi] as c; else empty">
+                      <div>
+                        <div
+                          class="text-sm font-semibold text-[#0D1440] leading-tight"
+                        >
+                          {{ c.title }}
+                        </div>
+                      </div>
+                    </ng-container>
+                    <ng-template #empty>
+                      <div class="text-[11px] text-gray-400">—</div>
+                    </ng-template>
                   </ng-template>
                 </div>
               </div>
@@ -108,61 +118,6 @@
             </ng-template>
           </ng-container>
         </div>
-      </div>
-    </div>
-
-    <!-- Editor inferior -->
-    <div
-      *ngIf="selected"
-      class="bg-white rounded-xl border border-gray-200 shadow p-4"
-    >
-      <div class="text-sm font-semibold text-gray-800 mb-3">
-        Editando: {{ selectedDayLabel() }} — {{ selectedBlockLabel() }}
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <input
-          type="text"
-          class="rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-          placeholder="Título (obligatorio)"
-          [(ngModel)]="editorTitle"
-        />
-        <input
-          type="text"
-          class="rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-          placeholder="Sala (opcional)"
-          [(ngModel)]="editorRoom"
-        />
-        <input
-          type="text"
-          class="rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-          placeholder="Nota (opcional)"
-          [(ngModel)]="editorNote"
-        />
-      </div>
-
-      <div class="mt-4 flex flex-wrap gap-3">
-        <button
-          type="button"
-          class="inline-flex items-center rounded-md bg-[#0D1440] text-white px-4 py-2 font-semibold hover:opacity-90"
-          (click)="applyCell()"
-        >
-          Aplicar
-        </button>
-        <button
-          type="button"
-          class="inline-flex items-center rounded-md border border-gray-300 px-4 py-2 hover:bg-gray-50"
-          (click)="clearCell()"
-        >
-          Vaciar celda
-        </button>
-        <button
-          type="button"
-          class="inline-flex items-center rounded-md px-4 py-2 hover:bg-gray-50"
-          (click)="selected = null"
-        >
-          Cancelar
-        </button>
       </div>
     </div>
   </section>

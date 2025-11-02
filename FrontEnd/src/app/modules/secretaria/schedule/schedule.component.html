@@ -1,85 +1,20 @@
 <app-layout [navItems]="secretariaNavItems" logoutLink="/login">
-  <section class="w-full px-8 py-10">
-    <!-- Card principal (solo borde azul, sin título) -->
+  <section class="w-full px-8 py-10 flex justify-center">
     <div
-      class="bg-white rounded-2xl border border-blue-400 shadow-md overflow-hidden"
+      class="bg-white rounded-2xl border border-blue-400 shadow-md p-6 w-full max-w-5xl text-center"
     >
-      <div class="overflow-x-auto">
-        <div
-          class="grid w-full"
-          [ngStyle]="{ 'grid-template-columns': '180px repeat(6, 1fr)' }"
-        >
-          <!-- Encabezados -->
-          <div
-            class="bg-[#EAF2FF] border border-gray-200 p-3 text-center font-semibold text-[#0D1440]"
-          >
-            Bloque
-          </div>
-          <div
-            *ngFor="let d of days"
-            class="bg-[#EAF2FF] border border-gray-200 p-3 text-center font-semibold text-[#0D1440]"
-          >
-            {{ d.label }}
-          </div>
+      <!-- Título -->
+      <h2 class="text-3xl font-semibold text-[#0D1440] mb-8">
+        Horario de {{ nombreParaTitulo }}
+      </h2>
 
-          <!-- Filas -->
-          <ng-container *ngFor="let b of blocks; let bi = index">
-            <!-- Columna izquierda: bloque horario -->
-            <div
-              class="border border-gray-200 p-3 text-center bg-gray-50 text-gray-800"
-              [ngClass]="{
-                'bg-yellow-50 font-semibold text-gray-900': b.isLunch
-              }"
-            >
-              <div>{{ b.label }}</div>
-              <div class="text-[12px] text-gray-600" *ngIf="!b.isLunch">
-                {{ b.code }}
-              </div>
-              <div class="text-[12px] text-amber-700" *ngIf="b.isLunch">
-                Almuerzo
-              </div>
-            </div>
+      <!-- Imagen del horario -->
+      <div class="flex justify-center">
+        <img [src]="horarioUrl"
+     alt="{{ titulo }} de {{ nombreParaTitulo }}"
+     class="rounded-2xl border border-gray-300 shadow-md w-full max-w-4xl h-auto" />
 
-            <!-- Celdas por día -->
-            <ng-container *ngIf="!b.isLunch; else lunchRow">
-              <div
-                *ngFor="let d of days"
-                class="border border-gray-200 bg-white hover:bg-blue-50 transition"
-              >
-                <div class="h-24 flex items-center justify-center text-center">
-                  <ng-container
-                    [ngTemplateOutlet]="cellTpl"
-                    [ngTemplateOutletContext]="{ c: schedule[d.key][bi] }"
-                  ></ng-container>
-                </div>
-              </div>
-            </ng-container>
-
-            <!-- Franja de almuerzo -->
-            <ng-template #lunchRow>
-              <div class="col-span-6 border border-gray-200">
-                <div
-                  class="h-16 bg-yellow-50 text-amber-800 font-medium flex items-center justify-center text-sm"
-                ></div>
-              </div>
-            </ng-template>
-          </ng-container>
-        </div>
       </div>
     </div>
   </section>
-
-  <!-- Template celda -->
-  <ng-template #cellTpl let-c="c">
-    <div *ngIf="c; else empty" class="px-2">
-      <div class="text-sm font-semibold text-[#0D1440] leading-tight">
-        {{ c.title }}
-      </div>
-      <div class="text-xs text-gray-600" *ngIf="c.room">Sala: {{ c.room }}</div>
-      <div class="text-xs text-gray-500" *ngIf="c.note">{{ c.note }}</div>
-    </div>
-    <ng-template #empty>
-      <div class="text-[11px] text-gray-400">—</div>
-    </ng-template>
-  </ng-template>
 </app-layout>

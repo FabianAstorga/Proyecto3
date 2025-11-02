@@ -12,19 +12,16 @@ function pad(n: number) {
   return n.toString().padStart(2, '0');
 }
 function weekKey(d: Date) {
-  // ISO week string: YYYY-W##
   const tmp = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-  // Jueves de la semana garantiza semana ISO
   tmp.setUTCDate(tmp.getUTCDate() + 4 - (tmp.getUTCDay() || 7));
   const yearStart = new Date(Date.UTC(tmp.getUTCFullYear(), 0, 1));
   const week = Math.ceil(((+tmp - +yearStart) / 86400000 + 1) / 7);
   return `${tmp.getUTCFullYear()}-W${pad(week)}`;
 }
 function mondayOfISOWeek(iso: string) {
-  // iso = 'YYYY-W##'
   const year = Number(iso.slice(0, 4));
   const week = Number(iso.slice(6));
-  const simple = new Date(Date.UTC(year, 0, 4)); // 4 de enero siempre semana 1
+  const simple = new Date(Date.UTC(year, 0, 4));
   const dayOfWeek = simple.getUTCDay() || 7;
   const monday = new Date(simple);
   monday.setUTCDate(simple.getUTCDate() - dayOfWeek + 1 + (week - 1) * 7);
@@ -39,6 +36,7 @@ function mondayOfISOWeek(iso: string) {
 })
 export class GestionarCalendarioComponent {
   secretariaNavItems = SECRETARIA_NAV_ITEMS;
+
   // Semana actual (ISO week)
   current = weekKey(new Date());
 
@@ -74,13 +72,8 @@ export class GestionarCalendarioComponent {
     sab: Array(this.blocks.length).fill(null),
   };
 
-  // Celda seleccionada
-  selected: { day: DayKey; bi: number } | null = null;
-
-  // Campos editor (compatibles con ngModel)
-  editorTitle = '';
-  editorRoom?: string;
-  editorNote?: string;
+  // Edición inline
+  editingInline: { day: DayKey; bi: number; value: string } | null = null;
 
   // Label “Del dd/mm al dd/mm”
   weekLabel(): string {
@@ -91,50 +84,40 @@ export class GestionarCalendarioComponent {
     return `Del ${f(monday)} al ${f(sunday)}`;
   }
 
-  onWeekChange(ev: Event) {
-    const input = ev.target as HTMLInputElement | null;
-    const value = input?.value ?? '';
-    if (!value) return;
-    this.current = value;
-    this.selected = null;
+  // Muestra "año 2025 - semana 44"
+  weekIsoLabel(): string {
+    const [anio, w] = this.current.split('-W');
+    const semana = Number(w);
+    return `año ${anio} - semana ${semana}`;
   }
 
-  openEditor(day: DayKey, bi: number) {
+  // Inline edit
+  startInlineEdit(day: DayKey, bi: number) {
     if (this.blocks[bi].isLunch) return;
-    this.selected = { day, bi };
-    const cell = this.schedule[day][bi];
-    this.editorTitle = cell?.title ?? '';
-    this.editorRoom = cell?.room;
-    this.editorNote = cell?.note;
+    const current = this.schedule[day][bi];
+    this.editingInline = { day, bi, value: current?.title ?? '' };
   }
 
-  selectedDayLabel(): string {
-    if (!this.selected) return '';
-    const d = this.days.find((x) => x.key === this.selected!.day);
-    return d?.label ?? '';
+  commitInlineEdit() {
+    if (!this.editingInline) return;
+    const { day, bi, value } = this.editingInline;
+    const title = (value || '').trim();
+    this.schedule[day][bi] = title ? { title } : null;
+    this.editingInline = null;
   }
 
-  selectedBlockLabel(): string {
-    if (!this.selected) return '';
-    const bi = this.selected!.bi;
-    return this.blocks[bi]?.label ?? '';
+  cancelInlineEdit() {
+    this.editingInline = null;
   }
 
-  applyCell() {
-    if (!this.selected) return;
-    const { day, bi } = this.selected;
-    const t = this.editorTitle?.trim();
-    this.schedule[day][bi] = t
-      ? { title: t, room: this.editorRoom, note: this.editorNote }
-      : null;
-    this.selected = null;
-  }
-
-  clearCell() {
-    if (!this.selected) return;
-    const { day, bi } = this.selected;
-    this.schedule[day][bi] = null;
-    this.selected = null;
+  onInlineKeydown(e: KeyboardEvent) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      this.commitInlineEdit();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      this.cancelInlineEdit();
+    }
   }
 
   guardarSemana() {

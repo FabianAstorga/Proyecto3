@@ -1,230 +1,144 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
-import { RouterLink } from '@angular/router';
-
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import {
-  MatNativeDateModule,
-  DateAdapter,
-  MAT_DATE_FORMATS,
-  MAT_DATE_LOCALE,
-  NativeDateAdapter,
-  MatOptionModule, // <-- para <mat-option>
-} from '@angular/material/core';
-import { MatSelectModule } from '@angular/material/select';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { FormsModule } from '@angular/forms'; // ✅ Import necesario para ngModel
 
 import { LayoutComponent } from '../../../components/layout/layout.component';
 import { SECRETARIA_NAV_ITEMS } from '../profile-home/secretaria.nav';
 
-/** ===== Tipos ===== */
 type Estado = 'Aprobada' | 'Pendiente' | 'Rechazada';
+
 type Activity = {
-  fecha: string; // ISO 'YYYY-MM-DD'
+  fecha: string;   // 'YYYY-MM-DD'
   titulo: string;
   detalle: string;
   estado: Estado;
   horas: number;
+  userId: number;
 };
 
-/** ===== Adapter: lunes como primer día ===== */
-class MondayFirstDateAdapter extends NativeDateAdapter {
-  override getFirstDayOfWeek(): number {
-    return 1;
-  } // 1 = lunes
-}
-
-/** ===== Formatos de fecha: dd/MM/yyyy ===== */
-export const ES_DATE_FORMATS = {
-  parse: { dateInput: 'dd/MM/yyyy' },
-  display: {
-    dateInput: 'dd/MM/yyyy',
-    monthYearLabel: 'MMMM yyyy',
-    dateA11yLabel: 'dd/MM/yyyy',
-    monthYearA11yLabel: 'MMMM yyyy',
-  },
+type User = {
+  id: number;
+  firstName: string;
+  lastName: string;
+  role: string;
 };
+
+type ViewMode = 'fecha' | 'funcionarioMes';
 
 @Component({
-  selector: 'app-activities-history',
   standalone: true,
+  selector: 'app-activities-history',
   imports: [
     CommonModule,
-    ReactiveFormsModule,
-    RouterLink,
-    MatFormFieldModule,
-    MatInputModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatSelectModule,
-    MatOptionModule,
-    LayoutComponent,
+    HttpClientModule,
+    FormsModule, // ✅ agregado
+    LayoutComponent
   ],
   templateUrl: './activities-history.component.html',
-  styleUrls: ['./activities-history.component.scss'],
-  providers: [
-    { provide: MAT_DATE_LOCALE, useValue: 'es-CL' },
-    { provide: DateAdapter, useClass: MondayFirstDateAdapter },
-    { provide: MAT_DATE_FORMATS, useValue: ES_DATE_FORMATS },
-  ],
 })
-export class ActivitiesHistoryComponent {
+export class ActivitiesHistoryComponent implements OnInit {
+  private http = inject(HttpClient);
+
+  // Mantiene el patrón del layout de Secretaría
   secretariaNavItems = SECRETARIA_NAV_ITEMS;
 
-  private fb = inject(FormBuilder);
+  loading = true;
+  error?: string;
 
-  /** Navbar/Sidebar del layout */
-  navItems = [
-    { label: 'Inicio perfil', link: '/perfil' },
-    { label: 'Agregar registro', link: '/actividades/nueva' },
-    { label: 'Horario', link: '/horario' },
-    { label: 'Historial', link: '/actividades/historial' },
-  ];
+  // Vista seleccionada
+  mode: ViewMode = 'funcionarioMes'; // Por defecto según lo que pidió César
 
-  /** Filtros (tipados) */
-  filters = this.fb.group({
-    q: this.fb.control<string>(''),
-    desde: this.fb.control<Date | null>(null),
-    hasta: this.fb.control<Date | null>(null),
-    estado: this.fb.control<'' | Estado>(''), // '' = Todos
-  });
+  // Lista combinada y ordenada por fecha desc
+  combined: Array<Activity & { fullName: string; role: string }> = [];
 
-  /** Accesores seguros para el template */
-  get estadoValue(): '' | Estado {
-    return (this.filters.controls.estado.value ?? '') as '' | Estado;
+  // Agrupado: Funcionario -> Mes -> Items
+  grouped: Array<{
+    fullName: string;
+    role: string;
+    months: Array<{ key: string; label: string; items: Activity[] }>;
+  }> = [];
+
+  // Conteo para activar scroll del historial “antiguo”
+  get totalRows(): number {
+    return this.combined.length;
   }
 
-  /** Datos demo */
-  activities: Activity[] = [
-    {
-      fecha: '2025-10-15',
-      titulo: 'Taller de CAD',
-      detalle: 'Modelado 3D',
-      estado: 'Aprobada',
-      horas: 4,
-    },
-    {
-      fecha: '2025-10-12',
-      titulo: 'Capacitación Docente',
-      detalle: 'Uso de plataformas virtuales',
-      estado: 'Aprobada',
-      horas: 3,
-    },
-    {
-      fecha: '2025-10-10',
-      titulo: 'Seminario de Materiales',
-      detalle: 'Compósitos avanzados',
-      estado: 'Pendiente',
-      horas: 2,
-    },
-    {
-      fecha: '2025-10-09',
-      titulo: 'Reunión de Facultad',
-      detalle: 'Proyectos de investigación',
-      estado: 'Pendiente',
-      horas: 2,
-    },
-    {
-      fecha: '2025-10-05',
-      titulo: 'Voluntariado Feria UTA',
-      detalle: 'Apoyo logístico',
-      estado: 'Aprobada',
-      horas: 5,
-    },
-    {
-      fecha: '2025-10-03',
-      titulo: 'Evaluación Parcial',
-      detalle: 'Aplicación de prueba a estudiantes',
-      estado: 'Aprobada',
-      horas: 6,
-    },
-    {
-      fecha: '2025-09-29',
-      titulo: 'Asesoría Académica',
-      detalle: 'Orientación a estudiantes de primer año',
-      estado: 'Rechazada',
-      horas: 1,
-    },
-    {
-      fecha: '2025-09-22',
-      titulo: 'Charla de Seguridad',
-      detalle: 'Protocolos en laboratorio',
-      estado: 'Aprobada',
-      horas: 2,
-    },
-    {
-      fecha: '2025-09-14',
-      titulo: 'Taller de Programación',
-      detalle: 'Introducción a Python',
-      estado: 'Aprobada',
-      horas: 4,
-    },
-    {
-      fecha: '2025-09-05',
-      titulo: 'Reunión con Dirección',
-      detalle: 'Planificación semestre',
-      estado: 'Pendiente',
-      horas: 1,
-    },
-  ];
+  ngOnInit(): void {
+    Promise.all([
+      this.http.get<User[]>('/assets/data/users.json').toPromise(),
+      this.http.get<Activity[]>('/assets/data/activities.json').toPromise(),
+    ])
+      .then(([users, acts]) => {
+        if (!users || !acts) throw new Error('Datos incompletos');
 
-  /** ===== Utils ===== */
-  private toISO(d: Date): string {
-    return new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()))
-      .toISOString()
-      .slice(0, 10);
-  }
-  private inRange(iso: string, from?: Date | null, to?: Date | null): boolean {
-    const f = from ? this.toISO(from) : null;
-    const t = to ? this.toISO(to) : null;
-    if (f && iso < f) return false;
-    if (t && iso > t) return false;
-    return true;
-  }
-  formatDMY(iso: string): string {
-    const [y, m, d] = iso.split('-').map(Number);
-    return `${String(d).padStart(2, '0')}/${String(m).padStart(2, '0')}/${y}`;
+        const byId = new Map(users.map(u => [u.id, u]));
+        // flat list
+        this.combined = acts
+          .map(a => {
+            const u = byId.get(a.userId);
+            return {
+              ...a,
+              fullName: u ? `${u.firstName} ${u.lastName}` : 'Desconocido',
+              role: u?.role ?? '—',
+            };
+          })
+          .sort((a, b) => (a.fecha < b.fecha ? 1 : a.fecha > b.fecha ? -1 : 0));
+
+        // grouped by Funcionario -> Mes
+        const byUser = new Map<string, { fullName: string; role: string; months: Map<string, Activity[]> }>();
+        for (const row of this.combined) {
+          const userKey = `${row.fullName}||${row.role}`;
+          if (!byUser.has(userKey)) {
+            byUser.set(userKey, { fullName: row.fullName, role: row.role, months: new Map() });
+          }
+          const cont = byUser.get(userKey)!;
+          const mKey = row.fecha.slice(0, 7); // YYYY-MM
+          if (!cont.months.has(mKey)) cont.months.set(mKey, []);
+          cont.months.get(mKey)!.push(row);
+        }
+
+        // ordenar meses desc y actividades desc
+        this.grouped = Array.from(byUser.values()).map(u => {
+          const monthEntries = Array.from(u.months.entries())
+            .sort((a, b) => (a[0] < b[0] ? 1 : a[0] > b[0] ? -1 : 0))
+            .map(([key, items]) => ({
+              key,
+              label: this.monthLabel(key),
+              items: items.sort((a, b) => (a.fecha < b.fecha ? 1 : a.fecha > b.fecha ? -1 : 0)),
+            }));
+          return { fullName: u.fullName, role: u.role, months: monthEntries };
+        })
+        // ordenar funcionarios alfabéticamente
+        .sort((a, b) => a.fullName.localeCompare(b.fullName));
+      })
+      .catch(err => {
+        console.error(err);
+        this.error = 'Error cargando historial';
+      })
+      .finally(() => (this.loading = false));
   }
 
-  /** Clase de color para estados (Tailwind) */
-  statusPillClass(est: '' | Estado): string {
+  // Etiqueta mes en español: “octubre 2025”
+  private monthLabel(yyyyMm: string): string {
+    const [y, m] = yyyyMm.split('-').map(Number);
+    const dt = new Date(Date.UTC(y, (m - 1), 1));
+    const fmt = new Intl.DateTimeFormat('es-CL', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+    const s = fmt.format(dt);
+    // capitalizar primera letra
+    return s.charAt(0).toLowerCase() === s.charAt(0)
+      ? s.charAt(0).toUpperCase() + s.slice(1)
+      : s;
+  }
+
+  statusPillClass(est: Estado): string {
     switch (est) {
       case 'Aprobada':
-        return 'bg-emerald-500/10 text-emerald-700 border-emerald-300';
+        return 'bg-emerald-500/10 text-emerald-700 border border-emerald-300';
       case 'Pendiente':
-        return 'bg-amber-500/10 text-amber-700 border-amber-300';
+        return 'bg-amber-500/10 text-amber-700 border border-amber-300';
       case 'Rechazada':
-        return 'bg-red-500/10 text-red-700 border-red-300';
-      default:
-        return 'bg-gray-500/10 text-gray-700 border-gray-300';
+        return 'bg-red-500/10 text-red-700 border border-red-300';
     }
-  }
-
-  displayEstado(est: '' | Estado): string {
-    return est === '' ? 'Todos' : est;
-  }
-
-  /** Lista filtrada + ordenada (fecha desc) */
-  get filtered(): Activity[] {
-    const { q, desde, hasta, estado } = this.filters.getRawValue();
-    const term = (q ?? '').trim().toLowerCase();
-
-    return this.activities
-      .filter(
-        (a) =>
-          this.inRange(a.fecha, desde ?? null, hasta ?? null) &&
-          ((estado ?? '') === '' || a.estado === estado) &&
-          (term === '' ||
-            a.titulo.toLowerCase().includes(term) ||
-            a.detalle.toLowerCase().includes(term) ||
-            a.estado.toLowerCase().includes(term))
-      )
-      .sort((a, b) => (a.fecha < b.fecha ? 1 : a.fecha > b.fecha ? -1 : 0));
-  }
-
-  clearFilters() {
-    this.filters.reset({ q: '', desde: null, hasta: null, estado: '' });
   }
 }
