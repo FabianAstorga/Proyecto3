@@ -1,8 +1,14 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
-import { Usuario } from '../../usuarios/entities/usuario.entity';
-import { Cargo } from '../../cargos/entities/cargo.entity';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
+import { Cargo } from './cargo.entity';
+import { Usuario } from './usuario.entity';
 
-@Entity({ name: 'empleado_cargo' })
+@Entity('employee-charge')
 export class EmpleadoCargo {
   @PrimaryGeneratedColumn()
   id: number; // Clave primaria simple para la relación

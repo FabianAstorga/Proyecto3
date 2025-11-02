@@ -1,8 +1,16 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
-import { Usuario } from '../../usuarios/entities/usuario.entity';
-import { Actividad } from '../../actividades/entities/actividade.entity';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  ManyToOne,
+  JoinColumn,
+  OneToMany,
+} from 'typeorm';
+import { Usuario } from './usuario.entity';
+import { Actividad } from './actividade.entity';
 
-@Entity({ name: 'formularios' })
+@Entity('form')
 export class Formulario {
   @PrimaryGeneratedColumn()
   id: number;

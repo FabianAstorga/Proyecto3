@@ -1,11 +1,17 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
-import { Formulario } from '../../formularios/entities/formulario.entity';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
+import { Formulario } from '../../database/entities/formulario.entity';
 
-@Entity({ name: 'actividades' })
+@Entity('activity')
 export class Actividad {
   @PrimaryGeneratedColumn()
   id: number;
-  
+
   @Column({ type: 'text' })
   descripcion: string;
 

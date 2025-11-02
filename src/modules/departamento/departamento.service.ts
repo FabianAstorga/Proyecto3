@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateDepartamentoDto } from './dto/create-departamento.dto';
 import { UpdateDepartamentoDto } from './dto/update-departamento.dto';
-import { Departamento } from './entities/departamento.entity';
+import { Departamento } from 'src/database/entities/departamento.entity';
 
 @Injectable()
 export class DepartamentoService {
@@ -13,7 +13,9 @@ export class DepartamentoService {
   ) {}
 
   create(createDepartamentoDto: CreateDepartamentoDto) {
-    const nuevoDepto = this.departamentoRepository.create(createDepartamentoDto);
+    const nuevoDepto = this.departamentoRepository.create(
+      createDepartamentoDto,
+    );
     return this.departamentoRepository.save(nuevoDepto);
   }
 

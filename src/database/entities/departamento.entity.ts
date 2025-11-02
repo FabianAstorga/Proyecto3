@@ -1,8 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { Usuario } from '../../usuarios/entities/usuario.entity';
-import { Sala } from '../../salas/entities/sala.entity';
+import { Sala } from './sala.entity';
+import { Usuario } from './usuario.entity';
 
-@Entity({ name: 'departamentos' })
+@Entity('department')
 export class Departamento {
   @PrimaryGeneratedColumn()
   id: number;
@@ -12,7 +12,7 @@ export class Departamento {
 
   @Column({ type: 'text', nullable: true })
   descripcion: string;
-  
+
   // Relación: Departamento "tiene" Usuarios
   @OneToMany(() => Usuario, (usuario) => usuario.departamento)
   usuarios: Usuario[];

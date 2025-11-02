@@ -1,17 +1,23 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
-import { Departamento } from '../../departamento/entities/departamento.entity';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
+import { Departamento } from './departamento.entity';
 
-@Entity({ name: 'salas' })
+@Entity('room')
 export class Sala {
   @PrimaryGeneratedColumn()
   id: number;
-  
+
   @Column({ unique: true })
   codigo: string;
 
   @Column()
   nombre: string;
-  
+
   @Column()
   ubicacion: string;
 

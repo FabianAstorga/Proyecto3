@@ -1,13 +1,19 @@
-import { 
-  Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, 
-  OneToMany, ManyToOne, JoinColumn, OneToOne 
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  OneToMany,
+  ManyToOne,
+  JoinColumn,
+  OneToOne,
 } from 'typeorm';
-import { Departamento } from '../../departamento/entities/departamento.entity';
-import { Formulario } from '../../formularios/entities/formulario.entity';
-import { Oficina } from '../../oficinas/entities/oficina.entity';
-import { EmpleadoCargo } from '../../empleado-cargos/entities/empleado-cargo.entity';
+import { Departamento } from './departamento.entity';
+import { Formulario } from './formulario.entity';
+import { Oficina } from './oficina.entity';
+import { EmpleadoCargo } from './empleado-cargo.entity';
 
-@Entity({ name: 'usuarios' })
+@Entity('user')
 export class Usuario {
   @PrimaryGeneratedColumn()
   id: number;
@@ -24,7 +30,7 @@ export class Usuario {
   @Column({ unique: true })
   correo: string;
 
-  @Column({ select: false }) 
+  @Column({ select: false })
   contrasena: string;
 
   @Column({ default: true })
@@ -44,8 +50,6 @@ export class Usuario {
 
   @CreateDateColumn()
   fecha_creacion: Date;
-
-
 
   // Relación: Usuario "jefe" (boss)
   @ManyToOne(() => Usuario, (usuario) => usuario.empleados)
@@ -73,6 +77,4 @@ export class Usuario {
   // Relación: Un usuario puede tener muchas asignaciones de cargo
   @OneToMany(() => EmpleadoCargo, (prog) => prog.usuario)
   asignaciones: EmpleadoCargo[];
-
-
 }

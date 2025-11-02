@@ -1,8 +1,10 @@
 /* este archivo se creo para realizar las migraciones
 // generar el archivo de la migración
-npx typeorm-ts-node-commonjs migration:generate \
-  -d ./src/database/data-source.ts \
-  ./src/database/migrations/eliminationphone
+linux -> npx typeorm-ts-node-commonjs migration:generate \ -d ./src/database/data-source.ts \
+./src/database/migrations/updateentity
+
+windows -> npx typeorm-ts-node-commonjs migration:generate ./src/database/migrations/initial -d ./src/database/data-source.ts
+ejecutar -> npx typeorm-ts-node-commonjs migration:run -d ./src/database/data-source.ts
 
 // ejecutar el archivo de la migración
 npx typeorm-ts-node-commonjs migration:run -d ./src/database/data-source.ts
@@ -20,7 +22,7 @@ export const AppDataSource = new DataSource({
   host: process.env.DB_HOST || 'localhost',
   port: Number(process.env.DB_PORT) || 3306,
   username: process.env.DB_USERNAME || 'panel',
-  password: process.env.DB_PASSWORD || '',      // tu contraseña está vacía
+  password: process.env.DB_PASSWORD || '', // tu contraseña está vacía
   database: process.env.DB_NAME || 'paneladmin',
   entities: [join(__dirname, 'entities/**/*.entity.{ts,js}')],
   migrations: [join(__dirname, 'migrations/*.{ts,js}')],
