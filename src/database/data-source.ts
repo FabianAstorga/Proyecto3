@@ -1,8 +1,10 @@
 /* este archivo se creo para realizar las migraciones
 // generar el archivo de la migración
-npx typeorm-ts-node-commonjs migration:generate \
-  -d ./src/database/data-source.ts \
-  ./src/database/migrations/eliminationphone
+linux -> npx typeorm-ts-node-commonjs migration:generate \ -d ./src/database/data-source.ts \
+./src/database/migrations/updateentity
+
+windows -> npx typeorm-ts-node-commonjs migration:generate ./src/database/migrations/initial -d ./src/database/data-source.ts
+ejecutar -> npx typeorm-ts-node-commonjs migration:run -d ./src/database/data-source.ts
 
 // ejecutar el archivo de la migración
 npx typeorm-ts-node-commonjs migration:run -d ./src/database/data-source.ts
