@@ -1,19 +1,15 @@
-import { IsString, IsNotEmpty, IsOptional, IsBoolean } from 'class-validator';
+import { IsString, IsOptional, IsBoolean } from 'class-validator';
 
 export class CreateDepartamentoDto {
   @IsString()
-  @IsNotEmpty()
-  nombre: string;
-
-  @IsString()
-  @IsNotEmpty()
-  codigo: string;
+  @IsOptional()
+  facultad?: string;
 
   @IsString()
   @IsOptional()
-  descripcion?: string;
-  
+  carrera?: string;
+
   @IsBoolean()
   @IsOptional()
-  activo?: boolean;
+  esActivo?: boolean;
 }

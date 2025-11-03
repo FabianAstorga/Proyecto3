@@ -15,31 +15,28 @@ import { EmpleadoCargo } from './empleado-cargo.entity';
 
 @Entity('user')
 export class Usuario {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
 
-  @Column({ unique: true })
-  rut: string;
-
-  @Column()
+  @Column({ type: 'varchar', length: 50 })
   nombre: string;
 
-  @Column()
-  apellidos: string;
+  @Column({ type: 'varchar', length: 50 })
+  apellido: string;
 
-  @Column({ unique: true })
+  @Column({ type: 'varchar', length: 100 })
   correo: string;
 
-  @Column({ select: false })
+  @Column({ type: 'varchar', length: 8, select: false })
   contrasena: string;
 
-  @Column({ default: true })
+  @Column({ type: 'boolean', default: true })
   estado: boolean;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', length: 20 })
   telefono: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', length: 10 })
   anexo: string;
 
   @Column({ nullable: true })
@@ -48,7 +45,7 @@ export class Usuario {
   @Column({ nullable: true })
   url_horario: string;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   fecha_creacion: Date;
 
   // Relación: Usuario "jefe" (boss)

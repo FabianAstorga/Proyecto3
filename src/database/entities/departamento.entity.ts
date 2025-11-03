@@ -8,10 +8,13 @@ export class Departamento {
   id: number;
 
   @Column()
-  nombre: string;
+  facultad: string;
 
-  @Column({ type: 'text', nullable: true })
-  descripcion: string;
+  @Column({ default: true })
+  esActivo: boolean;
+
+  @Column({ type: 'varchar', length: 10 })
+  carrera: string;
 
   // Relación: Departamento "tiene" Usuarios
   @OneToMany(() => Usuario, (usuario) => usuario.departamento)

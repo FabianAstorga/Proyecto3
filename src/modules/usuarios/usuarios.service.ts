@@ -1,5 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
@@ -15,7 +20,17 @@ export class UsuariosService {
   ) {}
 
   async create(createUsuarioDto: CreateUsuarioDto) {
-    // Encriptar la contraseña si se proporciona
+    // Verificar duplicado de correo
+    const existente = await this.usuarioRepository.findOne({
+      where: { correo: createUsuarioDto.correo },
+    });
+    if (existente) {
+      throw new ConflictException(
+        `El correo ${createUsuarioDto.correo} ya está registrado.`,
+      );
+    }
+
+    // Encriptar contraseña si se envía
     if (createUsuarioDto.contrasena) {
       const salt = await bcrypt.genSalt(10);
       createUsuarioDto.contrasena = await bcrypt.hash(
@@ -24,37 +39,32 @@ export class UsuariosService {
       );
     }
 
+    // instancia del usuario
     const nuevoUsuario = this.usuarioRepository.create(createUsuarioDto);
+    // Guardar
     return this.usuarioRepository.save(nuevoUsuario);
   }
 
-  /**
-   * Buscar un usuario por su correo electrónico.
-   * Se utiliza en la autenticación.
-   */
-  findOneByEmail(correo: string) {
-    return this.usuarioRepository.findOne({ where: { correo } });
-  }
-
-  /**
-   * Listar todos los usuarios.
-   */
   findAll() {
     return this.usuarioRepository.find();
   }
 
-  /**
-   * Buscar un usuario por ID.
-   */
-  findOne(id: number) {
-    return this.usuarioRepository.findOne({ where: { id } });
+  async findOne(id: number) {
+    const usuario = await this.usuarioRepository.findOne({ where: { id } });
+    if (!usuario) {
+      throw new NotFoundException(`Usuario con ID ${id} no encontrado.`);
+    }
+    return usuario;
   }
 
-  /**
-   * Actualizar los datos de un usuario existente.
-   * Si se incluye una nueva contraseña, se encripta antes de guardar.
-   */
+  // Actualizar o Encripta aaun usuario existente.
   async update(id: number, updateUsuarioDto: UpdateUsuarioDto) {
+    const usuario = await this.usuarioRepository.findOne({ where: { id } });
+    if (!usuario) {
+      throw new NotFoundException(`Usuario con ID ${id} no encontrado.`);
+    }
+
+    // Encriptar contraseña si se envía
     if (updateUsuarioDto.contrasena) {
       const salt = await bcrypt.genSalt(10);
       updateUsuarioDto.contrasena = await bcrypt.hash(
@@ -63,19 +73,54 @@ export class UsuariosService {
       );
     }
 
+    // Actualizar registro
     await this.usuarioRepository.update(id, updateUsuarioDto);
     return this.usuarioRepository.findOne({ where: { id } });
   }
 
   /**
    * Eliminar un usuario por ID.
+   * - Verifica existencia antes de eliminar.
    */
   async remove(id: number) {
     const usuario = await this.usuarioRepository.findOne({ where: { id } });
     if (!usuario) {
-      return { message: `Usuario con ID ${id} no encontrado` };
+      throw new NotFoundException(`Usuario con ID ${id} no encontrado.`);
     }
+
     await this.usuarioRepository.delete(id);
-    return { message: `Usuario con ID ${id} eliminado correctamente` };
+    return { message: `Usuario con ID ${id} eliminado correctamente.` };
+  }
+
+  /**
+   * Actualizar solo la foto del usuario (por URL).
+   * Se podría usar cuando subes una imagen y obtienes la URL.
+   */
+  async updateFoto(id: number, fotoUrl: string) {
+    const usuario = await this.usuarioRepository.findOne({ where: { id } });
+    if (!usuario) {
+      throw new NotFoundException(`Usuario con ID ${id} no encontrado.`);
+    }
+
+    usuario.foto_url = fotoUrl;
+    await this.usuarioRepository.save(usuario);
+    return usuario;
+  }
+  /**
+   * Buscar usuario por correo electrónico.
+   * Se usa para validaciones y autenticación.
+   */
+  findOneByEmail(correo: string) {
+    return this.usuarioRepository.findOne({ where: { correo } });
+  }
+
+  /**
+   * Buscar usuario por correo e incluir contraseña (para login).
+   */
+  findOneByEmailWithPassword(correo: string) {
+    return this.usuarioRepository.findOne({
+      where: { correo },
+      select: ['id', 'correo', 'contrasena', 'estado', 'nombre', 'apellido'],
+    });
   }
 }

@@ -9,26 +9,25 @@ import {
 
 export class RegisterDto {
   @IsEmail()
-  email!: string;
+  correo!: string;
 
   @IsNotEmpty()
-  @MinLength(6)
-  password!: string;
+  @MinLength(8)
+  contrasena!: string;
 
   @IsNotEmpty()
-  firstName!: string;
+  nombre!: string;
 
   @IsNotEmpty()
-  lastName!: string;
+  apellido!: string;
 
   @IsPhoneNumber()
-  @IsNotEmpty()
-  phone!: string;
+  telefono!: string;
+
+  @IsOptional()
+  isActive?: boolean;
 
   @IsOptional()
   @IsIn(['funcionario', 'secretaria', 'director'])
-  role!: string;
-
-  @IsOptional()
-  isActive!: boolean;
+  role?: string;
 }

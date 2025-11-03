@@ -19,13 +19,6 @@ export class EmpleadoCargo {
   @Column({ nullable: true })
   fecha_fin: Date;
 
-  // --- Claves foráneas ---
-  @Column()
-  usuarioId: number;
-
-  @Column()
-  cargoId: number;
-
   // --- Relaciones ---
   @ManyToOne(() => Usuario, (usuario) => usuario.asignaciones)
   @JoinColumn({ name: 'usuarioId' })
