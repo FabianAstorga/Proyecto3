@@ -13,7 +13,6 @@ type Activity = {
   titulo: string;
   detalle: string;
   estado: Estado;
-  horas: number;
   userId: number;
 };
 
@@ -21,6 +20,13 @@ type User = {
   id: number;
   firstName: string;
   lastName: string;
+  role: string;
+};
+
+type Combined = Activity & {
+  firstName: string;
+  lastName: string;
+  fullName: string;
   role: string;
 };
 
@@ -38,18 +44,15 @@ export class ActivitiesHistoryComponent implements OnInit {
   loading = true;
   error?: string;
 
-  // Datos base
   users: User[] = [];
-  combined: Array<
-    Activity & { firstName: string; lastName: string; fullName: string; role: string }
-  > = [];
+  combined: Combined[] = [];
 
-  // --------- Filtros ----------
+  // Filtros
   selectedUserId: number | null = null;
   selectedEstado: Estado | null = null;
-  searchText = '';
+  selectedDate: string | null = null; // 'YYYY-MM-DD'
 
-  // control de menús desplegables
+  // UI dropdowns
   showUserMenu = false;
   showEstadoMenu = false;
 
@@ -61,14 +64,14 @@ export class ActivitiesHistoryComponent implements OnInit {
       .then(([users, acts]) => {
         if (!users || !acts) throw new Error('Datos incompletos');
 
-        // usuarios ordenados
+        // Usuarios ordenados
         this.users = users.slice().sort((a, b) =>
           `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`)
         );
 
         const byId = new Map(users.map(u => [u.id, u]));
 
-        // Flat list combinada (incluye nombre y apellido por separado)
+        // Lista combinada
         this.combined = acts
           .map(a => {
             const u = byId.get(a.userId);
@@ -81,9 +84,8 @@ export class ActivitiesHistoryComponent implements OnInit {
               lastName,
               fullName: `${firstName} ${lastName}`.trim(),
               role,
-            };
+            } as Combined;
           })
-          // orden fecha desc
           .sort((a, b) => (a.fecha < b.fecha ? 1 : a.fecha > b.fecha ? -1 : 0));
       })
       .catch(err => {
@@ -93,7 +95,7 @@ export class ActivitiesHistoryComponent implements OnInit {
       .finally(() => (this.loading = false));
   }
 
-  // ---------- Helpers UI ----------
+  // ===== Helpers de UI =====
   statusPillClass(est: Estado): string {
     switch (est) {
       case 'Aprobada':
@@ -122,28 +124,44 @@ export class ActivitiesHistoryComponent implements OnInit {
   clearFilters(): void {
     this.selectedUserId = null;
     this.selectedEstado = null;
-    this.searchText = '';
+    this.selectedDate = null;
   }
 
-  // Filtrado para el GRID
-  get filteredCombined() {
-    const q = this.searchText.trim().toLowerCase();
+  // ===== Filtrado previo al agrupado =====
+  get filteredCombined(): Combined[] {
     return this.combined.filter(a => {
       const byUser = this.selectedUserId === null || a.userId === this.selectedUserId;
       const byEstado = this.selectedEstado === null || a.estado === this.selectedEstado;
-      const byQuery =
-        q.length === 0 ||
-        a.firstName.toLowerCase().includes(q) ||
-        a.lastName.toLowerCase().includes(q) ||
-        a.fullName.toLowerCase().includes(q) ||
-        a.titulo.toLowerCase().includes(q) ||
-        a.detalle.toLowerCase().includes(q) ||
-        a.role.toLowerCase().includes(q);
-      return byUser && byEstado && byQuery;
+      const byDate = !this.selectedDate || a.fecha === this.selectedDate;
+      return byUser && byEstado && byDate;
     });
   }
 
-  // Dropdowns
+  // ===== Agrupado por fecha =====
+  get groupedFiltered(): Array<{ fecha: string; items: Combined[] }> {
+    const arr = this.filteredCombined;
+    const map = new Map<string, Combined[]>();
+
+    for (const it of arr) {
+      const list = map.get(it.fecha);
+      if (list) list.push(it);
+      else map.set(it.fecha, [it]);
+    }
+
+    return Array.from(map.entries())
+      .map(([fecha, items]) => ({ fecha, items }))
+      .sort((a, b) => (a.fecha < b.fecha ? 1 : a.fecha > b.fecha ? -1 : 0));
+  }
+
+  // ===== PDF simulado por fecha =====
+  downloadByDate(fechaISO: string): void {
+    // Aquí integrarías tu servicio real de generación/descarga
+    // Por ahora simulamos:
+    console.log('Descargar PDF para fecha:', fechaISO);
+    alert(`Descargar PDF de actividades del ${new Date(fechaISO).toLocaleDateString()}`);
+  }
+
+  // ===== Dropdowns =====
   toggleUserMenu(): void {
     this.showUserMenu = !this.showUserMenu;
     if (this.showUserMenu) this.showEstadoMenu = false;

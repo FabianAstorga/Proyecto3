@@ -3,18 +3,14 @@
     <!-- Título -->
     <div class="mb-6">
       <h1 class="text-3xl font-bold text-[#0D1440]">Historial de actividades</h1>
-      <p class="text-sm text-gray-600 mt-1">
-        Revisa y filtra el historial general en la lista inferior.
-      </p>
+      <p class="text-sm text-gray-600 mt-1">Agrupado por fecha.</p>
     </div>
 
     <!-- Estados -->
     <div *ngIf="loading" class="text-gray-500 text-sm">Cargando…</div>
     <div *ngIf="!loading && error" class="text-red-600 text-sm">{{ error }}</div>
 
-    <!-- ===================================== -->
-    <!-- PANEL DE FILTROS -->
-    <!-- ===================================== -->
+    <!-- Filtros -->
     <div *ngIf="!loading && !error" class="bg-white border border-gray-200 rounded-xl shadow-sm p-4 mb-6">
       <div class="flex flex-wrap items-center gap-3">
         <!-- Usuario -->
@@ -81,13 +77,13 @@
           </div>
         </div>
 
-        <!-- Búsqueda texto -->
-        <div class="flex-1 min-w-[220px]">
+        <!-- Fecha (exacta) -->
+        <div>
+          <label class="block text-xs text-gray-600 mb-1">Fecha</label>
           <input
-            type="text"
-            [(ngModel)]="searchText"
-            placeholder="Buscar por nombre, apellido, actividad, detalle o rol…"
-            class="w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+            type="date"
+            [(ngModel)]="selectedDate"
+            class="px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
           />
         </div>
 
@@ -102,58 +98,76 @@
       </div>
     </div>
 
-    <!-- ===================================== -->
-    <!-- LISTA VERTICAL DE TARJETAS -->
-    <!-- ===================================== -->
-    <div *ngIf="!loading && !error" class="flex flex-col gap-4">
+    <!-- LISTA AGRUPADA POR FECHA -->
+    <div *ngIf="!loading && !error" class="flex flex-col gap-6">
       <div
-        *ngFor="let a of filteredCombined"
-        class="bg-white border border-gray-200 rounded-xl shadow-sm p-5 flex flex-col hover:shadow-md transition"
+        *ngFor="let g of groupedFiltered"
+        class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden"
       >
-        <!-- Encabezado: fecha + estado -->
-        <div class="flex items-start justify-between">
-          <div>
-            <div class="text-sm text-gray-500">{{ a.fecha | date:'dd/MM/yyyy' }}</div>
-            <div class="text-lg font-semibold text-[#0D1440]">{{ a.titulo }}</div>
+        <!-- Encabezado de la fecha (tono azul) -->
+        <div class="px-5 py-3 border-b border-gray-200 bg-[#EAF2FF]">
+          <div class="text-[12px] uppercase tracking-wide text-[#0D1440]/70">
+            Actividades realizadas el
           </div>
-          <span
-            class="px-2 py-1 rounded-full text-xs font-semibold whitespace-nowrap self-start"
-            [ngClass]="statusPillClass(a.estado)"
+          <div class="text-lg font-semibold text-[#0D1440]">
+            {{ g.fecha | date:'dd/MM/yyyy' }}
+          </div>
+        </div>
+
+        <!-- Actividades de esa fecha -->
+        <div class="divide-y divide-gray-100">
+          <div *ngFor="let a of g.items" class="p-5 hover:bg-gray-50 transition">
+            <div class="flex items-start justify-between">
+              <div class="min-w-0">
+                <div class="text-lg font-semibold text-[#0D1440] truncate">
+                  {{ a.titulo }}
+                </div>
+                <div class="text-sm text-gray-700 mt-1 truncate">
+                  {{ a.detalle }}
+                </div>
+              </div>
+              <span
+                class="px-2 py-1 rounded-full text-xs font-semibold whitespace-nowrap self-start"
+                [ngClass]="statusPillClass(a.estado)"
+              >
+                {{ a.estado }}
+              </span>
+            </div>
+
+            <div class="mt-3 flex flex-wrap gap-3 text-sm">
+              <div class="rounded-lg bg-[#EAF2FF] text-[#0D1440] px-3 py-1">
+                <span class="text-[11px] uppercase tracking-wide opacity-70 mr-1">Nombre:</span>
+                <span class="font-medium">{{ a.firstName }} {{ a.lastName }}</span>
+              </div>
+              <div class="rounded-lg bg-gray-50 text-gray-800 px-3 py-1">
+                <span class="text-[11px] uppercase tracking-wide opacity-70 mr-1">Rol:</span>
+                <span class="font-medium">{{ a.role }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer: botón PDF -->
+        <div class="px-5 py-3 border-t border-gray-200 flex justify-end">
+          <button
+            type="button"
+            class="inline-flex items-center gap-1 px-2 py-1 text-xs rounded-md bg-red-50 text-red-700 ring-1 ring-red-200 hover:bg-red-100"
+            (click)="downloadByDate(g.fecha)"
+            aria-label="Descargar PDF"
+            title="Descargar PDF"
           >
-            {{ a.estado }}
-          </span>
-        </div>
-
-        <!-- Detalle -->
-        <div class="text-sm text-gray-700 mt-2">
-          {{ a.detalle }}
-        </div>
-
-        <!-- Datos secundarios -->
-        <div class="mt-3 flex flex-wrap gap-3 text-sm">
-          <div class="rounded-lg bg-[#EAF2FF] text-[#0D1440] px-3 py-1">
-            <span class="text-[11px] uppercase tracking-wide opacity-70 mr-1">Nombre:</span>
-            <span class="font-medium">{{ a.firstName }}</span>
-          </div>
-          <div class="rounded-lg bg-[#EAF2FF] text-[#0D1440] px-3 py-1">
-            <span class="text-[11px] uppercase tracking-wide opacity-70 mr-1">Apellido:</span>
-            <span class="font-medium">{{ a.lastName }}</span>
-          </div>
-          <div class="rounded-lg bg-gray-50 text-gray-800 px-3 py-1">
-            <span class="text-[11px] uppercase tracking-wide opacity-70 mr-1">Rol:</span>
-            <span class="font-medium">{{ a.role }}</span>
-          </div>
-          <div class="rounded-lg bg-gray-50 text-gray-800 px-3 py-1">
-            <span class="text-[11px] uppercase tracking-wide opacity-70 mr-1">Horas:</span>
-            <span class="font-semibold">{{ a.horas }}</span>
-          </div>
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM14 3.5L18.5 8H14V3.5zM8 13h2.2c.9 0 1.8.7 1.8 1.8 0 1.1-.9 1.8-1.8 1.8H9.2V18H8v-5zm1.2 1.2v1.2h1c.4 0 .6-.3.6-.6s-.2-.6-.6-.6h-1zM13 13h1.6c1 0 1.9.8 1.9 1.9S15.6 17 14.6 17H13v-4zm1.2 1.2V15.8h.4c.4 0 .7-.3.7-.7s-.3-.7-.7-.7h-.4zM8 11h8v1.2H8V11z"/>
+            </svg>
+            PDF
+          </button>
         </div>
       </div>
 
       <!-- Estado vacío -->
       <div
-        *ngIf="filteredCombined.length === 0"
-        class="p-8 mt-4 text-center text-gray-500 bg-white border border-dashed rounded-xl"
+        *ngIf="groupedFiltered.length === 0"
+        class="p-8 mt-2 text-center text-gray-500 bg-white border border-dashed rounded-xl"
       >
         No hay resultados con los filtros aplicados.
       </div>

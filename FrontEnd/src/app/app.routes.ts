@@ -130,12 +130,6 @@ export const routes: Routes = [
             .then((m) => m.ProfileHomeComponent),
       },
       {
-        path: 'horario',
-        loadComponent: () =>
-          import('./modules/director/schedule/schedule.component')
-            .then((m) => m.ScheduleComponent),
-      },
-      {
         path: 'actividades',
         children: [
           { path: '', pathMatch: 'full', redirectTo: 'historial' },

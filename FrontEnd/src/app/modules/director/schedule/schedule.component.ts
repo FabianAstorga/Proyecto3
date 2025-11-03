@@ -1,137 +1,67 @@
-import { Component, inject } from '@angular/core';
-import { CommonModule, Location } from '@angular/common';
-import { RouterLink } from '@angular/router';
-import {
-  LayoutComponent,
-  NavItem,
-} from '../../../components/layout/layout.component';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { LayoutComponent } from '../../../components/layout/layout.component';
+import { SECRETARIA_NAV_ITEMS } from '../profile-home/secretaria.nav';
 
-type Block = {
-  label: string; // "08:00 - 09:30"
-  code: string; // "(1 - 2)"
-  isLunch?: boolean;
-};
-
-type DayKey = 'lun' | 'mar' | 'mie' | 'jue' | 'vie' | 'sab';
-type Cell = { title: string; room?: string; note?: string } | null;
+interface User {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string;
+  password: string;
+  photoUrl: string;
+  horarioUrl: string;
+}
 
 @Component({
   standalone: true,
   selector: 'app-schedule',
-  imports: [CommonModule, RouterLink, LayoutComponent],
+  imports: [CommonModule, LayoutComponent, HttpClientModule],
   templateUrl: './schedule.component.html',
 })
-export class ScheduleComponent {
-  private location = inject(Location);
+export class ScheduleComponent implements OnInit {
+  secretariaNavItems = SECRETARIA_NAV_ITEMS;
 
-  // Sidebar items
-  navItems: NavItem[] = [
-    { label: 'Inicio perfil', link: '/perfil' },
-    { label: 'Agregar registro', link: '/actividades/nueva' },
-    { label: 'Horario', link: '/horario' },
-    { label: 'Historial', link: '/actividades/historial' },
-  ];
+  titulo = 'Horario';
+  nombreParaTitulo = 'Cargando…';
+  horarioUrl = '/horario_secretaria.png';
 
-  // Bloques con formato solicitado
-  blocks: Block[] = [
-    { label: '08:00 - 09:30', code: '(1 - 2)' },
-    { label: '09:40 - 11:10', code: '(3 - 4)' },
-    { label: '11:20 - 12:50', code: '(5 - 6)' },
-    { label: '13:00 - 14:30', code: '(7 - 8)', isLunch: true }, // Almuerzo
-    { label: '14:45 - 16:15', code: '(9 - 10)' },
-    { label: '16:20 - 17:50', code: '(11 - 12)' },
-    { label: '17:55 - 19:25', code: '(13 - 14)' },
-    { label: '19:30 - 21:00', code: '(15 - 16)' },
-  ];
+  constructor(private http: HttpClient, private route: ActivatedRoute) {}
 
-  // Días (Lunes a Sábado)
-  days: { key: DayKey; label: string }[] = [
-    { key: 'lun', label: 'Lunes' },
-    { key: 'mar', label: 'Martes' },
-    { key: 'mie', label: 'Miércoles' },
-    { key: 'jue', label: 'Jueves' },
-    { key: 'vie', label: 'Viernes' },
-    { key: 'sab', label: 'Sábado' },
-  ];
+  ngOnInit(): void {
+    // Intentamos obtener :id (si cambiaste la ruta a horario/:id lo tomará de ahí)
+    const idParam = this.route.snapshot.paramMap.get('id');
 
-  // Ejemplo de carga (puedes reemplazar con datos del backend)
-  // Estructura: schedule[dayKey][blockIndex] = Cell | null
-  schedule: Record<DayKey, Cell[]> = {
-    lun: [
-      { title: 'Cálculo I', room: 'A-201' },
-      null,
-      null,
-      null,
-      { title: 'Física', room: 'Lab 3' },
-      null,
-      null,
-      null,
-      null,
-      null,
-    ],
-    mar: [
-      null,
-      { title: 'Programación', room: 'B-105' },
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-    ],
-    mie: [
-      null,
-      null,
-      { title: 'CAD', room: 'Lab CAD' },
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-    ],
-    jue: [
-      null,
-      null,
-      null,
-      null,
-      { title: 'Materiales', room: 'C-301' },
-      null,
-      null,
-      null,
-      null,
-      null,
-    ],
-    vie: [
-      null,
-      null,
-      null,
-      null,
-      null,
-      { title: 'Electrónica', room: 'D-102' },
-      null,
-      null,
-      null,
-      null,
-    ],
-    sab: [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      { title: 'Taller Proyecto', room: 'Makerspace' },
-      null,
-      null,
-      null,
-    ],
-  };
+    this.http.get<User[]>('/assets/data/users.json').subscribe({
+      next: (users) => {
+        let user: User | undefined;
 
-  goBack(): void {
-    this.location.back();
+        if (idParam) {
+          user = users.find((u) => u.id === +idParam);
+        }
+
+        // Fallback: primera Secretaria si no hay :id o no se encontró
+        if (!user) {
+          user = users.find((u) => u.role.toLowerCase() === 'secretaria') ?? users[0];
+        }
+
+        if (user) {
+          const primerNombre = user.firstName.split(' ')[0] ?? user.firstName;
+          const primerApellido = user.lastName.split(' ')[0] ?? user.lastName;
+
+          this.nombreParaTitulo = `${primerNombre} ${primerApellido}`;
+          this.horarioUrl = user.horarioUrl || '/horario_secretaria.png';
+        } else {
+          this.nombreParaTitulo = 'Usuario no encontrado';
+        }
+      },
+      error: (err) => {
+        console.error('Error cargando users.json:', err);
+        this.nombreParaTitulo = 'Error cargando usuario';
+      },
+    });
   }
 }
