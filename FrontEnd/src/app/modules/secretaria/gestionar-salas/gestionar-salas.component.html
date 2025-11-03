@@ -1,6 +1,6 @@
 <app-layout [navItems]="secretariaNavItems" logoutLink="/login">
   <section class="max-w-4xl mx-auto py-6">
-    <div class="bg-white border border-gray-200 rounded-2xl shadow-lg p-8">
+    <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-8">
       <div class="text-center mb-6">
         <h2 class="text-3xl font-extrabold text-[#0D1440]">
           Crear/Editar Sala
@@ -14,54 +14,36 @@
         <!-- Campos Nombre & Ubicación -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label for="nombre" class="block text-sm font-medium text-gray-700"
-              >Nombre de la Sala</label
-            >
+            <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre de la Sala</label>
             <input
               id="nombre"
               type="text"
               formControlName="nombre"
-              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500"
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400"
               placeholder="Ej: Laboratorio B-201"
             />
             <div
-              *ngIf="
-                salaForm.get('nombre')?.invalid &&
-                (salaForm.get('nombre')?.dirty ||
-                  salaForm.get('nombre')?.touched)
-              "
-              class="text-red-500 text-xs mt-1"
+              *ngIf="salaForm.get('nombre')?.invalid && (salaForm.get('nombre')?.dirty || salaForm.get('nombre')?.touched)"
+              class="text-red-600 text-xs mt-1"
             >
-              <span *ngIf="salaForm.get('nombre')?.errors?.['required']"
-                >El nombre es obligatorio.</span
-              >
+              <span *ngIf="salaForm.get('nombre')?.errors?.['required']">El nombre es obligatorio.</span>
             </div>
           </div>
 
           <div>
-            <label
-              for="ubicacion"
-              class="block text-sm font-medium text-gray-700"
-              >Ubicación / Campus</label
-            >
+            <label for="ubicacion" class="block text-sm font-medium text-gray-700">Ubicación / Campus</label>
             <input
               id="ubicacion"
               type="text"
               formControlName="ubicacion"
-              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500"
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400"
               placeholder="Ej: Campus Saucache, Edificio I"
             />
             <div
-              *ngIf="
-                salaForm.get('ubicacion')?.invalid &&
-                (salaForm.get('ubicacion')?.dirty ||
-                  salaForm.get('ubicacion')?.touched)
-              "
-              class="text-red-500 text-xs mt-1"
+              *ngIf="salaForm.get('ubicacion')?.invalid && (salaForm.get('ubicacion')?.dirty || salaForm.get('ubicacion')?.touched)"
+              class="text-red-600 text-xs mt-1"
             >
-              <span *ngIf="salaForm.get('ubicacion')?.errors?.['required']"
-                >La ubicación es obligatoria.</span
-              >
+              <span *ngIf="salaForm.get('ubicacion')?.errors?.['required']">La ubicación es obligatoria.</span>
             </div>
           </div>
         </div>
@@ -69,58 +51,38 @@
         <!-- Capacidad & Código -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label
-              for="capacidadMax"
-              class="block text-sm font-medium text-gray-700"
-              >Capacidad Máxima (personas)</label
-            >
+            <label for="capacidadMax" class="block text-sm font-medium text-gray-700">Capacidad Máxima (personas)</label>
             <input
               id="capacidadMax"
               type="number"
               formControlName="capacidadMax"
               min="1"
-              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500"
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400"
               placeholder="Mínimo 1"
             />
             <div
-              *ngIf="
-                salaForm.get('capacidadMax')?.invalid &&
-                (salaForm.get('capacidadMax')?.dirty ||
-                  salaForm.get('capacidadMax')?.touched)
-              "
-              class="text-red-500 text-xs mt-1"
+              *ngIf="salaForm.get('capacidadMax')?.invalid && (salaForm.get('capacidadMax')?.dirty || salaForm.get('capacidadMax')?.touched)"
+              class="text-red-600 text-xs mt-1"
             >
-              <span *ngIf="salaForm.get('capacidadMax')?.errors?.['required']"
-                >La capacidad es obligatoria.</span
-              >
-              <span *ngIf="salaForm.get('capacidadMax')?.errors?.['min']"
-                >Debe ser al menos 1 persona.</span
-              >
+              <span *ngIf="salaForm.get('capacidadMax')?.errors?.['required']">La capacidad es obligatoria.</span>
+              <span *ngIf="salaForm.get('capacidadMax')?.errors?.['min']">Debe ser al menos 1 persona.</span>
             </div>
           </div>
 
           <div>
-            <label for="codigo" class="block text-sm font-medium text-gray-700"
-              >Código de Identificación</label
-            >
+            <label for="codigo" class="block text-sm font-medium text-gray-700">Código de Identificación</label>
             <input
               id="codigo"
               type="text"
               formControlName="codigo"
-              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500"
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400"
               placeholder="Ej: LAB201"
             />
             <div
-              *ngIf="
-                salaForm.get('codigo')?.invalid &&
-                (salaForm.get('codigo')?.dirty ||
-                  salaForm.get('codigo')?.touched)
-              "
-              class="text-red-500 text-xs mt-1"
+              *ngIf="salaForm.get('codigo')?.invalid && (salaForm.get('codigo')?.dirty || salaForm.get('codigo')?.touched)"
+              class="text-red-600 text-xs mt-1"
             >
-              <span *ngIf="salaForm.get('codigo')?.errors?.['required']"
-                >El código es obligatorio.</span
-              >
+              <span *ngIf="salaForm.get('codigo')?.errors?.['required']">El código es obligatorio.</span>
             </div>
           </div>
         </div>
@@ -128,13 +90,11 @@
         <!-- Upload Imagen del Mapa y QR -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label class="block text-sm font-medium text-gray-700"
-              >Subir Imagen del Mapa (Opcional)</label
-            >
+            <label class="block text-sm font-medium text-gray-700">Subir Imagen del Mapa (Opcional)</label>
             <div
               class="border-2 border-dashed rounded-md p-6 mt-1 text-center cursor-pointer transition-colors duration-200"
               [ngClass]="{
-                'border-blue-500 bg-blue-50': isDragging,
+                'border-yellow-500 bg-yellow-50': isDragging,
                 'border-gray-300 hover:border-gray-400': !isDragging
               }"
               (dragover)="handleDragOver($event)"
@@ -142,9 +102,8 @@
               (drop)="handleDrop($event)"
               (click)="fileInput.click()"
             >
-              <p class="text-gray-600 mb-2">
-                <span class="font-bold">Arrastra y suelta aquí</span> el plano,
-                o haz click para seleccionar.
+              <p class="text-gray-700 mb-3">
+                <span class="font-semibold">Arrastra y suelta aquí</span> el plano, o haz click para seleccionar.
               </p>
 
               <label for="fileInput" class="sr-only">Subir imagen</label>
@@ -156,47 +115,50 @@
                 (change)="handleFileInput($event)"
                 class="hidden"
               />
-              <button type="button" (click)="fileInput.click()">
+              <button
+                type="button"
+                (click)="fileInput.click()"
+                class="inline-flex items-center px-3 py-1.5 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50"
+              >
                 Seleccionar archivo
               </button>
 
-              <div *ngIf="selectedMapFile" class="mt-2 relative">
+              <div *ngIf="selectedMapFile" class="mt-3 relative">
                 <button
                   type="button"
                   (click)="removeSelectedImage()"
-                  class="absolute top-0 right-0 text-red-600 font-bold rounded-full bg-white shadow p-1 hover:bg-red-100 transition"
+                  class="absolute -top-2 -right-2 text-red-600 font-bold rounded-full bg-white shadow p-1 hover:bg-red-100 transition"
+                  aria-label="Quitar imagen seleccionada"
+                  title="Quitar imagen"
                 >
                   ✕
                 </button>
-                <p class="text-sm font-semibold text-green-600">
+                <p class="text-sm font-semibold text-emerald-700">
                   Archivo seleccionado: {{ selectedMapFile.name }}
                 </p>
                 <img
                   *ngIf="mapPreview"
                   [src]="mapPreview"
-                  alt="Vista previa"
-                  class="mt-2 mx-auto max-h-40 rounded-md shadow-sm"
+                  alt="Vista previa del plano"
+                  class="mt-2 mx-auto max-h-40 rounded-md border border-gray-200 shadow-sm"
                 />
               </div>
             </div>
-            <p class="text-gray-400 text-xs mt-1">
-              Sube una imagen (PNG, JPG, GIF, etc.) del plano de ubicación de la
-              sala.
+            <p class="text-gray-500 text-xs mt-2">
+              Sube una imagen (PNG, JPG, GIF, etc.) del plano de ubicación de la sala.
             </p>
           </div>
 
           <div>
-            <label for="QR" class="block text-sm font-medium text-gray-700"
-              >URL del Código QR (Opcional)</label
-            >
+            <label for="QR" class="block text-sm font-medium text-gray-700">URL del Código QR (Opcional)</label>
             <input
               id="QR"
               type="url"
               formControlName="QR"
-              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500"
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400"
               placeholder="https://qrcodes.com/sala-xyz..."
             />
-            <p class="text-gray-400 text-xs mt-1">
+            <p class="text-gray-500 text-xs mt-2">
               URL de la imagen o recurso del código QR.
             </p>
           </div>
@@ -206,7 +168,7 @@
           <button
             type="submit"
             [disabled]="salaForm.invalid"
-            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition duration-150"
+            class="w-full flex justify-center py-3 px-4 rounded-md shadow-sm text-lg font-semibold text-[#0D1440] bg-yellow-400 hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400 disabled:opacity-50 disabled:cursor-not-allowed transition"
           >
             Registrar Sala
           </button>

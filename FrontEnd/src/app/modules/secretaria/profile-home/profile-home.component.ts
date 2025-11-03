@@ -2,10 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { switchMap, of } from 'rxjs';
+
 import { User } from '../../../models/user.model';
 import { Activity } from '../../../models/activity.model';
 import { Cargo } from '../../../models/charge.model';
-import { switchMap, of } from 'rxjs';
+
 import {
   LayoutComponent,
   NavItem,
@@ -27,12 +29,12 @@ type Gestion = {
   templateUrl: './profile-home.component.html',
 })
 export class ProfileHomeComponent implements OnInit {
-  // Inicializar vacío para que se llene dinámicamente
   user: User | undefined;
 
-  tasksCount = 27;
-  notificationLabel = '2 nuevas';
-  lastSession = '2025-10-30 09:48';
+  // KPIs (calculados desde activities.json)
+  tasksCount = 0;
+  notificationLabel = '—';
+  lastSession = '—';
 
   recent: Activity[] = [];
   cargoDescripcion: string[] = [];
@@ -41,17 +43,10 @@ export class ProfileHomeComponent implements OnInit {
   showDetails = false;
 
   get secretariaNavItems(): NavItem[] {
-    const userId = this.user?.id || 0; // Obtiene el ID real o 0 si no está cargado
+    const userId = this.user?.id || 0;
     const items = [...SECRETARIA_NAV_ITEMS];
-
-    // Busca el ítem del perfil
     const perfilItem = items.find((item) => item.label === 'Inicio perfil');
-
-    if (perfilItem) {
-      // Reemplaza el placeholder :id con el valor real
-      perfilItem.link = `/secretaria/perfil/${userId}`;
-    }
-
+    if (perfilItem) perfilItem.link = `/secretaria/perfil/${userId}`;
     return items;
   }
 
@@ -62,45 +57,57 @@ export class ProfileHomeComponent implements OnInit {
       .pipe(
         switchMap((params) => {
           const id = params.get('id');
-          if (id) {
-            return this.http.get<User[]>('/assets/data/users.json').pipe(
-              switchMap((users) => {
-                this.user = users.find((u) => u.id === +id);
-                return of(this.user);
-              })
-            );
-          }
-          return of(undefined);
+          if (!id) return of(undefined);
+
+          // 1) Cargar usuario desde users.json
+          return this.http.get<User[]>('/assets/data/users.json').pipe(
+            switchMap((users) => {
+              this.user = users.find((u) => u.id === +id);
+              return of(this.user);
+            })
+          );
         })
       )
       .subscribe(() => {
-        // Al asignar this.user, el getter se actualizará automáticamente la próxima vez que el DOM lo pida.
         if (this.user) {
+          // 2) Cargar actividades y KPIs desde activities.json
           this.loadActivities();
+
+          // 3) Cargar descripción del cargo desde charges.json
           this.loadCargos();
         }
       });
   }
 
-  loadActivities() {
+  private loadActivities() {
     this.http.get<Activity[]>('/assets/data/activities.json').subscribe({
       next: (activities) => {
-        if (this.user) {
-          this.recent = activities.filter((a) => a.userId === this.user?.id);
-          this.tasksCount = this.recent.length;
-        }
+        if (!this.user) return;
+
+        // Del JSON: todas las actividades del usuario
+        this.recent = activities
+          .filter((a) => a.userId === this.user!.id)
+          .sort((a, b) => (a.fecha < b.fecha ? 1 : a.fecha > b.fecha ? -1 : 0));
+
+        // KPIs calculados desde el JSON
+        this.tasksCount = this.recent.length;
+
+        const pendientes = this.recent.filter((a) => a.estado === 'Pendiente').length;
+        this.notificationLabel = pendientes > 0 ? `${pendientes} pendientes` : 'Sin pendientes';
+
+        // “Última sesión” = fecha más reciente encontrada en sus actividades
+        this.lastSession = this.recent.length > 0 ? this.recent[0].fecha : '—';
       },
       error: (err) => console.error('Error cargando actividades:', err),
     });
   }
 
-  loadCargos() {
+  private loadCargos() {
     this.http.get<Cargo[]>('/assets/data/charges.json').subscribe({
       next: (cargos) => {
-        if (this.user) {
-          const cargo = cargos.find((c) => c.role === this.user?.role);
-          this.cargoDescripcion = cargo ? cargo.descripcion : [];
-        }
+        if (!this.user) return;
+        const cargo = cargos.find((c) => c.role === this.user!.role);
+        this.cargoDescripcion = cargo ? cargo.descripcion : [];
       },
       error: (err) => console.error('Error cargando cargos:', err),
     });
@@ -115,15 +122,11 @@ export class ProfileHomeComponent implements OnInit {
     return map[estado];
   }
 
-  openDetails() {
-    this.showDetails = true;
-  }
-  closeDetails() {
-    this.showDetails = false;
-  }
+  // Modal
+  openDetails() { this.showDetails = true; }
+  closeDetails() { this.showDetails = false; }
 
   onAvatarError(e: Event) {
-    // Si la URL de la foto falla, usa una imagen de avatar predeterminada
     (e.target as HTMLImageElement).src = '/avatar.png';
   }
 }

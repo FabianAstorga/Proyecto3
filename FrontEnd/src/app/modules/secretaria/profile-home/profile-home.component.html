@@ -1,24 +1,27 @@
 <app-layout [navItems]="secretariaNavItems" logoutLink="/login">
+
   <!-- Identidad -->
   <div
+    *ngIf="user"
     class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 flex items-center justify-between gap-4"
   >
     <!-- Izquierda: avatar + nombre + correo -->
     <div class="flex items-center gap-4 min-w-0">
       <img
-        [src]="user!.photoUrl"
+        [src]="user.photoUrl"
+        (error)="onAvatarError($event)"
         alt="avatar"
         class="h-16 w-16 md:h-20 md:w-20 rounded-full ring-2 ring-yellow-300 object-cover"
       />
       <div class="min-w-0">
         <div class="text-2xl md:text-3xl font-bold text-gray-900 truncate">
-          {{ user!.firstName }} {{ user!.lastName }}
+          {{ user.firstName }} {{ user.lastName }}
         </div>
         <div class="text-xl md:text-2xl text-gray-800 truncate">
-          {{ user!.role }}
+          {{ user.role }}
         </div>
         <div class="text-sm md:text-base text-gray-700 truncate">
-          {{ user!.email }}
+          {{ user.email }}
         </div>
       </div>
     </div>
