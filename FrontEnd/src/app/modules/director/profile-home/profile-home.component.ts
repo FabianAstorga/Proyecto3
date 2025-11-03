@@ -7,6 +7,7 @@ import { User } from '../../../models/user.model';
 import { Activity } from '../../../models/activity.model';
 import { Cargo } from '../../../models/charge.model';
 import { switchMap, of } from 'rxjs';
+import { DIRECTOR_NAV_ITEMS } from '../profile-home/director.nav';
 
 type Report = {
   fecha: string;
@@ -22,6 +23,8 @@ type Report = {
   templateUrl: './profile-home.component.html',
 })
 export class ProfileHomeComponent implements OnInit {
+  navItems = DIRECTOR_NAV_ITEMS;
+
   user: User | undefined;
 
   reportsReviewed = 14;
@@ -83,16 +86,10 @@ export class ProfileHomeComponent implements OnInit {
     });
   }
 
-  openDetails() {
-    this.showDetails = true;
-  }
-  closeDetails() {
-    this.showDetails = false;
-  }
+  openDetails() { this.showDetails = true; }
+  closeDetails() { this.showDetails = false; }
 
-  onAvatarError(e: Event) {
-    (e.target as HTMLImageElement).src = '/avatar.png';
-  }
+  onAvatarError(e: Event) { (e.target as HTMLImageElement).src = '/avatar.png'; }
 
   getReportState(estado: Activity['estado']): Report['estado'] {
     const map: Record<Activity['estado'], Report['estado']> = {

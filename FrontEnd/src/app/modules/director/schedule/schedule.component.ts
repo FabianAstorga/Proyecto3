@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { LayoutComponent } from '../../../components/layout/layout.component';
-import { SECRETARIA_NAV_ITEMS } from '../profile-home/secretaria.nav';
+import { DIRECTOR_NAV_ITEMS } from '../profile-home/director.nav';
 
 interface User {
   id: number;
@@ -23,7 +23,7 @@ interface User {
   templateUrl: './schedule.component.html',
 })
 export class ScheduleComponent implements OnInit {
-  secretariaNavItems = SECRETARIA_NAV_ITEMS;
+  navItems = DIRECTOR_NAV_ITEMS;
 
   titulo = 'Horario';
   nombreParaTitulo = 'Cargando…';
@@ -32,7 +32,7 @@ export class ScheduleComponent implements OnInit {
   constructor(private http: HttpClient, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
-    // Intentamos obtener :id (si cambiaste la ruta a horario/:id lo tomará de ahí)
+    // Si más adelante usas /director/horario/:id, esto lo toma
     const idParam = this.route.snapshot.paramMap.get('id');
 
     this.http.get<User[]>('/assets/data/users.json').subscribe({
@@ -43,9 +43,11 @@ export class ScheduleComponent implements OnInit {
           user = users.find((u) => u.id === +idParam);
         }
 
-        // Fallback: primera Secretaria si no hay :id o no se encontró
+        // Fallback: busca un director; si no, toma el primero
         if (!user) {
-          user = users.find((u) => u.role.toLowerCase() === 'secretaria') ?? users[0];
+          user =
+            users.find((u) => u.role.toLowerCase() === 'director') ??
+            users[0];
         }
 
         if (user) {
