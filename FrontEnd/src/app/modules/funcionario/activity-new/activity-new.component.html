@@ -1,30 +1,26 @@
-<app-layout [title]="'Académico'" [logoutLink]="'/login'">
-  <!-- CONTENIDO -->
+<app-layout [title]="'Académico'" [navItems]="funcionarioNavItems" [logoutLink]="'/login'">
   <div class="min-h-screen" style="background-color:#F4F8FF;">
-    <!-- Card grande -->
     <section class="max-w-6xl mx-auto px-6 py-10">
-      <!-- Borde azul -->
       <div class="bg-white rounded-2xl border border-blue-300 shadow-sm">
         <div class="px-8 pt-8">
-          <!-- Título con logo, mismo tamaño/peso que el nombre del perfil -->
           <div class="flex items-baseline justify-center gap-3">
-  <img src="/logodim.png" alt="Logo" class="h-12 w-auto select-none" />
-  <h2 class="text-2xl md:text-3xl font-bold text-[#0D1440] leading-tight">
-    Registrar Actividad Curricular
-  </h2>
-</div>
+            <img src="/logodim.png" alt="Logo" class="h-12 w-auto select-none" />
+            <h2 class="text-2xl md:text-3xl font-bold text-[#0D1440] leading-tight">
+              Registrar Actividad Curricular
+            </h2>
+          </div>
         </div>
 
-        <!-- Aviso general si hay fechas fuera del mes -->
-        <div *ngIf="form.errors?.['outOfMonth']"
+        <!-- Aviso MULTI-DÍA inválido -->
+        <div *ngIf="multi.invalid && multi.touched"
              class="mx-8 mt-4 rounded-md bg-red-50 border border-red-200 text-red-700 px-4 py-3 text-sm">
-          Solo puedes registrar actividades dentro del <strong>mes actual</strong>.
+          Revisa el bloque <strong>Múltiples días</strong>: debes mantenerte dentro del mes actual y respetar feriados.
         </div>
 
         <form class="px-8 py-8 space-y-7" [formGroup]="form" (ngSubmit)="submit()">
           <!-- Fila 1 -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Fecha principal -->
+            <!-- Fecha principal (ahora sin restricciones) -->
             <div class="md:col-span-1">
               <label class="block text-sm font-medium text-gray-700">Fecha (principal)</label>
               <mat-form-field appearance="outline" class="w-full mt-1">
@@ -32,15 +28,12 @@
                   matInput
                   [matDatepicker]="picker1"
                   formControlName="fecha"
-                  [matDatepickerFilter]="dateFilter"
+                  [matDatepickerFilter]="dateFilterMain"
                   placeholder="dd/mm/aaaa"
                 />
-                <mat-datepicker #picker1 [dateClass]="dateClass"></mat-datepicker>
+                <mat-datepicker #picker1></mat-datepicker>
                 <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
               </mat-form-field>
-              <p *ngIf="f.fecha.touched && f.fecha.errors?.['outOfMonth']" class="mt-1 text-sm text-red-600">
-                Debe estar dentro del mes actual ({{ monthStartISO }} a {{ monthEndISO }}).
-              </p>
             </div>
 
             <!-- Tipo de actividad -->
@@ -51,6 +44,17 @@
                   <mat-option *ngFor="let t of tiposActividad" [value]="t">{{ t }}</mat-option>
                 </mat-select>
               </mat-form-field>
+
+              <!-- Campo “Otro (especificar)” -->
+              <div *ngIf="form.get('tipo_actividad')?.value === 'Otro (especificar)'">
+                <mat-form-field appearance="outline" class="w-full mt-2">
+                  <input matInput formControlName="tipo_actividad_otro" placeholder="Especifica el tipo de actividad" />
+                </mat-form-field>
+                <p *ngIf="form.get('tipo_actividad_otro')?.touched && form.get('tipo_actividad_otro')?.invalid"
+                   class="mt-1 text-xs text-red-600">
+                  Campo requerido (máx. 100 caracteres).
+                </p>
+              </div>
             </div>
 
             <!-- Estado -->
@@ -68,14 +72,15 @@
           <div>
             <label class="block text-sm font-medium text-gray-700">Descripción</label>
             <mat-form-field appearance="outline" class="w-full mt-1">
-              <textarea matInput rows="6" formControlName="descripcionAct" placeholder="Describe brevemente la actividad realizada..."></textarea>
+              <textarea matInput rows="6" formControlName="descripcionAct"
+                        placeholder="Describe brevemente la actividad realizada..."></textarea>
             </mat-form-field>
             <p *ngIf="f.descripcionAct.touched && f.descripcionAct.invalid" class="mt-1 text-sm text-red-600">
               La descripción es obligatoria (máx. 500 caracteres).
             </p>
           </div>
 
-          <!-- MULTI-DÍA -->
+          <!-- MULTI-DÍA (se mantiene restricción al mes + bloqueo feriados) -->
           <div class="rounded-xl border border-gray-200 bg-gray-50 p-5" formGroupName="multi">
             <div class="flex items-center justify-between gap-4">
               <div class="text-sm font-semibold text-gray-800">Aplicar a múltiples días</div>
@@ -105,7 +110,7 @@
                           class="inline-flex items-center px-3 py-1.5 rounded-md border border-blue-600 text-blue-600 font-medium hover:bg-blue-50">
                     + Agregar fecha
                   </button>
-                  <span class="text-xs text-gray-600">Añade fechas dentro del mes actual (no feriados).</span>
+                  <span class="text-xs text-gray-600">Solo dentro del mes actual (se excluyen feriados).</span>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3" formArrayName="specificDates">
@@ -115,10 +120,9 @@
                         matInput
                         [matDatepicker]="specPicker"
                         [formControlName]="i"
-                        [matDatepickerFilter]="dateFilter"
+                        [matDatepickerFilter]="dateFilterMulti"
                         placeholder="dd/mm/aaaa"
                       />
-                      <!-- Un solo datepicker compartido -->
                       <mat-datepicker #specPicker [dateClass]="dateClass"></mat-datepicker>
                       <mat-datepicker-toggle matSuffix [for]="specPicker"></mat-datepicker-toggle>
                     </mat-form-field>
@@ -138,15 +142,12 @@
                         matInput
                         [matDatepicker]="startPicker"
                         formControlName="start"
-                        [matDatepickerFilter]="dateFilter"
+                        [matDatepickerFilter]="dateFilterMulti"
                         placeholder="dd/mm/aaaa"
                       />
                       <mat-datepicker #startPicker [dateClass]="dateClass"></mat-datepicker>
                       <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
                     </mat-form-field>
-                    <p *ngIf="weekly.get('start')?.errors?.['outOfMonth']" class="mt-1 text-xs text-red-600">
-                      Debe estar dentro del mes actual.
-                    </p>
                   </div>
                   <div>
                     <label class="block text-sm font-medium text-gray-700">Hasta</label>
@@ -155,15 +156,12 @@
                         matInput
                         [matDatepicker]="endPicker"
                         formControlName="end"
-                        [matDatepickerFilter]="dateFilter"
+                        [matDatepickerFilter]="dateFilterMulti"
                         placeholder="dd/mm/aaaa"
                       />
                       <mat-datepicker #endPicker [dateClass]="dateClass"></mat-datepicker>
                       <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
                     </mat-form-field>
-                    <p *ngIf="weekly.get('end')?.errors?.['outOfMonth']" class="mt-1 text-xs text-red-600">
-                      Debe estar dentro del mes actual.
-                    </p>
                     <p *ngIf="weekly.get('end')?.errors?.['range']" class="mt-1 text-xs text-red-600">
                       “Hasta” no puede ser menor que “Desde”.
                     </p>
@@ -212,7 +210,7 @@
               Registrar
             </button>
 
-            <a routerLink="/perfil"
+            <a [routerLink]="perfilLink"
                class="w-full inline-flex items-center justify-center px-4 py-3 rounded-md
                       bg-blue-600 text-white font-semibold hover:bg-blue-700
                       focus:outline-none focus:ring-4 ring-blue-200 transition">
@@ -224,14 +222,10 @@
     </section>
   </div>
 
-  <!-- Estilos locales para el calendario de Angular Material -->
+  <!-- Estilos locales para el calendario de Angular Material (para MULTI-DÍA) -->
   <style>
     .mat-calendar-body-disabled .mat-calendar-body-cell-content { opacity: 0.35; }
-    .holiday-cell .mat-calendar-body-cell-content {
-      background: #0D1440; color: #fff; opacity: 0.35; border-radius: 9999px;
-    }
-    .available-cell .mat-calendar-body-cell-content {
-      background: rgba(13, 20, 64, 0.06); border-radius: 9999px;
-    }
+    .holiday-cell .mat-calendar-body-cell-content { background: #0D1440; color: #fff; opacity: 0.35; border-radius: 9999px; }
+    .available-cell .mat-calendar-body-cell-content { background: rgba(13, 20, 64, 0.06); border-radius: 9999px; }
   </style>
 </app-layout>

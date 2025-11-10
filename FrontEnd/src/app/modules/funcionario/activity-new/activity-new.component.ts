@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, ActivatedRoute } from '@angular/router';
 import {
   ReactiveFormsModule,
   FormBuilder,
@@ -22,23 +22,19 @@ import {
 } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 
-import { LayoutComponent } from '../../../components/layout/layout.component';
+import {
+  LayoutComponent,
+  NavItem,
+} from '../../../components/layout/layout.component';
+import { FUNCIONARIO_NAV_ITEMS } from '../profile-home/funcionario.nav';
 
 type WeekFlags = {
-  mon: boolean;
-  tue: boolean;
-  wed: boolean;
-  thu: boolean;
-  fri: boolean;
-  sat: boolean;
-  sun: boolean;
+  mon: boolean; tue: boolean; wed: boolean; thu: boolean; fri: boolean; sat: boolean; sun: boolean;
 };
 
-/** Adapter para que la semana comience en lunes */
+/** Semana parte en lunes */
 class MondayFirstDateAdapter extends NativeDateAdapter {
-  override getFirstDayOfWeek(): number {
-    return 1;
-  } // 0=Domingo, 1=Lunes
+  override getFirstDayOfWeek(): number { return 1; }
 }
 
 /** Formatos de fecha: dd/MM/yyyy */
@@ -68,15 +64,28 @@ export const ES_DATE_FORMATS = {
   ],
   templateUrl: './activity-new.component.html',
   providers: [
-    { provide: MAT_DATE_LOCALE, useValue: 'es-CL' }, // Español (Chile)
+    { provide: MAT_DATE_LOCALE, useValue: 'es-CL' },
     { provide: DateAdapter, useClass: MondayFirstDateAdapter },
     { provide: MAT_DATE_FORMATS, useValue: ES_DATE_FORMATS },
   ],
 })
 export class ActivityNewComponent {
   private fb = inject(FormBuilder);
+  private route = inject(ActivatedRoute);
 
-  // Catálogos demo
+  // Nav dinámico con el :id actual
+  get funcionarioNavItems(): NavItem[] {
+    const id = this.route.snapshot.paramMap.get('id') ?? '';
+    return FUNCIONARIO_NAV_ITEMS.map(i =>
+      i.label === 'Inicio perfil' ? { ...i, link: `/funcionario/perfil/${id}` } : i
+    );
+  }
+  get perfilLink(): string {
+    const id = this.route.snapshot.paramMap.get('id') ?? '';
+    return `/funcionario/perfil/${id}`;
+  }
+
+  // Catálogos (con “Otro (especificar)”)
   tiposActividad = [
     'Taller',
     'Seminario',
@@ -84,55 +93,34 @@ export class ActivityNewComponent {
     'Investigación',
     'Deportivo',
     'Cultural',
+    'Otro (especificar)',
   ];
   estados = ['Realizada', 'Pendiente'];
 
-  // Mes actual (límites)
+  // Mes actual (para MULTI-DÍA)
   private readonly now = new Date();
-  private readonly firstDay = new Date(
-    this.now.getFullYear(),
-    this.now.getMonth(),
-    1
-  );
-  private readonly lastDay = new Date(
-    this.now.getFullYear(),
-    this.now.getMonth() + 1,
-    0
-  );
+  private readonly firstDay = new Date(this.now.getFullYear(), this.now.getMonth(), 1);
+  private readonly lastDay  = new Date(this.now.getFullYear(), this.now.getMonth() + 1, 0);
 
   readonly monthStartISO = this.toISO(this.firstDay);
-  readonly monthEndISO = this.toISO(this.lastDay);
+  readonly monthEndISO   = this.toISO(this.lastDay);
 
-  // Feriados 2025 (Chile)
+  // Feriados 2025 (Chile) -> se siguen bloqueando en MULTI-DÍA
   private readonly feriadosISO = new Set<string>([
-    '2025-01-01',
-    '2025-04-18',
-    '2025-04-19',
-    '2025-05-01',
-    '2025-05-21',
-    '2025-06-07',
-    '2025-06-20',
-    '2025-06-29',
-    '2025-07-16',
-    '2025-08-15',
-    '2025-09-18',
-    '2025-09-19',
-    '2025-10-12',
-    '2025-10-31',
-    '2025-11-01',
-    '2025-11-16',
-    '2025-12-08',
-    '2025-12-14',
-    '2025-12-25',
+    '2025-01-01','2025-04-18','2025-04-19','2025-05-01','2025-05-21','2025-06-07','2025-06-20',
+    '2025-06-29','2025-07-16','2025-08-15','2025-09-18','2025-09-19','2025-10-12','2025-10-31',
+    '2025-11-01','2025-11-16','2025-12-08','2025-12-14','2025-12-25',
   ]);
 
-  // Hoy
-  readonly today = new Date();
-
+  // === Form ===
   form = this.fb.group({
     descripcionAct: ['', [Validators.required, Validators.maxLength(500)]],
-    fecha: [this.today, Validators.required],
+
+    // ⬇⬇ CAMBIO: la fecha principal ya NO se restringe al mes vigente
+    fecha: [new Date(), Validators.required],
+
     tipo_actividad: [this.tiposActividad[0], Validators.required],
+    tipo_actividad_otro: [''], // requerido si se elige “Otro (especificar)”
     estado: [this.estados[0], Validators.required],
 
     multi: this.fb.group({
@@ -140,149 +128,109 @@ export class ActivityNewComponent {
       mode: ['specific' as 'specific' | 'weekly'],
       specificDates: this.fb.array<Date>([]),
       weekly: this.fb.group({
-        start: [this.today, Validators.required],
-        end: [this.today, Validators.required],
+        start: [new Date(), Validators.required],
+        end:   [new Date(), Validators.required],
         weekdays: this.fb.group<WeekFlags>({
-          mon: false,
-          tue: false,
-          wed: false,
-          thu: false,
-          fri: false,
-          sat: false,
-          sun: false,
+          mon: false, tue: false, wed: false, thu: false, fri: false, sat: false, sun: false,
         }),
       }),
     }),
-  });
+  }, { validators: [] }); // removemos el validador global del mes
 
   constructor() {
-    // Validador de mes (defensa extra)
-    this.form.addValidators(this.restrictToCurrentMonth.bind(this));
+    // Validador condicional para “tipo_actividad_otro”
+    this.form.get('tipo_actividad')!.valueChanges.subscribe(val => {
+      const otroCtrl = this.form.get('tipo_actividad_otro')!;
+      if (val === 'Otro (especificar)') {
+        otroCtrl.addValidators([Validators.required, Validators.maxLength(100)]);
+      } else {
+        otroCtrl.clearValidators();
+        otroCtrl.reset('');
+      }
+      otroCtrl.updateValueAndValidity({ emitEvent: false });
+    });
+
+    // Validador SOLO para la sección MULTI-DÍA (mes vigente + no feriados + rango)
+    this.multi.addValidators(this.validateMultiSection.bind(this));
   }
 
-  // Getters
-  get f() {
-    return this.form.controls;
-  }
-  get multi() {
-    return this.form.get('multi')!;
-  }
-  get specificDates(): FormArray {
-    return this.multi.get('specificDates') as FormArray;
-  }
-  get weekly() {
-    return this.multi.get('weekly')!;
-  }
-  get weekdays() {
-    return this.weekly.get('weekdays')!;
-  }
+  // Getters de conveniencia
+  get f() { return this.form.controls; }
+  get multi() { return this.form.get('multi')!; }
+  get specificDates(): FormArray { return this.multi.get('specificDates') as FormArray; }
+  get weekly() { return this.multi.get('weekly')!; }
 
-  // ==== UI helpers (datepicker) ====
-  dateFilter = (d: Date | null): boolean => {
+  // ==== Filtros de calendario ====
+
+  /** ⬇⬇ FECHA PRINCIPAL: sin restricciones (se permiten fechas anteriores) */
+  dateFilterMain = (_d: Date | null): boolean => true;
+
+  /** MULTI-DÍA: restringe al mes vigente y NO permite feriados */
+  dateFilterMulti = (d: Date | null): boolean => {
     if (!d) return false;
     const iso = this.toISO(d);
-    return (
-      iso >= this.monthStartISO &&
-      iso <= this.monthEndISO &&
-      !this.feriadosISO.has(iso)
-    );
+    return iso >= this.monthStartISO && iso <= this.monthEndISO && !this.feriadosISO.has(iso);
   };
 
+  /** Estilo visual en calendario (se usa en MULTI-DÍA) */
   dateClass = (d: Date): string => {
-    return this.feriadosISO.has(this.toISO(d))
-      ? 'holiday-cell'
-      : 'available-cell';
+    return this.feriadosISO.has(this.toISO(d)) ? 'holiday-cell' : 'available-cell';
   };
 
-  addSpecificDate(value: Date = this.today) {
-    this.specificDates.push(this.fb.control(value, Validators.required));
-  }
-  removeSpecificDate(i: number) {
-    this.specificDates.removeAt(i);
-  }
-
-  // ==== Validación ====
-  private restrictToCurrentMonth(
-    group: AbstractControl
-  ): ValidationErrors | null {
-    const inMonth = (dt: Date | null | undefined) =>
-      !!dt &&
-      this.toISO(dt) >= this.monthStartISO &&
-      this.toISO(dt) <= this.monthEndISO;
+  // ==== Validación MULTI-DÍA (solo esta sección queda limitada al mes) ====
+  private validateMultiSection(group: AbstractControl): ValidationErrors | null {
+    const enable = group.get('enable')?.value as boolean;
+    if (!enable) return null;
 
     let anyError = false;
+    const mode = group.get('mode')?.value as 'specific' | 'weekly';
 
-    const fecha = group.get('fecha')?.value as Date | null;
-    group.get('fecha')?.setErrors(null);
-    if (!inMonth(fecha)) {
-      group.get('fecha')?.setErrors({ outOfMonth: true });
-      anyError = true;
+    const inMonth = (dt: Date | null | undefined) =>
+      !!dt && this.toISO(dt) >= this.monthStartISO && this.toISO(dt) <= this.monthEndISO;
+
+    if (mode === 'specific') {
+      const fa = group.get('specificDates') as FormArray;
+      fa.controls.forEach((c) => {
+        const v = c.value as Date | null;
+        c.setErrors(null);
+        if (!inMonth(v)) { c.setErrors({ outOfMonth: true }); anyError = true; }
+        else if (v && this.feriadosISO.has(this.toISO(v))) { c.setErrors({ holiday: true }); anyError = true; }
+      });
+    } else {
+      const startCtrl = group.get('weekly.start')!;
+      const endCtrl   = group.get('weekly.end')!;
+      const s = startCtrl.value as Date | null;
+      const e = endCtrl.value   as Date | null;
+      startCtrl.setErrors(null); endCtrl.setErrors(null);
+
+      if (!inMonth(s)) { startCtrl.setErrors({ outOfMonth: true }); anyError = true; }
+      if (!inMonth(e)) { endCtrl.setErrors({ outOfMonth: true }); anyError = true; }
+      if (s && e && s > e) { endCtrl.setErrors({ range: true }); anyError = true; }
     }
 
-    const multi = group.get('multi');
-    if (multi?.get('enable')?.value) {
-      const mode = multi.get('mode')?.value as 'specific' | 'weekly';
-      if (mode === 'specific') {
-        const fa = multi.get('specificDates') as FormArray;
-        fa.controls.forEach((c) => {
-          const v = c.value as Date | null;
-          if (!inMonth(v)) {
-            c.setErrors({ outOfMonth: true });
-            anyError = true;
-          } else if (c.hasError('outOfMonth')) c.setErrors(null);
-        });
-      } else {
-        const startCtrl = multi.get('weekly.start');
-        const endCtrl = multi.get('weekly.end');
-        const s = startCtrl?.value as Date | null;
-        const e = endCtrl?.value as Date | null;
-        startCtrl?.setErrors(null);
-        endCtrl?.setErrors(null);
-        if (!inMonth(s)) {
-          startCtrl?.setErrors({ outOfMonth: true });
-          anyError = true;
-        }
-        if (!inMonth(e)) {
-          endCtrl?.setErrors({ outOfMonth: true });
-          anyError = true;
-        }
-        if (s && e && s > e) {
-          endCtrl?.setErrors({ range: true });
-          anyError = true;
-        }
-      }
-    }
-
-    return anyError ? { outOfMonth: true } : null;
+    return anyError ? { multiInvalid: true } : null;
   }
 
   // ==== Utilidades ====
   private toISO(d: Date): string {
-    return new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()))
-      .toISOString()
-      .slice(0, 10);
+    return new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())).toISOString().slice(0, 10);
   }
-
   private *daysBetween(start: Date, end: Date) {
     const cur = new Date(start);
-    while (cur <= end) {
-      yield new Date(cur);
-      cur.setDate(cur.getDate() + 1);
-    }
+    while (cur <= end) { yield new Date(cur); cur.setDate(cur.getDate() + 1); }
+  }
+  private selectedWeekdays(): number[] {
+    const w = this.weekly.get('weekdays')!.value as WeekFlags;
+    const map: [keyof WeekFlags, number][] = [['sun',0],['mon',1],['tue',2],['wed',3],['thu',4],['fri',5],['sat',6]];
+    return map.filter(([k]) => (w as any)[k]).map(([, num]) => num);
   }
 
-  private selectedWeekdays(): number[] {
-    const w = this.weekdays.value as WeekFlags;
-    const map: [keyof WeekFlags, number][] = [
-      ['sun', 0],
-      ['mon', 1],
-      ['tue', 2],
-      ['wed', 3],
-      ['thu', 4],
-      ['fri', 5],
-      ['sat', 6],
-    ];
-    return map.filter(([k]) => w[k]).map(([, num]) => num);
+  // ==== Acciones UI MULTI-DÍA ====
+  addSpecificDate(value: Date = new Date()) {
+    this.specificDates.push(this.fb.control(value, Validators.required));
+  }
+  removeSpecificDate(i: number) {
+    this.specificDates.removeAt(i);
   }
 
   // ==== Envío ====
@@ -293,19 +241,22 @@ export class ActivityNewComponent {
     }
 
     const base = this.form.value;
-    const fechas = new Set<string>([this.toISO(base.fecha as Date)]);
 
+    // Tipo final (maneja “Otro (especificar)”)
+    const tipoFinal =
+      base.tipo_actividad === 'Otro (especificar)' && base.tipo_actividad_otro
+        ? base.tipo_actividad_otro
+        : base.tipo_actividad;
+
+    // Fechas
+    const fechas = new Set<string>([this.toISO(base.fecha as Date)]);
     const multi = base.multi!;
     if (multi.enable) {
       if (multi.mode === 'specific') {
         for (const c of this.specificDates.controls) {
           const v = (c as AbstractControl).value as Date;
           const iso = this.toISO(v);
-          if (
-            !this.feriadosISO.has(iso) &&
-            iso >= this.monthStartISO &&
-            iso <= this.monthEndISO
-          ) {
+          if (iso >= this.monthStartISO && iso <= this.monthEndISO && !this.feriadosISO.has(iso)) {
             fechas.add(iso);
           }
         }
@@ -315,12 +266,7 @@ export class ActivityNewComponent {
         const wdays = this.selectedWeekdays();
         for (const d of this.daysBetween(s, e)) {
           const iso = this.toISO(d);
-          if (
-            wdays.includes(d.getDay()) &&
-            !this.feriadosISO.has(iso) &&
-            iso >= this.monthStartISO &&
-            iso <= this.monthEndISO
-          ) {
+          if (wdays.includes(d.getDay()) && iso >= this.monthStartISO && iso <= this.monthEndISO && !this.feriadosISO.has(iso)) {
             fechas.add(iso);
           }
         }
@@ -329,11 +275,11 @@ export class ActivityNewComponent {
 
     const payload = {
       descripcionAct: base.descripcionAct,
-      tipo_actividad: base.tipo_actividad,
+      tipo_actividad: tipoFinal,
       estado: base.estado,
       fechas: Array.from(fechas).sort(),
     };
 
-    console.log('Payload actividad (con feriados bloqueados):', payload);
+    console.log('Payload actividad (fecha principal libre; multi dentro del mes):', payload);
   }
 }

@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { LayoutComponent } from '../../../components/layout/layout.component';
+import { LayoutComponent, NavItem } from '../../../components/layout/layout.component';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { User } from '../../../models/user.model';
 import { Activity } from '../../../models/activity.model';
 import { Cargo } from '../../../models/charge.model';
 import { switchMap, of } from 'rxjs';
+import { FUNCIONARIO_NAV_ITEMS } from './funcionario.nav';
 
 @Component({
   standalone: true,
@@ -22,10 +23,20 @@ export class ProfileHomeComponent implements OnInit {
   cargoDescripcion: string[] = [];
   notificationLabel = 'Urgente';
   lastSession = '2025-10-16 14:22';
-
   showDetails = false;
 
   constructor(private http: HttpClient, private route: ActivatedRoute) {}
+
+  /** Nav dinámico con el :id del usuario (igual que en Secretaría) */
+  get funcionarioNavItems(): NavItem[] {
+    const idFromRoute = Number(this.route.snapshot.paramMap.get('id') ?? NaN);
+    const id = this.user?.id ?? (Number.isFinite(idFromRoute) ? idFromRoute : undefined);
+
+    const items = [...FUNCIONARIO_NAV_ITEMS];
+    const perfilItem = items.find(i => i.label === 'Inicio perfil');
+    if (perfilItem) perfilItem.link = id ? `/funcionario/perfil/${id}` : `/funcionario/perfil`;
+    return items;
+  }
 
   ngOnInit() {
     this.route.paramMap
@@ -70,14 +81,7 @@ export class ProfileHomeComponent implements OnInit {
     });
   }
 
-  openDetails() {
-    this.showDetails = true;
-  }
-  closeDetails() {
-    this.showDetails = false;
-  }
-
-  onAvatarError(e: Event) {
-    (e.target as HTMLImageElement).src = '/avatar.png';
-  }
+  openDetails() { this.showDetails = true; }
+  closeDetails() { this.showDetails = false; }
+  onAvatarError(e: Event) { (e.target as HTMLImageElement).src = '/avatar.png'; }
 }

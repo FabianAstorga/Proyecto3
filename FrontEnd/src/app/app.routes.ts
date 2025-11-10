@@ -16,18 +16,29 @@ export const routes: Routes = [
   {
     path: 'funcionario',
     children: [
+      // Perfil sin id (usa usuario logueado) y con id (perfil específico)
+      {
+        path: 'perfil',
+        loadComponent: () =>
+          import('./modules/funcionario/profile-home/profile-home.component')
+            .then((m) => m.ProfileHomeComponent),
+      },
       {
         path: 'perfil/:id',
         loadComponent: () =>
           import('./modules/funcionario/profile-home/profile-home.component')
             .then((m) => m.ProfileHomeComponent),
       },
+
+      // Horario
       {
         path: 'horario',
         loadComponent: () =>
           import('./modules/funcionario/schedule/schedule.component')
             .then((m) => m.ScheduleComponent),
       },
+
+      // Actividades
       {
         path: 'actividades',
         children: [
@@ -48,6 +59,9 @@ export const routes: Routes = [
           },
         ],
       },
+
+      // Default /funcionario -> perfil (sin id)
+      { path: '', pathMatch: 'full', redirectTo: 'perfil' },
     ],
   },
 
@@ -57,7 +71,7 @@ export const routes: Routes = [
   {
     path: 'secretaria',
     children: [
-      // PERFIL
+      // PERFIL (si quieres, puedes añadir también 'perfil' sin :id)
       {
         path: 'perfil/:id',
         loadComponent: () =>
@@ -73,7 +87,7 @@ export const routes: Routes = [
             .then((m) => m.ScheduleComponent),
       },
 
-      // ACTIVIDADES (historial y nueva)
+      // ACTIVIDADES
       {
         path: 'actividades',
         children: [
@@ -85,11 +99,10 @@ export const routes: Routes = [
                 './modules/secretaria/activities-history/activities-history.component'
               ).then((m) => m.ActivitiesHistoryComponent),
           },
-          
         ],
       },
 
-      // Rutas propias de secretaría
+      // Rutas propias
       {
         path: 'gestionar-funcionario',
         loadComponent: () =>
@@ -112,7 +125,7 @@ export const routes: Routes = [
           ).then((m) => m.GestionarSalasComponent),
       },
 
-      // Redirección inicial para /secretaria
+      // Default /secretaria -> perfil/0 (si prefieres, puedes cambiarlo luego a 'perfil')
       { path: '', pathMatch: 'full', redirectTo: 'perfil/0' },
     ],
   },
@@ -121,43 +134,49 @@ export const routes: Routes = [
   // Área DIRECTOR
   // ============================
   {
-  path: 'director',
-  children: [
-    // Soporta /director/perfil  -> redirige a /director/perfil/0 (o el id que uses por defecto)
-    { path: 'perfil', pathMatch: 'full', redirectTo: 'perfil/0' },
+    path: 'director',
+    children: [
+      // Perfil sin id y con id
+      {
+        path: 'perfil',
+        loadComponent: () =>
+          import('./modules/director/profile-home/profile-home.component')
+            .then((m) => m.ProfileHomeComponent),
+      },
+      {
+        path: 'perfil/:id',
+        loadComponent: () =>
+          import('./modules/director/profile-home/profile-home.component')
+            .then((m) => m.ProfileHomeComponent),
+      },
 
-    // Perfil con :id
-    {
-      path: 'perfil/:id',
-      loadComponent: () =>
-        import('./modules/director/profile-home/profile-home.component')
-          .then((m) => m.ProfileHomeComponent),
-    },
+      // Calendario
+      {
+        path: 'horario',
+        loadComponent: () =>
+          import('./modules/director/schedule/schedule.component')
+            .then((m) => m.ScheduleComponent),
+      },
 
-    // Calendario (Schedule)
-    {
-      path: 'horario',
-      loadComponent: () =>
-        import('./modules/director/schedule/schedule.component')
-          .then((m) => m.ScheduleComponent),
-    },
+      // Actividades -> Historial
+      {
+        path: 'actividades',
+        children: [
+          { path: '', pathMatch: 'full', redirectTo: 'historial' },
+          {
+            path: 'historial',
+            loadComponent: () =>
+              import(
+                './modules/director/historial-funcionario/historial-funcionario.component'
+              ).then((m) => m.HistorialFuncionarioComponent),
+          },
+        ],
+      },
 
-    // Actividades -> Historial
-    {
-      path: 'actividades',
-      children: [
-        { path: '', pathMatch: 'full', redirectTo: 'historial' },
-        {
-          path: 'historial',
-          loadComponent: () =>
-            import('./modules/director/historial-funcionario/historial-funcionario.component')
-              .then((m) => m.HistorialFuncionarioComponent),
-        },
-      ],
-    },
-  ],
-},
-
+      // Default /director -> perfil (sin id)
+      { path: '', pathMatch: 'full', redirectTo: 'perfil' },
+    ],
+  },
 
   // ============================
   // Alias: ACTIVIDAD (redirige al historial de Secretaría)
@@ -174,5 +193,8 @@ export const routes: Routes = [
     ],
   },
 
+  // ============================
+  // Wildcard
+  // ============================
   { path: '**', redirectTo: '' },
 ];
