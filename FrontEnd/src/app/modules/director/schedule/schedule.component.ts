@@ -23,8 +23,10 @@ interface User {
   templateUrl: './schedule.component.html',
 })
 export class ScheduleComponent implements OnInit {
-  navItems = DIRECTOR_NAV_ITEMS;
+  // === NAV ===
+  readonly DIRECTOR_NAV_ITEMS = DIRECTOR_NAV_ITEMS;
 
+  // === Datos de pantalla ===
   titulo = 'Horario';
   nombreParaTitulo = 'Cargando…';
   horarioUrl = '/horario_secretaria.png';
@@ -32,7 +34,6 @@ export class ScheduleComponent implements OnInit {
   constructor(private http: HttpClient, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
-    // Si más adelante usas /director/horario/:id, esto lo toma
     const idParam = this.route.snapshot.paramMap.get('id');
 
     this.http.get<User[]>('/assets/data/users.json').subscribe({
@@ -43,7 +44,7 @@ export class ScheduleComponent implements OnInit {
           user = users.find((u) => u.id === +idParam);
         }
 
-        // Fallback: busca un director; si no, toma el primero
+        // Si no hay id, toma al primer usuario con rol Director
         if (!user) {
           user =
             users.find((u) => u.role.toLowerCase() === 'director') ??
