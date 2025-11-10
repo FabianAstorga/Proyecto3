@@ -1,22 +1,24 @@
+// v3-modal-centrado (front puro, sin persistencia y sin panel lateral)
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { LayoutComponent, NavItem } from '../../../components/layout/layout.component';
 import { FUNCIONARIO_NAV_ITEMS } from '../profile-home/funcionario.nav';
 
-type Block = { label: string; code: string; isLunch?: boolean; };
+type Block = { label: string; code: string; isLunch?: boolean };
 type DayKey = 'lun' | 'mar' | 'mie' | 'jue' | 'vie' | 'sab';
 type Cell = { title: string; room?: string; note?: string } | null;
 
 @Component({
   standalone: true,
   selector: 'app-schedule',
-  imports: [CommonModule, RouterLink, LayoutComponent],
+  imports: [CommonModule, RouterLink, LayoutComponent, FormsModule],
   templateUrl: './schedule.component.html',
 })
 export class ScheduleComponent {
-  // NAV del layout
   funcionarioNavItems: NavItem[] = FUNCIONARIO_NAV_ITEMS;
+  canEdit = true; // front puro
 
   blocks: Block[] = [
     { label: '08:00 - 09:30', code: '(1 - 2)' },
@@ -30,17 +32,85 @@ export class ScheduleComponent {
   ];
 
   days: { key: DayKey; label: string }[] = [
-    { key: 'lun', label: 'Lunes' }, { key: 'mar', label: 'Martes' },
-    { key: 'mie', label: 'Miércoles' }, { key: 'jue', label: 'Jueves' },
-    { key: 'vie', label: 'Viernes' }, { key: 'sab', label: 'Sábado' },
+    { key: 'lun', label: 'Lunes' },
+    { key: 'mar', label: 'Martes' },
+    { key: 'mie', label: 'Miércoles' },
+    { key: 'jue', label: 'Jueves' },
+    { key: 'vie', label: 'Viernes' },
+    { key: 'sab', label: 'Sábado' },
   ];
 
+  // 7 slots (todos menos almuerzo)
   schedule: Record<DayKey, Cell[]> = {
-    lun: [{ title: 'Cálculo I', room: 'A-201' }, null, null, null, { title: 'Física', room: 'Lab 3' }, null, null, null, null, null],
-    mar: [null, { title: 'Programación', room: 'B-105' }, null, null, null, null, null, null, null, null],
-    mie: [null, null, { title: 'CAD', room: 'Lab CAD' }, null, null, null, null, null, null, null],
-    jue: [null, null, null, null, { title: 'Materiales', room: 'C-301' }, null, null, null, null, null],
-    vie: [null, null, null, null, null, { title: 'Electrónica', room: 'D-102' }, null, null, null, null],
-    sab: [null, null, null, null, null, null, { title: 'Taller Proyecto', room: 'Makerspace' }, null, null, null],
+    lun: [{ title: 'Cálculo I', room: 'A-201' }, null, null, { title: 'Física', room: 'Lab 3' }, null, null, null],
+    mar: [null, { title: 'Programación', room: 'B-105' }, null, null, null, null, null],
+    mie: [null, null, { title: 'CAD', room: 'Lab CAD' }, null, null, null, null],
+    jue: [null, null, null, { title: 'Materiales', room: 'C-301' }, null, null, null],
+    vie: [null, null, null, null, { title: 'Electrónica', room: 'D-102' }, null, null],
+    sab: [null, null, null, null, null, { title: 'Taller Proyecto', room: 'Makerspace' }, null],
   };
+
+  // ===== Modal centrado =====
+  modal = {
+    open: false,
+    day: null as DayKey | null,
+    dayLabel: '',
+    blockLabel: '',
+    index: -1, // índice de datos (0..6)
+    model: { title: '', room: '', note: '' },
+  };
+
+  // índice visible (incluye lunch) → índice real (sin lunch)
+  visibleIndexToDataIndex(visibleIndex: number): number {
+    let count = -1;
+    for (let i = 0; i < this.blocks.length; i++) {
+      if (this.blocks[i].isLunch) continue;
+      count++;
+      if (i === visibleIndex) return count;
+    }
+    return -1; // almuerzo
+  }
+
+  openModal(day: DayKey, visibleIndex: number) {
+    if (!this.canEdit) return;
+    const dataIndex = this.visibleIndexToDataIndex(visibleIndex);
+    if (dataIndex === -1) return; // almuerzo no editable
+
+    const current = this.schedule[day][dataIndex] ?? null;
+    this.modal.open = true;
+    this.modal.day = day;
+    this.modal.dayLabel = this.days.find(d => d.key === day)?.label ?? '';
+    this.modal.blockLabel = this.blocks[visibleIndex]?.label ?? '';
+    this.modal.index = dataIndex;
+    this.modal.model = {
+      title: current?.title ?? '',
+      room: current?.room ?? '',
+      note: current?.note ?? '',
+    };
+  }
+
+  saveFromModal() {
+    if (!this.modal.open || !this.modal.day) return;
+    const t = this.modal.model.title.trim();
+    const payload: Cell = t
+      ? { title: t, room: this.modal.model.room?.trim() || undefined, note: this.modal.model.note?.trim() || undefined }
+      : null;
+    this.schedule[this.modal.day][this.modal.index] = payload;
+    this.closeModal();
+  }
+
+  clearFromModal() {
+    if (!this.modal.open || !this.modal.day) return;
+    this.schedule[this.modal.day][this.modal.index] = null;
+    this.closeModal();
+  }
+
+  closeModal() {
+    this.modal.open = false;
+    this.modal.day = null;
+    this.modal.index = -1;
+    this.modal.dayLabel = '';
+    this.modal.blockLabel = '';
+    this.modal.model = { title: '', room: '', note: '' };
+  }
 }

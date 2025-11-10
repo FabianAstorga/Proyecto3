@@ -1,16 +1,22 @@
+<!-- v3-modal-centrado (sin panel lateral, editor en ventana modal) -->
 <app-layout [title]="'Académico'" [navItems]="funcionarioNavItems" [logoutLink]="'/login'">
-  <section class="w-full px-8 py-10">
+  <section class="w-full px-4 md:px-8 py-6 md:py-10">
     <div class="bg-white rounded-2xl border border-blue-400 shadow-md overflow-hidden">
+      <div class="px-4 py-2 text-[12px] text-gray-500">
+        Haz clic en una celda para editar.
+      </div>
+
       <div class="overflow-x-auto">
         <div class="grid w-full" [ngStyle]="{ 'grid-template-columns': '180px repeat(6, 1fr)' }">
-          <div class="bg-[#EAF2FF] border border-gray-200 p-3 text-center font-semibold text-[#0D1440]">
-            Bloque
-          </div>
+          <!-- Encabezados -->
+          <div class="bg-[#EAF2FF] border border-gray-200 p-3 text-center font-semibold text-[#0D1440]">Bloque</div>
           <div *ngFor="let d of days" class="bg-[#EAF2FF] border border-gray-200 p-3 text-center font-semibold text-[#0D1440]">
             {{ d.label }}
           </div>
 
+          <!-- Filas -->
           <ng-container *ngFor="let b of blocks; let bi = index">
+            <!-- Columna bloque -->
             <div
               class="border border-gray-200 p-3 text-center bg-gray-50 text-gray-800"
               [ngClass]="{ 'bg-yellow-50 font-semibold text-gray-900': b.isLunch }"
@@ -20,12 +26,18 @@
               <div class="text-[12px] text-amber-700" *ngIf="b.isLunch">Almuerzo</div>
             </div>
 
+            <!-- Celdas por día -->
             <ng-container *ngIf="!b.isLunch; else lunchRow">
-              <div *ngFor="let d of days" class="border border-gray-200 bg-white hover:bg-blue-50 transition">
-                <div class="h-24 flex items-center justify-center text-center">
+              <div
+                *ngFor="let d of days"
+                class="border border-gray-200 bg-white hover:bg-blue-50 transition cursor-pointer"
+                (click)="openModal(d.key, bi)"
+                title="Editar"
+              >
+                <div class="h-24 flex items-center justify-center text-center px-2">
                   <ng-container
                     [ngTemplateOutlet]="cellTpl"
-                    [ngTemplateOutletContext]="{ c: schedule[d.key][bi] }"
+                    [ngTemplateOutletContext]="{ c: schedule[d.key][visibleIndexToDataIndex(bi)] }"
                   ></ng-container>
                 </div>
               </div>
@@ -42,6 +54,78 @@
     </div>
   </section>
 
+  <!-- ===== Modal de edición ===== -->
+  <div *ngIf="modal.open" class="fixed inset-0 z-50">
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-black/40" (click)="closeModal()"></div>
+
+    <!-- Diálogo -->
+    <div class="absolute inset-0 flex items-center justify-center p-4">
+      <div class="w-full max-w-md bg-white rounded-2xl shadow-xl border border-blue-200">
+        <div class="px-4 py-3 border-b flex items-center justify-between">
+          <div>
+            <div class="text-xs text-gray-500">Editando</div>
+            <div class="font-semibold text-[#0D1440] leading-tight">
+              {{ modal.dayLabel }} — {{ modal.blockLabel }}
+            </div>
+          </div>
+          <button class="p-2 rounded hover:bg-gray-100" (click)="closeModal()" aria-label="Cerrar">✕</button>
+        </div>
+
+        <form (ngSubmit)="saveFromModal()" class="p-4 space-y-3">
+          <div>
+            <label class="text-xs text-gray-600">Título *</label>
+            <input
+              type="text"
+              class="w-full border rounded-md px-3 py-2 text-sm"
+              placeholder="Ej.: Programación"
+              [(ngModel)]="modal.model.title"
+              name="title"
+              required
+              autofocus
+            />
+          </div>
+          <div>
+            <label class="text-xs text-gray-600">Sala (opcional)</label>
+            <input
+              type="text"
+              class="w-full border rounded-md px-3 py-2 text-sm"
+              placeholder="Ej.: B-105"
+              [(ngModel)]="modal.model.room"
+              name="room"
+            />
+          </div>
+          <div>
+            <label class="text-xs text-gray-600">Nota (opcional)</label>
+            <input
+              type="text"
+              class="w-full border rounded-md px-3 py-2 text-sm"
+              placeholder="Observaciones…"
+              [(ngModel)]="modal.model.note"
+              name="note"
+            />
+          </div>
+
+          <div class="flex items-center gap-2 pt-1">
+            <button type="submit" class="px-3 py-2 rounded-md bg-blue-600 text-white text-sm hover:bg-blue-700">
+              Guardar
+            </button>
+            <button type="button" class="px-3 py-2 rounded-md bg-gray-100 border text-sm hover:bg-gray-200"
+                    (click)="closeModal()">
+              Cancelar
+            </button>
+            <button type="button"
+                    class="ml-auto px-3 py-2 rounded-md bg-red-50 text-red-700 border border-red-200 text-sm hover:bg-red-100"
+                    (click)="clearFromModal()">
+              Limpiar celda
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vista de celda -->
   <ng-template #cellTpl let-c="c">
     <div *ngIf="c; else empty" class="px-2">
       <div class="text-sm font-semibold text-[#0D1440] leading-tight">{{ c.title }}</div>
