@@ -8,5 +8,6 @@ import { Cargo } from '../../database/entities/cargo.entity';
   imports: [TypeOrmModule.forFeature([Cargo])],
   controllers: [CargosController],
   providers: [CargosService],
+  //exports: [CargosService],
 })
 export class CargosModule {}

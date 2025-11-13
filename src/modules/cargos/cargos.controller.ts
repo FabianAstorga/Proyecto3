@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Param,
+  Body,
+} from '@nestjs/common';
 import { CargosService } from './cargos.service';
 import { CreateCargoDto } from './dto/create-cargo.dto';
 import { UpdateCargoDto } from './dto/update-cargo.dto';
@@ -8,8 +16,8 @@ export class CargosController {
   constructor(private readonly cargosService: CargosService) {}
 
   @Post()
-  create(@Body() createCargoDto: CreateCargoDto) {
-    return this.cargosService.create(createCargoDto);
+  create(@Body() dto: CreateCargoDto) {
+    return this.cargosService.create(dto);
   }
 
   @Get()
@@ -23,8 +31,8 @@ export class CargosController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCargoDto: UpdateCargoDto) {
-    return this.cargosService.update(+id, updateCargoDto);
+  update(@Param('id') id: string, @Body() dto: UpdateCargoDto) {
+    return this.cargosService.update(+id, dto);
   }
 
   @Delete(':id')

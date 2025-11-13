@@ -1,34 +1,42 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { ActividadesService } from './actividades.service';
-import { CreateActividadDto } from './dto/create-actividade.dto';
-import { UpdateActividadeDto } from './dto/update-actividade.dto';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
+import { ActividadService } from './actividades.service';
+import { CreateActividadDto } from './dto/create-actividad.dto';
+import { UpdateActividadDto } from './dto/update-actividad.dto';
 
-@Controller('actividades')
-export class ActividadesController {
-  constructor(private readonly actividadesService: ActividadesService) {}
+@Controller('actividad')
+export class ActividadController {
+  constructor(private readonly actividadService: ActividadService) {}
 
   @Post()
-  create(@Body() createActividadeDto: CreateActividadDto) {
-    return this.actividadesService.create(createActividadeDto);
+  create(@Body() dto: CreateActividadDto) {
+    return this.actividadService.create(dto);
   }
 
   @Get()
   findAll() {
-    return this.actividadesService.findAll();
+    return this.actividadService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.actividadesService.findOne(+id);
+  findOne(@Param('id') id: number) {
+    return this.actividadService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateActividadeDto: UpdateActividadeDto) {
-    return this.actividadesService.update(+id, updateActividadeDto);
+  update(@Param('id') id: number, @Body() dto: UpdateActividadDto) {
+    return this.actividadService.update(id, dto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.actividadesService.remove(+id);
+  remove(@Param('id') id: number) {
+    return this.actividadService.remove(id);
   }
 }

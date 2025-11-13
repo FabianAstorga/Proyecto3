@@ -2,17 +2,17 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { EmpleadoCargo } from './empleado-cargo.entity';
 
-@Entity('charge')
+@Entity('cargo')
 export class Cargo {
   @PrimaryGeneratedColumn()
-  id_Cargo: number;
+  id_cargo: number;
 
   @Column({ unique: true })
-  rol: string; // Ejemplo: 'Profesor', 'Jefe de Dpto.', 'Secretario'
+  ocupacion: string; // Ejemplo: 'Profesor', 'Jefe de Dpto.', 'Secretario'
 
-  @Column()
-  especialidad: string;
+  @Column({ type: 'text', nullable: true })
+  descripcion: string;
 
-  @OneToMany(() => EmpleadoCargo, (prog) => prog.cargo)
-  asignaciones: EmpleadoCargo[];
+  @OneToMany(() => EmpleadoCargo, (ec) => ec.cargo)
+  empleados: EmpleadoCargo[];
 }

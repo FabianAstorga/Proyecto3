@@ -8,12 +8,12 @@ import {
   JoinColumn,
   OneToOne,
 } from 'typeorm';
-import { Departamento } from './departamento.entity';
-import { Formulario } from './formulario.entity';
-import { Oficina } from './oficina.entity';
 import { EmpleadoCargo } from './empleado-cargo.entity';
+import { Informe } from './informe.entity';
+import { Horario } from './horario.entity';
+import { Notificacion } from './notificacion.entity';
 
-@Entity('user')
+@Entity('usuario')
 export class Usuario {
   @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
@@ -36,42 +36,25 @@ export class Usuario {
   @Column({ type: 'varchar', length: 20 })
   telefono: string;
 
-  @Column({ type: 'varchar', length: 10 })
-  anexo: string;
-
   @Column({ nullable: true })
   foto_url: string;
 
-  @Column({ nullable: true })
-  url_horario: string;
+  @Column({ default: false })
+  esJefe: boolean;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   fecha_creacion: Date;
 
-  // Relación: Usuario "jefe" (boss)
-  @ManyToOne(() => Usuario, (usuario) => usuario.empleados)
-  @JoinColumn({ name: 'jefe_id' }) // Columna de clave foránea
-  jefe: Usuario;
+  // Relaciones
+  @OneToMany(() => EmpleadoCargo, (ec) => ec.usuario)
+  cargos: EmpleadoCargo[];
 
-  // Relación: Usuario "empleados" (employ)
-  @OneToMany(() => Usuario, (usuario) => usuario.jefe)
-  empleados: Usuario[];
+  @OneToMany(() => Informe, (i) => i.usuario)
+  informes: Informe[];
 
-  // Relación: Usuario "pertenece" a Departamento
-  @ManyToOne(() => Departamento, (departamento) => departamento.usuarios)
-  @JoinColumn({ name: 'departamento_id' })
-  departamento: Departamento;
+  @OneToMany(() => Horario, (h) => h.asignado_por)
+  horarios: Horario[];
 
-  // Relación: Usuario "registra" Formularios
-  @OneToMany(() => Formulario, (formulario) => formulario.usuario)
-  formularios: Formulario[];
-
-  // Relación: Usuario "tiene" Oficina
-  @OneToOne(() => Oficina)
-  @JoinColumn({ name: 'oficina_id' })
-  oficina: Oficina;
-
-  // Relación: Un usuario puede tener muchas asignaciones de cargo
-  @OneToMany(() => EmpleadoCargo, (prog) => prog.usuario)
-  asignaciones: EmpleadoCargo[];
+  @OneToMany(() => Notificacion, (n) => n.usuario)
+  notificaciones: Notificacion[];
 }

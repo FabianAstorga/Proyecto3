@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
-import { ActividadesService } from './actividades.service';
-import { ActividadesController } from './actividades.controller';
+import { ActividadService } from './actividades.service';
+import { ActividadController } from './actividades.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Actividad } from '../../database/entities/actividade.entity';
+import { Actividad } from '../../database/entities/actividad.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Actividad])],
-  controllers: [ActividadesController],
-  providers: [ActividadesService],
+  controllers: [ActividadController],
+  providers: [ActividadService],
 })
 export class ActividadesModule {}

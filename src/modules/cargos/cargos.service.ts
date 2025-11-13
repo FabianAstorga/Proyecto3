@@ -1,26 +1,52 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateCargoDto } from './dto/create-cargo.dto';
 import { UpdateCargoDto } from './dto/update-cargo.dto';
+import { Cargo } from 'src/database/entities/cargo.entity';
 
 @Injectable()
 export class CargosService {
-  create(createCargoDto: CreateCargoDto) {
-    return 'This action adds a new cargo';
+  constructor(
+    @InjectRepository(Cargo)
+    private readonly cargoRepository: Repository<Cargo>,
+  ) {}
+
+  async create(dto: CreateCargoDto) {
+    const existente = await this.cargoRepository.findOne({
+      where: { ocupacion: dto.ocupacion },
+    });
+    if (existente)
+      throw new ConflictException(`El cargo ${dto.ocupacion} ya existe.`);
+    const cargo = this.cargoRepository.create(dto);
+    return this.cargoRepository.save(cargo);
   }
 
   findAll() {
-    return `This action returns all cargos`;
+    return this.cargoRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} cargo`;
+  async findOne(id: number) {
+    const cargo = await this.cargoRepository.findOne({
+      where: { id_cargo: id },
+    });
+    if (!cargo)
+      throw new NotFoundException(`Cargo con ID ${id} no encontrado.`);
+    return cargo;
   }
 
-  update(id: number, updateCargoDto: UpdateCargoDto) {
-    return `This action updates a #${id} cargo`;
+  async update(id: number, dto: UpdateCargoDto) {
+    const cargo = await this.findOne(id);
+    Object.assign(cargo, dto);
+    return this.cargoRepository.save(cargo);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} cargo`;
+  async remove(id: number) {
+    const cargo = await this.findOne(id);
+    return this.cargoRepository.remove(cargo);
   }
 }
