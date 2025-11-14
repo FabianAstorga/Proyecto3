@@ -16,7 +16,7 @@ import {
 } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 
-import { LayoutComponent } from '../../../components/layout/layout.component';
+import { LayoutComponent } from '../../components/layout/layout.component';
 import { FUNCIONARIO_NAV_ITEMS } from '../profile-home/funcionario.nav';
 
 type Estado = 'Aprobada' | 'Pendiente' | 'Rechazada';

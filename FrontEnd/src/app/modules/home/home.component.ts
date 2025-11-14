@@ -15,11 +15,10 @@ import {
   FormGroup,
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { Subscription } from 'rxjs';
-import { User } from '../../models/user.model';
 import { FooterComponent } from '../../components/footer/footer.component';
 import { AuthService } from '../../services/auth.service';
+import { DataService } from '../../services/data.service';
+
 @Component({
   standalone: true,
   selector: 'app-home',
@@ -28,7 +27,6 @@ import { AuthService } from '../../services/auth.service';
     ReactiveFormsModule,
     RouterLink,
     FooterComponent,
-    HttpClientModule,
   ],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
@@ -47,14 +45,11 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   showPassword = false;
   form!: FormGroup;
 
-  private users: User[] = [];
-  private usersSubscription: Subscription | undefined;
-
   constructor(
     private fb: FormBuilder,
-    private http: HttpClient,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private dataService: DataService
   ) {}
 
   ngOnInit(): void {
@@ -72,19 +67,8 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
       remember: [false],
     });
 
-    // Al cargar la página, resetear el formulario para asegurar que está limpio.
-    this.form.reset(); // 👈 Reset al inicio
-
-    // Cargar usuarios desde JSON
-    this.usersSubscription = this.http
-      .get<User[]>('/assets/data/users.json')
-      .subscribe({
-        next: (data) => {
-          this.users = data;
-          console.log('Usuarios cargados desde JSON:', this.users); // ✅
-        },
-        error: (err) => console.error('Error cargando usuarios:', err),
-      });
+    // Asegurar formulario limpio al inicio
+    this.form.reset();
   }
 
   ngAfterViewInit(): void {
@@ -103,7 +87,6 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ngOnDestroy(): void {
     if (this.timerId) clearInterval(this.timerId);
-    this.usersSubscription?.unsubscribe();
   }
 
   private nextBackground(): void {
@@ -117,20 +100,22 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     this.currentBg = this.images[i];
   }
 
-  // --- Lógica de Modal (Añadir Reset aquí) ---
+  // --- Lógica de Modal ---
 
   openLogin(): void {
     this.loginOpen = true;
-    this.form.reset(); // 👈 Reset al abrir
+    this.form.reset();
   }
+
   closeLogin(): void {
     this.loginOpen = false;
-    this.form.reset(); // 👈 Reset al cerrar
+    this.form.reset();
   }
+
   toggleLogin(): void {
     this.loginOpen = !this.loginOpen;
     if (this.loginOpen) {
-      this.form.reset(); // 👈 Reset si se abre
+      this.form.reset();
     }
   }
 
@@ -152,29 +137,32 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     const email = this.form.value.email.trim();
     const password = this.form.value.password.trim();
 
-    const user = this.users.find(
-      (u) =>
-        u.email.trim().toLowerCase() === email.toLowerCase() &&
-        (u.password ?? '').trim() === password
-    );
+    // 🔹 Ahora usamos DataService.login (lee users.json internamente)
+    this.dataService.login(email, password).subscribe((user) => {
+      if (!user) {
+        alert('Correo o contraseña incorrectos');
+        this.form.reset();
+        this.form.markAsUntouched();
+        return;
+      }
 
-    if (user) {
       // 🔹 Generar token simulado (en producción viene del backend)
       const payload = {
         id: user.id,
         email: user.email,
         role: user.role,
-        exp: Math.floor(Date.now() / 1000) + 60 * 60, // expira en 1 hora
+        exp: Math.floor(Date.now() / 1000) + 60 * 60, // 1 hora
       };
       const token = btoa(JSON.stringify(payload)); // solo demo
-      this.authService.login(token); // 🔹 Guardar token en AuthService
+      this.authService.login(token);
 
-      this.closeLogin(); // cerrar modal
+      this.closeLogin();
 
-      // Redirigir según rol
+      // 🔹 Redirigir según rol (usando los roles nuevos)
       switch (user.role.toLowerCase()) {
-        case 'director':
-          this.router.navigate(['/director/perfil', user.id]);
+        case 'administrador':
+          // Por ahora lo dejamos en home; más adelante irá a un panel admin
+          this.router.navigate(['/home']);
           break;
         case 'secretaria':
           this.router.navigate(['/secretaria/perfil', user.id]);
@@ -182,11 +170,11 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
         case 'funcionario':
           this.router.navigate(['/funcionario/perfil', user.id]);
           break;
+        default:
+          // Si por algún motivo viene un rol inesperado
+          this.router.navigate(['/home']);
+          break;
       }
-    } else {
-      alert('Correo o contraseña incorrectos');
-      this.form.reset();
-      this.form.markAsUntouched();
-    }
+    });
   }
 }

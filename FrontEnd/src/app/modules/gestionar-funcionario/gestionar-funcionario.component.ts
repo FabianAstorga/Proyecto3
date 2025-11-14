@@ -6,8 +6,7 @@ import {
   Validators,
   FormGroup,
 } from '@angular/forms';
-import { LayoutComponent } from '../../../components/layout/layout.component';
-import { SECRETARIA_NAV_ITEMS } from '../profile-home/secretaria.nav';
+import { LayoutComponent } from '../../components/layout/layout.component';
 
 type Usuario = {
   id: number;
@@ -31,7 +30,7 @@ type Usuario = {
 })
 export class GestionarFuncionarioComponent {
   // iMPORTAR NAV SECRETARIA
-  secretariaNavItems = SECRETARIA_NAV_ITEMS;
+
   // listado demo en memoria
   usuarios = signal<Usuario[]>([
     {

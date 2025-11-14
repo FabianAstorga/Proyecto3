@@ -25,7 +25,7 @@ import { MatSelectModule } from '@angular/material/select';
 import {
   LayoutComponent,
   NavItem,
-} from '../../../components/layout/layout.component';
+} from '../../components/layout/layout.component';
 import { FUNCIONARIO_NAV_ITEMS } from '../profile-home/funcionario.nav';
 
 type WeekFlags = {

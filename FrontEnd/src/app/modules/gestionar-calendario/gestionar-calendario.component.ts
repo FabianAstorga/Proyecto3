@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LayoutComponent } from '../../../components/layout/layout.component';
-import { SECRETARIA_NAV_ITEMS } from '../profile-home/secretaria.nav';
+import { LayoutComponent } from '../../components/layout/layout.component';
+import { SECRETARIA_NAV_ITEMS } from '../secretaria/profile-home/secretaria.nav';
 
 type Block = { label: string; code: string; isLunch?: boolean };
 type DayKey = 'lun' | 'mar' | 'mie' | 'jue' | 'vie' | 'sab';

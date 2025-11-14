@@ -20,13 +20,13 @@ export const routes: Routes = [
       {
         path: 'perfil',
         loadComponent: () =>
-          import('./modules/funcionario/profile-home/profile-home.component')
+          import('./modules/profile-home/profile-home.component')
             .then((m) => m.ProfileHomeComponent),
       },
       {
         path: 'perfil/:id',
         loadComponent: () =>
-          import('./modules/funcionario/profile-home/profile-home.component')
+          import('./modules/profile-home/profile-home.component')
             .then((m) => m.ProfileHomeComponent),
       },
 
@@ -34,7 +34,7 @@ export const routes: Routes = [
       {
         path: 'horario',
         loadComponent: () =>
-          import('./modules/funcionario/schedule/schedule.component')
+          import('./modules/schedule/schedule.component')
             .then((m) => m.ScheduleComponent),
       },
 
@@ -47,14 +47,14 @@ export const routes: Routes = [
             path: 'historial',
             loadComponent: () =>
               import(
-                './modules/funcionario/activities-history/activities-history.component'
+                './modules/activities-history/activities-history.component'
               ).then((m) => m.ActivitiesHistoryComponent),
           },
           {
             path: 'nueva',
             loadComponent: () =>
               import(
-                './modules/funcionario/activity-new/activity-new.component'
+                './modules/activity-new/activity-new.component'
               ).then((m) => m.ActivityNewComponent),
           },
         ],
@@ -107,14 +107,14 @@ export const routes: Routes = [
         path: 'gestionar-funcionario',
         loadComponent: () =>
           import(
-            './modules/secretaria/gestionar-funcionario/gestionar-funcionario.component'
+            './modules/gestionar-funcionario/gestionar-funcionario.component'
           ).then((m) => m.GestionarFuncionarioComponent),
       },
       {
         path: 'gestionar-calendario',
         loadComponent: () =>
           import(
-            './modules/secretaria/gestionar-calendario/gestionar-calendario.component'
+            './modules/gestionar-calendario/gestionar-calendario.component'
           ).then((m) => m.GestionarCalendarioComponent),
       },
       {

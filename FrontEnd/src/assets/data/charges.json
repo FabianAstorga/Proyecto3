@@ -1,17 +1,17 @@
 [
   {
-    "role": "Director",
+    "role": "Administrador",
     "descripcion": [
-      "Dirigir y coordinar las actividades académicas, administrativas y financieras del departamento.",
-      "Supervisar el cumplimiento de los planes de docencia, investigación y vinculación con el medio.",
-      "Revisar y aprobar los informes de gestión de las distintas áreas y programas.",
-      "Promover el desarrollo profesional del cuerpo académico y administrativo.",
-      "Coordinar con la Facultad y la Universidad la planificación estratégica del departamento.",
-      "Representar al departamento en reuniones, comités y actos oficiales.",
-      "Fomentar la calidad, innovación y mejora continua en los procesos internos.",
-      "Gestionar los recursos humanos, materiales y presupuestarios asignados.",
-      "Velar por el cumplimiento de la normativa universitaria y ética institucional.",
-      "Impulsar proyectos que fortalezcan la imagen y posicionamiento del departamento."
+      "Gestionar la creación, actualización y desactivación de cuentas de usuarios.",
+      "Definir y mantener los perfiles y permisos de acceso al sistema.",
+      "Supervisar el correcto funcionamiento general del sistema de registro de actividades.",
+      "Revisar reportes globales de uso del sistema y detectar posibles incidencias.",
+      "Coordinar con soporte técnico la solución de problemas funcionales o técnicos.",
+      "Mantener actualizada la configuración general (horarios, parámetros, catálogos, etc.).",
+      "Resguardar la seguridad de la información y el cumplimiento de las políticas institucionales.",
+      "Apoyar en la capacitación inicial de nuevos usuarios del sistema.",
+      "Realizar auditorías periódicas sobre el uso del sistema y los registros almacenados.",
+      "Proponer mejoras y evoluciones del sistema para apoyar la gestión académica y administrativa."
     ]
   },
   {

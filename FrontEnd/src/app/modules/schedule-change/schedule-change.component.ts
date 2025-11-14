@@ -2,8 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { LayoutComponent } from '../../../components/layout/layout.component';
-import { SECRETARIA_NAV_ITEMS } from '../profile-home/secretaria.nav';
+
 
 interface User {
   id: number;
@@ -19,11 +18,10 @@ interface User {
 @Component({
   standalone: true,
   selector: 'app-schedule',
-  imports: [CommonModule, LayoutComponent, HttpClientModule],
+  imports: [CommonModule, , HttpClientModule],
   templateUrl: './schedule.component.html',
 })
 export class ScheduleComponent implements OnInit {
-  secretariaNavItems = SECRETARIA_NAV_ITEMS;
 
   titulo = 'Horario';
   nombreParaTitulo = 'Cargando…';

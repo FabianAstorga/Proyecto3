@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { LayoutComponent, NavItem } from '../../../components/layout/layout.component';
+import { LayoutComponent, NavItem } from '../../components/layout/layout.component';
 import { FUNCIONARIO_NAV_ITEMS } from '../profile-home/funcionario.nav';
 
 type Block = { label: string; code: string; isLunch?: boolean };

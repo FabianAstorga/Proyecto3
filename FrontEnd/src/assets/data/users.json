@@ -1,11 +1,11 @@
 [
   {
     "id": 1,
-    "firstName": "Rodrigo",
-    "lastName": "Salazar Díaz",
-    "email": "rodrigo.salazar@uta.cl",
-    "role": "Director",
-    "password": "123",
+    "firstName": "Administrador",
+    "lastName": "Sistema",
+    "email": "admin@uta.cl",
+    "role": "Administrador",
+    "password": "admin",
     "photoUrl": "/usuario(1).png",
     "horarioUrl": "/horario_secretaria.png"
   },
@@ -94,7 +94,7 @@
     "firstName": "Patricia",
     "lastName": "Vargas Hidalgo",
     "email": "patricia.vargas@uta.cl",
-    "role": "Director",
+    "role": "Funcionario",
     "password": "123",
     "photoUrl": "/usuario(1).png",
     "horarioUrl": "/horario_secretaria.png"
