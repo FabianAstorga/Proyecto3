@@ -2,32 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 
-export type UserRole = 'Administrador' | 'Funcionario' | 'Secretaria';
+// 👇 Usamos SIEMPRE los modelos centrales
+import { User } from '../models/user.model';
+import { Activity } from '../models/activity.model';
+import { Cargo } from '../models/charge.model';
 
-export interface User {
-  id: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  role: UserRole;
-  password: string;
-  photoUrl: string;
-  horarioUrl: string;
-}
-
-export interface Activity {
-  fecha: string;   // YYYY-MM-DD
-  titulo: string;
-  detalle: string;
-  estado: string;  // 'Aprobada' | 'Pendiente' | etc.
-  horas: number;
-  userId: number;
-}
-
-export interface Cargo {
-  role: UserRole;
-  descripcion: string[];
-}
+// Tipo auxiliar: el rol es el mismo que el del modelo User
+export type UserRole = User['role'];
 
 @Injectable({
   providedIn: 'root'
@@ -57,8 +38,9 @@ export class DataService {
     return this.getUsers().pipe(
       map(users => {
         const user = users.find(
-          u => u.email.trim().toLowerCase() === email.trim().toLowerCase() &&
-               (u.password ?? '').trim() === password.trim()
+          u =>
+            u.email.trim().toLowerCase() === email.trim().toLowerCase() &&
+            (u.password ?? '').trim() === password.trim()
         );
         return user ?? null;
       })
@@ -71,21 +53,19 @@ export class DataService {
     return this.http.get<Activity[]>(this.activitiesUrl);
   }
 
-  // Actividades de un usuario específico
   getActivitiesByUser(userId: number): Observable<Activity[]> {
     return this.getAllActivities().pipe(
       map(list => list.filter(a => a.userId === userId))
     );
   }
 
-  // (Opcional) todas las actividades, excluyendo admin si algún día tuviera
   getActivitiesForFuncionarios(): Observable<Activity[]> {
     return this.getAllActivities().pipe(
-      map(list => list.filter(a => a.userId !== 1))
+      map(list => list.filter(a => a.userId !== 1)) // excluye admin si algún día tuviera
     );
   }
 
-  // 🔹 Cargos (descripción por rol)
+  // 🔹 Cargos
 
   getCargos(): Observable<Cargo[]> {
     return this.http.get<Cargo[]>(this.cargosUrl);

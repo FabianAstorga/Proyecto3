@@ -3,8 +3,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { LayoutComponent, NavItem } from '../../components/layout/layout.component';
-import { FUNCIONARIO_NAV_ITEMS } from '../profile-home/funcionario.nav';
+import { LayoutComponent } from '../../components/layout/layout.component';
 
 type Block = { label: string; code: string; isLunch?: boolean };
 type DayKey = 'lun' | 'mar' | 'mie' | 'jue' | 'vie' | 'sab';
@@ -17,7 +16,7 @@ type Cell = { title: string; room?: string; note?: string } | null;
   templateUrl: './schedule.component.html',
 })
 export class ScheduleComponent {
-  funcionarioNavItems: NavItem[] = FUNCIONARIO_NAV_ITEMS;
+  // ya no usamos nav por rol, el horario es común
   canEdit = true; // front puro
 
   blocks: Block[] = [
@@ -40,7 +39,7 @@ export class ScheduleComponent {
     { key: 'sab', label: 'Sábado' },
   ];
 
-  // 7 slots (todos menos almuerzo)
+  // 7 slots (todos menos almuerzo) por día
   schedule: Record<DayKey, Cell[]> = {
     lun: [{ title: 'Cálculo I', room: 'A-201' }, null, null, { title: 'Física', room: 'Lab 3' }, null, null, null],
     mar: [null, { title: 'Programación', room: 'B-105' }, null, null, null, null, null],
@@ -93,7 +92,11 @@ export class ScheduleComponent {
     if (!this.modal.open || !this.modal.day) return;
     const t = this.modal.model.title.trim();
     const payload: Cell = t
-      ? { title: t, room: this.modal.model.room?.trim() || undefined, note: this.modal.model.note?.trim() || undefined }
+      ? {
+          title: t,
+          room: this.modal.model.room?.trim() || undefined,
+          note: this.modal.model.note?.trim() || undefined,
+        }
       : null;
     this.schedule[this.modal.day][this.modal.index] = payload;
     this.closeModal();
