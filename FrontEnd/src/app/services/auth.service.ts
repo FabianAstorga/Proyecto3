@@ -5,6 +5,8 @@ import { jwtDecode } from 'jwt-decode';
 interface DecodedToken {
   exp: number;
   role: string;
+  id: number;
+  email?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -19,7 +21,8 @@ export class AuthService {
 
   logout(): void {
     localStorage.removeItem(this.TOKEN_KEY);
-    this.router.navigate(['/login']);
+    // OJO: no tienes ruta '/login', probablemente quieras ir al home
+    this.router.navigate(['/']);
   }
 
   getToken(): string | null {
@@ -31,7 +34,7 @@ export class AuthService {
     if (!token) return null;
 
     try {
-      return jwtDecode<DecodedToken>(token); // ✅ aquí cambiamos la función
+      return jwtDecode<DecodedToken>(token);
     } catch (error) {
       console.error('Error decodificando el token:', error);
       return null;
@@ -47,5 +50,10 @@ export class AuthService {
   getUserRole(): string | null {
     const decodedToken = this.getDecodedToken();
     return decodedToken ? decodedToken.role : null;
+  }
+
+  getUserId(): number | null {
+    const decodedToken = this.getDecodedToken();
+    return decodedToken ? decodedToken.id : null;
   }
 }
