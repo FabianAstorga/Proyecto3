@@ -27,17 +27,17 @@ export class CreateUsuarioDto {
   @IsString()
   @IsOptional()
   @MinLength(8, { message: 'La contraseña debe tener al menos 8 caracteres' })
-  contrasena?: string;
+  contrasena: string;
 
   @IsPhoneNumber()
   @IsString()
-  telefono?: string;
-
-  @IsString()
-  @IsOptional()
-  anexo?: string;
+  telefono: string;
 
   @IsString()
   @IsOptional()
   foto_url?: string;
+
+  @IsIn(['funcionario', 'secretaria', 'administrador'])
+  @IsOptional()
+  rol?: string;
 }

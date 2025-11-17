@@ -1,8 +1,6 @@
 import {
   IsBoolean,
-  isBoolean,
-  IsEnum,
-  IsNotEmpty,
+  IsIn,
   IsOptional,
   IsPhoneNumber,
   IsString,
@@ -34,9 +32,9 @@ export class UpdateUsuarioDto {
 
   @IsOptional()
   @IsString()
-  anexo?: string;
-
-  @IsOptional()
-  @IsString()
   foto_url?: string;
+
+  @IsIn(['funcionario', 'secretaria', 'administrador'])
+  @IsOptional() 
+  rol?: string;
 }

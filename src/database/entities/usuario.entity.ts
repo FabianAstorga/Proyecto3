@@ -10,13 +10,20 @@ import {
 } from 'typeorm';
 import { EmpleadoCargo } from './empleado-cargo.entity';
 import { Informe } from './informe.entity';
-import { Horario } from './horario.entity';
-import { Notificacion } from './notificacion.entity';
+import { Agenda } from './agenda.entity';
+
 
 @Entity('usuario')
 export class Usuario {
   @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
+
+  @Column({
+  type: 'enum',
+  enum: ['funcionario', 'secretaria', 'administrador'],
+  default: 'funcionario',
+  })
+  rol: string;
 
   @Column({ type: 'varchar', length: 50 })
   nombre: string;
@@ -39,9 +46,6 @@ export class Usuario {
   @Column({ nullable: true })
   foto_url: string;
 
-  @Column({ default: false })
-  esJefe: boolean;
-
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   fecha_creacion: Date;
 
@@ -52,9 +56,7 @@ export class Usuario {
   @OneToMany(() => Informe, (i) => i.usuario)
   informes: Informe[];
 
-  @OneToMany(() => Horario, (h) => h.asignado_por)
-  horarios: Horario[];
+  @OneToMany(() => Agenda, agenda => agenda.usuario)
+  agendas: Agenda[];
 
-  @OneToMany(() => Notificacion, (n) => n.usuario)
-  notificaciones: Notificacion[];
 }

@@ -10,20 +10,12 @@ import { UsuariosService } from '../usuarios/usuarios.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { CreateUsuarioDto } from '../usuarios/dto/create-usuario.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { EmpleadoCargo } from 'src/database/entities/empleado-cargo.entity';
-import { Cargo } from 'src/database/entities/cargo.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usuariosService: UsuariosService,
     private jwtService: JwtService,
-    @InjectRepository(Cargo)
-    private cargoRepository: Repository<Cargo>,
-    @InjectRepository(EmpleadoCargo)
-    private empleadoCargoRepository: Repository<EmpleadoCargo>,
   ) {}
 
   async register(registerDto: RegisterDto) {
@@ -32,9 +24,8 @@ export class AuthService {
     );
     if (existingUser) throw new ConflictException('Correo ya registrado.');
 
-    const role = registerDto.role || 'funcionario';
-    const cargo = await this.cargoRepository.findOne({ where: { rol: role } });
-    if (!cargo) throw new NotFoundException(`Rol '${role}' no existe.`);
+    // El rol viene directamente del DTO
+    const rol = registerDto.rol || 'funcionario';
 
     const createUsuarioDto: CreateUsuarioDto = {
       correo: registerDto.correo,
@@ -42,25 +33,20 @@ export class AuthService {
       nombre: registerDto.nombre,
       apellido: registerDto.apellido,
       telefono: registerDto.telefono,
+      rol: rol,
     };
 
     const usuario = await this.usuariosService.create(createUsuarioDto);
 
-    const empleadoCargo = this.empleadoCargoRepository.create({
-      usuario,
-      cargo,
-      fecha_inicio: new Date(),
-    });
-    await this.empleadoCargoRepository.save(empleadoCargo);
-
     const payload = {
       sub: usuario.id,
       correo: usuario.correo,
-      roles: [cargo.rol],
+      rol: usuario.rol,
     };
-    const token = this.jwtService.sign(payload);
 
+    const token = this.jwtService.sign(payload);
     const { contrasena, ...usuarioSinContrasena } = usuario;
+
     return { user: usuarioSinContrasena, access_token: token };
   }
 
@@ -68,13 +54,18 @@ export class AuthService {
     const user = await this.usuariosService.findOneByEmailWithPassword(
       loginDto.correo,
     );
+
     if (!user) throw new UnauthorizedException('Credenciales inválidas.');
 
     const match = await bcrypt.compare(loginDto.contrasena, user.contrasena);
     if (!match) throw new UnauthorizedException('Credenciales inválidas.');
 
-    const roles = user.asignaciones?.map((a) => a.cargo.rol) || [];
-    const payload = { sub: user.id, correo: user.correo, roles };
+    const payload = {
+      sub: user.id,
+      correo: user.correo,
+      rol: user.rol, // 👈 aquí usamos el rol del usuario
+    };
+
     const token = this.jwtService.sign(payload);
 
     const { contrasena, ...usuarioSinContrasena } = user;

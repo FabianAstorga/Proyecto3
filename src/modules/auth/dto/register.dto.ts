@@ -25,9 +25,9 @@ export class RegisterDto {
   telefono!: string;
 
   @IsOptional()
-  isActive?: boolean;
+  estado?: boolean;
 
   @IsOptional()
-  @IsIn(['funcionario', 'secretaria', 'director'])
-  role?: string;
+  @IsIn(['funcionario', 'secretaria', 'administrador'])
+  rol?: string;
 }
