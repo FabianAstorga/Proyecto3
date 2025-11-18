@@ -1,4 +1,4 @@
-<app-layout [navItems]="secretariaNavItems" logoutLink="/login">
+<app-layout [title]="'Gestión de calendario'" [logoutLink]="'/login'">
   <section class="w-full px-8 py-10 space-y-4">
     <!-- Encabezado de semana -->
     <div class="flex flex-wrap items-center justify-between gap-4">
@@ -59,7 +59,7 @@
               </div>
             </div>
 
-            <!-- Celdas -->
+            <!-- Celdas editables -->
             <ng-container *ngIf="!b.isLunch; else lunchRow">
               <div
                 *ngFor="let d of days"

@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -7,6 +7,8 @@ import {
   FormGroup,
 } from '@angular/forms';
 import { LayoutComponent } from '../../components/layout/layout.component';
+import { DataService } from '../../services/data.service';
+import { User } from '../../models/user.model';
 
 type Usuario = {
   id: number;
@@ -28,33 +30,9 @@ type Usuario = {
   templateUrl: './gestionar-funcionario.component.html',
   styleUrls: ['./gestionar-funcionario.component.scss'],
 })
-export class GestionarFuncionarioComponent {
-  // iMPORTAR NAV SECRETARIA
-
-  // listado demo en memoria
-  usuarios = signal<Usuario[]>([
-    {
-      id: 1,
-      nombre: 'María',
-      apellidos: 'Navarrete Bustamante',
-      correo: 'mnavarrete@uta.cl',
-      telefono: '+56 58 220 5282',
-      anexo: '35282',
-      url_horario: 'https://intranet/horario/mnavarrete',
-      estado: 'Activo',
-    },
-    {
-      id: 2,
-      nombre: 'Luis',
-      apellidos: 'Araya Tapia',
-      correo: 'laraya@uta.cl',
-      telefono: '+56 58 220 4010',
-      anexo: '34010',
-      estado: 'Inactivo',
-    },
-  ]);
-
-  private idSeq = 3;
+export class GestionarFuncionarioComponent implements OnInit {
+  usuarios = signal<Usuario[]>([]);
+  private idSeq = 1;
 
   form: FormGroup;
   modo: 'crear' | 'editar' = 'crear';
@@ -62,7 +40,7 @@ export class GestionarFuncionarioComponent {
 
   estados = ['Activo', 'Inactivo'] as const;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private dataService: DataService) {
     this.form = this.fb.group({
       nombre: ['', [Validators.required, Validators.maxLength(80)]],
       apellidos: ['', [Validators.required, Validators.maxLength(120)]],
@@ -73,6 +51,33 @@ export class GestionarFuncionarioComponent {
       foto_url: [''],
       rut: [''],
       estado: ['Activo', Validators.required],
+    });
+  }
+
+  ngOnInit(): void {
+    this.dataService.getUsers().subscribe({
+      next: (users: User[]) => {
+        // Ajusta el filtro según lo que quieras administrar
+        const mapped: Usuario[] = users
+          .filter(u => u.role === 'Funcionario') // si quieres todos, quita este filtro
+          .map(u => ({
+            id: u.id,
+            nombre: u.firstName,
+            apellidos: u.lastName,
+            correo: u.email,
+            telefono: (u as any).phone ?? '',
+            anexo: (u as any).anexo ?? '',
+            url_horario: (u as any).horarioUrl ?? '',
+            foto_url: (u as any).photoUrl ?? '',
+            rut: (u as any).rut ?? '',
+            estado: ((u as any).estado as 'Activo' | 'Inactivo') ?? 'Activo',
+          }));
+
+        this.idSeq =
+          mapped.reduce((max, u) => (u.id > max ? u.id : max), 0) + 1;
+        this.usuarios.set(mapped);
+      },
+      error: err => console.error('Error cargando usuarios:', err),
     });
   }
 
@@ -105,7 +110,11 @@ export class GestionarFuncionarioComponent {
       id: this.idSeq++,
       ...(this.form.value as Omit<Usuario, 'id'>),
     };
-    this.usuarios.update((list) => [nuevo, ...list]);
+    this.usuarios.update(list => [nuevo, ...list]);
+
+    // TODO: cuando tengas backend, aquí llamas a DataService para persistir
+    // this.dataService.createFuncionario(nuevo).subscribe(...);
+
     this.resetForm();
   }
 
@@ -120,19 +129,25 @@ export class GestionarFuncionarioComponent {
       this.form.markAllAsTouched();
       return;
     }
-    const updated = {
+    const updated: Usuario = {
       id: this.editId,
       ...(this.form.value as Omit<Usuario, 'id'>),
-    } as Usuario;
-    this.usuarios.update((list) =>
-      list.map((x) => (x.id === this.editId ? updated : x))
+    };
+    this.usuarios.update(list =>
+      list.map(x => (x.id === this.editId ? updated : x))
     );
+
+    // TODO: DataService.updateFuncionario(updated).subscribe(...);
+
     this.resetForm();
   }
 
   eliminar(id: number) {
     if (!confirm('¿Eliminar funcionario?')) return;
-    this.usuarios.update((list) => list.filter((u) => u.id !== id));
+    this.usuarios.update(list => list.filter(u => u.id !== id));
+
+    // TODO: DataService.deleteFuncionario(id).subscribe(...);
+
     if (this.editId === id) this.resetForm();
   }
 }

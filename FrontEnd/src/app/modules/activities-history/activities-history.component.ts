@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -17,19 +17,19 @@ import {
 import { MatSelectModule } from '@angular/material/select';
 
 import { LayoutComponent } from '../../components/layout/layout.component';
-import { FUNCIONARIO_NAV_ITEMS } from '../profile-home/funcionario.nav';
+import { DataService } from '../../services/data.service';
+import { AuthService } from '../../services/auth.service';
+import { User } from '../../models/user.model';
+import { Activity } from '../../models/activity.model';
 
-type Estado = 'Aprobada' | 'Pendiente' | 'Rechazada';
-type Activity = {
-  fecha: string;
-  titulo: string;
-  detalle: string;
-  estado: Estado;
-  horas: number;
-};
+import jsPDF from 'jspdf';
+
+type Estado = Activity['estado'];
 
 class MondayFirstDateAdapter extends NativeDateAdapter {
-  override getFirstDayOfWeek(): number { return 1; }
+  override getFirstDayOfWeek(): number {
+    return 1;
+  }
 }
 
 export const ES_DATE_FORMATS = {
@@ -41,6 +41,18 @@ export const ES_DATE_FORMATS = {
     monthYearA11yLabel: 'MMMM yyyy',
   },
 };
+
+interface UserGroup {
+  userId: number;
+  userName: string;
+  activities: Activity[];
+}
+
+interface MonthGroup {
+  monthKey: string;   // '2025-10'
+  monthLabel: string; // 'Octubre 2025'
+  users: UserGroup[];
+}
 
 @Component({
   selector: 'app-activities-history',
@@ -65,18 +77,23 @@ export const ES_DATE_FORMATS = {
     { provide: MAT_DATE_FORMATS, useValue: ES_DATE_FORMATS },
   ],
 })
-export class ActivitiesHistoryComponent {
+export class ActivitiesHistoryComponent implements OnInit {
   private fb = inject(FormBuilder);
+  private dataService = inject(DataService);
+  private authService = inject(AuthService);
 
-  // ==== NAV del layout (usado por el template) ====
-  funcionarioNavItems = FUNCIONARIO_NAV_ITEMS;
+  // Nombre de la secretaria logueada (para PDF y cabecera)
+  secretaryName = '';
 
-  // (el template muestra/oculta modal en algunos casos: proveemos banderas y métodos)
-  showDetails = false;
-  openDetails() { this.showDetails = true; }
-  closeDetails() { this.showDetails = false; }
+  // Datos crudos
+  private allUsers: User[] = [];
+  private allActivities: Activity[] = [];
 
-  // ==== Filtros ====
+  // Vista agrupada
+  groupedMonths: MonthGroup[] = [];
+  totalActivities = 0;
+
+  // Filtros
   filters = this.fb.group({
     q: this.fb.control<string>(''),
     desde: this.fb.control<Date | null>(null),
@@ -88,61 +105,271 @@ export class ActivitiesHistoryComponent {
     return (this.filters.controls.estado.value ?? '') as '' | Estado;
   }
 
-  // ==== Datos demo ====
-  activities: Activity[] = [
-    { fecha: '2025-10-15', titulo: 'Taller de CAD', detalle: 'Modelado 3D', estado: 'Aprobada', horas: 4 },
-    { fecha: '2025-10-12', titulo: 'Capacitación Docente', detalle: 'Uso de plataformas virtuales', estado: 'Aprobada', horas: 3 },
-    { fecha: '2025-10-10', titulo: 'Seminario de Materiales', detalle: 'Compósitos avanzados', estado: 'Pendiente', horas: 2 },
-    { fecha: '2025-10-09', titulo: 'Reunión de Facultad', detalle: 'Proyectos de investigación', estado: 'Pendiente', horas: 2 },
-    { fecha: '2025-10-05', titulo: 'Voluntariado Feria UTA', detalle: 'Apoyo logístico', estado: 'Aprobada', horas: 5 },
-    { fecha: '2025-10-03', titulo: 'Evaluación Parcial', detalle: 'Aplicación de prueba', estado: 'Aprobada', horas: 6 },
-    { fecha: '2025-09-29', titulo: 'Asesoría Académica', detalle: 'Orientación a estudiantes', estado: 'Rechazada', horas: 1 },
-    { fecha: '2025-09-22', titulo: 'Charla de Seguridad', detalle: 'Protocolos', estado: 'Aprobada', horas: 2 },
-    { fecha: '2025-09-14', titulo: 'Taller de Programación', detalle: 'Intro a Python', estado: 'Aprobada', horas: 4 },
-    { fecha: '2025-09-05', titulo: 'Reunión con Dirección', detalle: 'Planificación', estado: 'Pendiente', horas: 1 },
-  ];
+  ngOnInit(): void {
+    // Cargar usuarios y actividades, luego construir la vista
+    this.dataService
+      .getUsers()
+      .subscribe({
+        next: (users) => {
+          this.allUsers = users;
 
-  // ==== Utils ====
-  private toISO(d: Date): string {
-    return new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())).toISOString().slice(0, 10);
+          // Intentar obtener la secretaria logueada
+          const currentId = this.authService.getUserId();
+          const secretary = users.find(
+            (u) => u.id === currentId && u.role === 'Secretaria'
+          );
+          this.secretaryName = secretary
+            ? `${secretary.firstName} ${secretary.lastName}`
+            : '';
+
+          // Ahora cargar actividades
+          this.dataService.getAllActivities().subscribe({
+            next: (acts) => {
+              this.allActivities = acts;
+              this.rebuildView();
+            },
+            error: (err) =>
+              console.error('Error cargando actividades:', err),
+          });
+        },
+        error: (err) => console.error('Error cargando usuarios:', err),
+      });
+
+    // Reconstruir vista cuando cambian los filtros
+    this.filters.valueChanges.subscribe(() => this.rebuildView());
   }
-  private inRange(iso: string, from?: Date | null, to?: Date | null): boolean {
+
+  // ================== LÓGICA DE VISTA ==================
+
+  private rebuildView(): void {
+    if (!this.allUsers.length || !this.allActivities.length) {
+      this.groupedMonths = [];
+      this.totalActivities = 0;
+      return;
+    }
+
+    // Consideramos actividades solo de FUNCIONARIOS
+    const funcionarioIds = new Set(
+      this.allUsers
+        .filter((u) => u.role === 'Funcionario')
+        .map((u) => u.id)
+    );
+
+    const { q, desde, hasta, estado } = this.filters.getRawValue();
+    const term = (q ?? '').trim().toLowerCase();
+
+    const filtered = this.allActivities.filter((a) => {
+      if (!funcionarioIds.has(a.userId)) return false;
+
+      if (!this.inRange(a.fecha, desde ?? null, hasta ?? null)) return false;
+
+      if (estado !== '' && a.estado !== estado) return false;
+
+      if (term) {
+        const user = this.allUsers.find((u) => u.id === a.userId);
+        const userName = user
+          ? `${user.firstName} ${user.lastName}`.toLowerCase()
+          : '';
+
+        const inText =
+          a.titulo.toLowerCase().includes(term) ||
+          a.detalle.toLowerCase().includes(term) ||
+          a.estado.toLowerCase().includes(term) ||
+          userName.includes(term);
+
+        if (!inText) return false;
+      }
+
+      return true;
+    });
+
+    this.totalActivities = filtered.length;
+
+    // Agrupar por mes y luego por usuario
+    const byMonth = new Map<string, Activity[]>();
+
+    for (const a of filtered) {
+      const key = a.fecha.slice(0, 7); // 'YYYY-MM'
+      const bucket = byMonth.get(key) ?? [];
+      bucket.push(a);
+      byMonth.set(key, bucket);
+    }
+
+    const months: MonthGroup[] = [];
+
+    for (const [monthKey, acts] of byMonth.entries()) {
+      // agrupar por usuario
+      const byUser = new Map<number, Activity[]>();
+      for (const a of acts) {
+        const ua = byUser.get(a.userId) ?? [];
+        ua.push(a);
+        byUser.set(a.userId, ua);
+      }
+
+      const userGroups: UserGroup[] = Array.from(byUser.entries())
+        .map(([userId, list]) => {
+          const user = this.allUsers.find((u) => u.id === userId);
+          const userName = user
+            ? `${user.firstName} ${user.lastName}`
+            : `Usuario ${userId}`;
+
+          // Ordenar actividades dentro de usuario por fecha desc
+          list.sort((a, b) =>
+            a.fecha < b.fecha ? 1 : a.fecha > b.fecha ? -1 : 0
+          );
+
+          return { userId, userName, activities: list };
+        })
+        .sort((a, b) => a.userName.localeCompare(b.userName));
+
+      months.push({
+        monthKey,
+        monthLabel: this.getMonthLabel(monthKey),
+        users: userGroups,
+      });
+    }
+
+    // Ordenar meses descendente
+    months.sort((a, b) =>
+      a.monthKey < b.monthKey ? 1 : a.monthKey > b.monthKey ? -1 : 0
+    );
+
+    this.groupedMonths = months;
+  }
+
+  // ================== UTILIDADES ==================
+
+  private toISO(d: Date): string {
+    return new Date(
+      Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())
+    )
+      .toISOString()
+      .slice(0, 10);
+  }
+
+  private inRange(
+    iso: string,
+    from?: Date | null,
+    to?: Date | null
+  ): boolean {
     const f = from ? this.toISO(from) : null;
     const t = to ? this.toISO(to) : null;
     if (f && iso < f) return false;
     if (t && iso > t) return false;
     return true;
   }
+
   formatDMY(iso: string): string {
     const [y, m, d] = iso.split('-').map(Number);
-    return `${String(d).padStart(2, '0')}/${String(m).padStart(2, '0')}/${y}`;
+    return `${String(d).padStart(2, '0')}/${String(m).padStart(
+      2,
+      '0'
+    )}/${y}`;
   }
 
   statusPillClass(est: '' | Estado): string {
     switch (est) {
-      case 'Aprobada': return 'bg-emerald-500/10 text-emerald-700 border-emerald-300';
-      case 'Pendiente': return 'bg-amber-500/10 text-amber-700 border-amber-300';
-      case 'Rechazada': return 'bg-red-500/10 text-red-700 border-red-300';
-      default:          return 'bg-gray-500/10 text-gray-700 border-gray-300';
+      case 'Aprobada':
+        return 'bg-emerald-500/10 text-emerald-700 border-emerald-300';
+      case 'Pendiente':
+        return 'bg-amber-500/10 text-amber-700 border-amber-300';
+      case 'Rechazada':
+        return 'bg-red-500/10 text-red-700 border-red-300';
+      default:
+        return 'bg-gray-500/10 text-gray-700 border-gray-300';
     }
   }
-  displayEstado(est: '' | Estado): string { return est === '' ? 'Todos' : est; }
 
-  get filtered(): Activity[] {
-    const { q, desde, hasta, estado } = this.filters.getRawValue();
-    const term = (q ?? '').trim().toLowerCase();
-    return this.activities
-      .filter(a =>
-        this.inRange(a.fecha, desde ?? null, hasta ?? null) &&
-        ((estado ?? '') === '' || a.estado === estado) &&
-        (term === '' ||
-          a.titulo.toLowerCase().includes(term) ||
-          a.detalle.toLowerCase().includes(term) ||
-          a.estado.toLowerCase().includes(term)))
-      .sort((a, b) => (a.fecha < b.fecha ? 1 : a.fecha > b.fecha ? -1 : 0));
+  displayEstado(est: '' | Estado): string {
+    return est === '' ? 'Todos' : est;
+  }
+
+  getMonthTotalActivities(month: MonthGroup): number {
+    return month.users.reduce(
+      (sum, u) => sum + u.activities.length,
+      0
+    );
+  }
+
+  private getMonthLabel(key: string): string {
+    const [yearStr, monthStr] = key.split('-');
+    const year = Number(yearStr);
+    const month = Number(monthStr); // 1..12
+    const meses = [
+      'enero',
+      'febrero',
+      'marzo',
+      'abril',
+      'mayo',
+      'junio',
+      'julio',
+      'agosto',
+      'septiembre',
+      'octubre',
+      'noviembre',
+      'diciembre',
+    ];
+    const nombre = meses[month - 1] ?? '';
+    return `${nombre.charAt(0).toUpperCase()}${nombre.slice(
+      1
+    )} ${year}`;
   }
 
   clearFilters() {
-    this.filters.reset({ q: '', desde: null, hasta: null, estado: '' });
+    this.filters.reset({
+      q: '',
+      desde: null,
+      hasta: null,
+      estado: '',
+    });
+    this.rebuildView();
+  }
+
+  // ================== PDF POR MES ==================
+
+  downloadMonthPdf(month: MonthGroup): void {
+    const doc = new jsPDF();
+    let y = 20;
+    const marginX = 14;
+
+    // Cabecera
+    doc.setFontSize(14);
+    const title = `Historial de actividades - ${month.monthLabel}`;
+    doc.text(title, marginX, y);
+    y += 8;
+
+    doc.setFontSize(11);
+    const secName =
+      this.secretaryName || 'Secretaría (sin identificar)';
+    doc.text(`Secretaria: ${secName}`, marginX, y);
+    y += 10;
+
+    // Contenido: por usuario
+    month.users.forEach((ug) => {
+      if (y > 270) {
+        doc.addPage();
+        y = 20;
+      }
+
+      doc.setFontSize(12);
+      doc.text(ug.userName, marginX, y);
+      y += 6;
+
+      doc.setFontSize(10);
+      ug.activities.forEach((a) => {
+        if (y > 280) {
+          doc.addPage();
+          y = 20;
+        }
+        const line = `- ${this.formatDMY(a.fecha)} · ${a.titulo} · ${a.horas} h (${a.estado})`;
+        doc.text(line, marginX, y);
+        y += 5;
+      });
+
+      y += 4;
+    });
+
+    const cleanKey = month.monthKey.replace('-', '');
+    doc.save(`reporte_actividades_${cleanKey}.pdf`);
   }
 }

@@ -1,157 +1,137 @@
 import { Routes } from '@angular/router';
-import { AuthGuard } from './services/auth.guard'; // ajusta la ruta si tu guard está en otra carpeta
+import { AuthGuard } from './services/auth.guard';
 
+// HOME público
 export const routes: Routes = [
-  // ============================
-  // Home público
-  // ============================
   {
     path: '',
     loadComponent: () =>
-      import('./modules/home/home.component').then((m) => m.HomeComponent),
+      import('./modules/home/home.component').then(m => m.HomeComponent),
   },
 
   // ============================
-  // Área FUNCIONARIO
+  // ÁREA FUNCIONARIO
   // ============================
   {
-    path: 'funcionario',
+    path: 'funcionario/:id',
     canActivate: [AuthGuard],
     canActivateChild: [AuthGuard],
     data: { roles: ['Funcionario'] },
     children: [
-      // Perfil (usa componentes globales)
       {
         path: 'perfil',
         loadComponent: () =>
           import('./modules/profile-home/profile-home.component').then(
-            (m) => m.ProfileHomeComponent
+            m => m.ProfileHomeComponent
           ),
       },
       {
-        path: 'perfil/:id',
+        path: 'actividades/nueva',
         loadComponent: () =>
-          import('./modules/profile-home/profile-home.component').then(
-            (m) => m.ProfileHomeComponent
+          import('./modules/activity-new/activity-new.component').then(
+            m => m.ActivityNewComponent
           ),
       },
-
-      // Horario común
       {
         path: 'horario',
         loadComponent: () =>
           import('./modules/schedule/schedule.component').then(
-            (m) => m.ScheduleComponent
+            m => m.ScheduleComponent
           ),
       },
-
-      // Actividades (historial + nueva)
       {
-        path: 'actividades',
-        children: [
-          { path: '', pathMatch: 'full', redirectTo: 'historial' },
-          {
-            path: 'historial',
-            loadComponent: () =>
-              import(
-                './modules/activities-history/activities-history.component'
-              ).then((m) => m.ActivitiesHistoryComponent),
-          },
-          {
-            path: 'nueva',
-            loadComponent: () =>
-              import('./modules/activity-new/activity-new.component').then(
-                (m) => m.ActivityNewComponent
-              ),
-          },
-        ],
+        path: '',
+        pathMatch: 'full',
+        redirectTo: 'perfil',
       },
-
-      // Default /funcionario -> perfil
-      { path: '', pathMatch: 'full', redirectTo: 'perfil' },
     ],
   },
 
   // ============================
-  // Área SECRETARÍA (usa los mismos módulos comunes)
+  // ÁREA SECRETARÍA
   // ============================
   {
-    path: 'secretaria',
+    path: 'secretaria/:id',
     canActivate: [AuthGuard],
     canActivateChild: [AuthGuard],
-    data: { roles: ['Secretaria', 'Administrador'] }, // si quieres que el admin entre por aquí
+    data: { roles: ['Secretaria'] },
     children: [
       {
         path: 'perfil',
         loadComponent: () =>
           import('./modules/profile-home/profile-home.component').then(
-            (m) => m.ProfileHomeComponent
+            m => m.ProfileHomeComponent
           ),
       },
       {
-        path: 'perfil/:id',
-        loadComponent: () =>
-          import('./modules/profile-home/profile-home.component').then(
-            (m) => m.ProfileHomeComponent
-          ),
-      },
-
-      // Horario común
-      {
-        path: 'horario',
-        loadComponent: () =>
-          import('./modules/schedule/schedule.component').then(
-            (m) => m.ScheduleComponent
-          ),
-      },
-
-      // Actividades (solo historial para secretaria)
-      {
-        path: 'actividades',
-        children: [
-          { path: '', pathMatch: 'full', redirectTo: 'historial' },
-          {
-            path: 'historial',
-            loadComponent: () =>
-              import(
-                './modules/activities-history/activities-history.component'
-              ).then((m) => m.ActivitiesHistoryComponent),
-          },
-        ],
-      },
-
-      // Vistas de gestión propias de secretaria/admin
-      {
-        path: 'gestionar-funcionario',
+        path: 'actividades/historial',
         loadComponent: () =>
           import(
-            './modules/gestionar-funcionario/gestionar-funcionario.component'
-          ).then((m) => m.GestionarFuncionarioComponent),
+            './modules/activities-history/activities-history.component'
+          ).then(m => m.ActivitiesHistoryComponent),
       },
       {
-        path: 'gestionar-calendario',
+        path: 'calendario',
         loadComponent: () =>
           import(
             './modules/gestionar-calendario/gestionar-calendario.component'
-          ).then((m) => m.GestionarCalendarioComponent),
+          ).then(m => m.GestionarCalendarioComponent),
       },
-
-      // Default /secretaria -> perfil
-      { path: '', pathMatch: 'full', redirectTo: 'perfil' },
+      {
+        path: 'funcionarios',
+        loadComponent: () =>
+          import(
+            './modules/gestionar-funcionario/gestionar-funcionario.component'
+          ).then(m => m.GestionarFuncionarioComponent),
+      },
+      {
+        path: '',
+        pathMatch: 'full',
+        redirectTo: 'perfil',
+      },
     ],
   },
 
   // ============================
-  // Alias simple (si lo necesitas)
+  // ÁREA ADMINISTRADOR
   // ============================
   {
-    path: 'actividad',
-    redirectTo: '/secretaria/actividades/historial',
-    pathMatch: 'full',
+    path: 'admin/:id',
+    canActivate: [AuthGuard],
+    canActivateChild: [AuthGuard],
+    data: { roles: ['Administrador'] },
+    children: [
+      {
+        path: 'perfil',
+        loadComponent: () =>
+          import('./modules/profile-home/profile-home.component').then(
+            m => m.ProfileHomeComponent
+          ),
+      },
+      {
+        path: 'funcionarios',
+        loadComponent: () =>
+          import(
+            './modules/gestionar-funcionario/gestionar-funcionario.component'
+          ).then(m => m.GestionarFuncionarioComponent),
+      },
+      {
+        path: 'calendario',
+        loadComponent: () =>
+          import(
+            './modules/gestionar-calendario/gestionar-calendario.component'
+          ).then(m => m.GestionarCalendarioComponent),
+      },
+      {
+        path: '',
+        pathMatch: 'full',
+        redirectTo: 'funcionarios',
+      },
+    ],
   },
 
   // ============================
-  // Wildcard
+  // FALLO DE RUTA
   // ============================
   { path: '**', redirectTo: '' },
 ];

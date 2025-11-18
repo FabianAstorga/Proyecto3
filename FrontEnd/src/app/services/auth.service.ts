@@ -1,3 +1,4 @@
+// src/app/services/auth.service.ts
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
@@ -6,7 +7,7 @@ interface DecodedToken {
   exp: number;
   role: string;
   id: number;
-  email?: string;
+  email: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -15,14 +16,14 @@ export class AuthService {
 
   constructor(private router: Router) {}
 
+  // Guarda el token (cuando el backend te lo entrega)
   login(token: string): void {
     localStorage.setItem(this.TOKEN_KEY, token);
   }
 
   logout(): void {
     localStorage.removeItem(this.TOKEN_KEY);
-    // OJO: no tienes ruta '/login', probablemente quieras ir al home
-    this.router.navigate(['/']);
+    this.router.navigate(['/login']);
   }
 
   getToken(): string | null {
@@ -41,6 +42,8 @@ export class AuthService {
     }
   }
 
+  // -------- Helpers de sesión --------
+
   isLoggedIn(): boolean {
     const decodedToken = this.getDecodedToken();
     if (!decodedToken) return false;
@@ -55,5 +58,37 @@ export class AuthService {
   getUserId(): number | null {
     const decodedToken = this.getDecodedToken();
     return decodedToken ? decodedToken.id : null;
+  }
+
+  getUserEmail(): string | null {
+    const decodedToken = this.getDecodedToken();
+    return decodedToken ? decodedToken.email : null;
+  }
+
+  // -------- Ruta home según rol --------
+  /**
+   * Devuelve la ruta "home" según el rol del usuario.
+   * Si no hay usuario o rol, vuelve a '/'.
+   */
+  getHomeRouteForRole(): string {
+    const role = this.getUserRole();
+    const id = this.getUserId();
+
+    if (!role || !id) {
+      return '/';
+    }
+
+    switch (role) {
+      case 'Funcionario':
+        return `/funcionario/perfil/${id}`;
+      case 'Secretaria':
+        return `/secretaria/perfil/${id}`;
+      case 'Director':
+        return `/director/perfil/${id}`;
+      case 'Admin':
+        return '/admin/dashboard';
+      default:
+        return '/';
+    }
   }
 }

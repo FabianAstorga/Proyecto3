@@ -1,3 +1,4 @@
+// src/app/services/auth.guard.ts
 import { Injectable } from '@angular/core';
 import {
   CanActivate,
@@ -33,7 +34,8 @@ export class AuthGuard implements CanActivate, CanActivateChild {
   ): boolean | UrlTree {
     // 1) Debe estar logueado
     if (!this.authService.isLoggedIn()) {
-      return this.router.createUrlTree(['/'], {
+      // 👇 si tu login está en otra ruta, cámbialo aquí
+      return this.router.createUrlTree(['/login'], {
         queryParams: { returnUrl: state.url },
       });
     }
@@ -50,9 +52,8 @@ export class AuthGuard implements CanActivate, CanActivateChild {
       return true;
     }
 
-    // 4) No autorizado → te mando al home con flag
-    return this.router.createUrlTree(['/'], {
-      queryParams: { unauthorized: true },
-    });
+    // 4) No autorizado → lo mando al "home" según su rol
+    const fallback = this.authService.getHomeRouteForRole() || '/';
+    return this.router.parseUrl(fallback);
   }
 }

@@ -1,21 +1,33 @@
-<app-layout [navItems]="funcionarioNavItems" [logoutLink]="'/login'">
+<app-layout [title]="'Secretaría'" [logoutLink]="'/login'">
   <section class="max-w-7xl mx-auto px-6 py-8">
     <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6 overflow-hidden">
-      <div class="px-6 py-4 border-b border-gray-200">
-        <h1 class="text-2xl md:text-3xl font-bold text-[#0D1440]">
-          Historial de actividades
-        </h1>
+      <!-- Cabecera -->
+      <div class="px-6 py-4 border-b border-gray-200 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+        <div>
+          <h1 class="text-2xl md:text-3xl font-bold text-[#0D1440]">
+            Historial de actividades
+          </h1>
+          <p class="text-xs text-gray-500 mt-1" *ngIf="secretaryName">
+            Secretaria: <span class="font-semibold">{{ secretaryName }}</span>
+          </p>
+          <p class="text-xs text-gray-500 mt-1">
+            Total actividades en vista: {{ totalActivities }}
+          </p>
+        </div>
       </div>
 
+      <!-- Filtros -->
       <div class="p-4 md:p-5">
         <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <!-- Texto -->
           <div class="md:col-span-2">
             <label class="block text-sm font-medium text-gray-700 mb-1">Buscar por texto</label>
             <mat-form-field appearance="outline" class="w-full">
-              <input matInput placeholder="Escribe aquí..." [formControl]="filters.controls.q" />
+              <input matInput placeholder="Actividad, detalle, estado o funcionario..." [formControl]="filters.controls.q" />
             </mat-form-field>
           </div>
 
+          <!-- Desde -->
           <div class="w-full md:w-40">
             <label class="block text-sm font-medium text-gray-700 mb-1">Desde</label>
             <mat-form-field appearance="outline" class="w-full">
@@ -34,6 +46,7 @@
             </mat-form-field>
           </div>
 
+          <!-- Hasta -->
           <div class="w-full md:w-40">
             <label class="block text-sm font-medium text-gray-700 mb-1">Hasta</label>
             <mat-form-field appearance="outline" class="w-full">
@@ -52,6 +65,7 @@
             </mat-form-field>
           </div>
 
+          <!-- Estado -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
             <mat-form-field appearance="outline" class="w-full">
@@ -66,22 +80,34 @@
                 </mat-select-trigger>
 
                 <mat-option [value]="">
-                  <span class="px-2 py-0.5 rounded-full border text-xs font-medium" [ngClass]="statusPillClass('')">
+                  <span
+                    class="px-2 py-0.5 rounded-full border text-xs font-medium"
+                    [ngClass]="statusPillClass('')"
+                  >
                     Todos
                   </span>
                 </mat-option>
                 <mat-option value="Aprobada">
-                  <span class="px-2 py-0.5 rounded-full border text-xs font-medium" [ngClass]="statusPillClass('Aprobada')">
+                  <span
+                    class="px-2 py-0.5 rounded-full border text-xs font-medium"
+                    [ngClass]="statusPillClass('Aprobada')"
+                  >
                     Aprobada
                   </span>
                 </mat-option>
                 <mat-option value="Pendiente">
-                  <span class="px-2 py-0.5 rounded-full border text-xs font-medium" [ngClass]="statusPillClass('Pendiente')">
+                  <span
+                    class="px-2 py-0.5 rounded-full border text-xs font-medium"
+                    [ngClass]="statusPillClass('Pendiente')"
+                  >
                     Pendiente
                   </span>
                 </mat-option>
                 <mat-option value="Rechazada">
-                  <span class="px-2 py-0.5 rounded-full border text-xs font-medium" [ngClass]="statusPillClass('Rechazada')">
+                  <span
+                    class="px-2 py-0.5 rounded-full border text-xs font-medium"
+                    [ngClass]="statusPillClass('Rechazada')"
+                  >
                     Rechazada
                   </span>
                 </mat-option>
@@ -101,30 +127,59 @@
         </div>
       </div>
 
-      <div class="rounded-b-xl bg-blue-50 transition-all" [ngClass]="{ 'max-h-96 overflow-y-auto': filtered.length > 5 }">
-        <div *ngIf="filtered.length === 0" class="px-6 py-10 text-center text-sm text-gray-500">
+      <!-- Contenido agrupado -->
+      <div class="rounded-b-xl bg-blue-50 transition-all">
+        <div *ngIf="groupedMonths.length === 0" class="px-6 py-10 text-center text-sm text-gray-500">
           No hay actividades que coincidan con los filtros.
         </div>
 
-        <ul *ngIf="filtered.length > 0" class="divide-y divide-blue-100">
-          <li
-            *ngFor="let a of filtered; let i = index"
-            class="px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3"
-          >
-            <div class="min-w-0">
-              <div class="text-sm md:text-base font-semibold text-gray-900">
-                Actividad {{ i + 1 }} — {{ a.titulo }}
-              </div>
-              <div class="text-sm text-gray-700">
-                {{ a.detalle }} · {{ formatDMY(a.fecha) }} · {{ a.horas }} h
-              </div>
+        <div *ngFor="let month of groupedMonths" class="border-t border-blue-200">
+          <!-- Encabezado de mes + botón PDF -->
+          <div class="px-6 py-3 bg-blue-100 flex items-center justify-between gap-3">
+            <div>
+              <h2 class="text-lg font-semibold text-[#0D1440]">{{ month.monthLabel }}</h2>
+              <p class="text-xs text-gray-600">
+                Actividades en el mes: {{ getMonthTotalActivities(month) }}
+              </p>
             </div>
+            <button
+              type="button"
+              (click)="downloadMonthPdf(month)"
+              class="inline-flex items-center px-3 py-2 rounded-md bg-blue-600 text-white text-xs md:text-sm font-semibold hover:bg-blue-700"
+            >
+              Descargar PDF
+            </button>
+          </div>
 
-            <span class="text-xs px-2 py-1 rounded-full border self-start md:self-auto" [ngClass]="statusPillClass(a.estado)">
-              {{ a.estado }}
-            </span>
-          </li>
-        </ul>
+          <!-- Usuarios dentro del mes -->
+          <div class="bg-blue-50">
+            <div *ngFor="let ug of month.users" class="px-6 py-4 border-t border-blue-100">
+              <h3 class="text-sm md:text-base font-semibold text-gray-900 mb-2">
+                {{ ug.userName }}
+              </h3>
+
+              <ul class="space-y-2">
+                <li
+                  *ngFor="let a of ug.activities"
+                  class="flex flex-col md:flex-row md:items-center md:justify-between gap-2"
+                >
+                  <div class="text-sm text-gray-800">
+                    <span class="font-medium">{{ formatDMY(a.fecha) }}</span> ·
+                    {{ a.titulo }} · {{ a.horas }} h
+                    <span class="text-xs text-gray-500" *ngIf="a.detalle"> — {{ a.detalle }}</span>
+                  </div>
+
+                  <span
+                    class="text-xs px-2 py-1 rounded-full border self-start md:self-auto"
+                    [ngClass]="statusPillClass(a.estado)"
+                  >
+                    {{ a.estado }}
+                  </span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </section>

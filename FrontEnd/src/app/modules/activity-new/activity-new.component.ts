@@ -84,7 +84,7 @@ export class ActivityNewComponent {
     return id != null ? `/funcionario/perfil/${id}` : '/funcionario/perfil';
   }
 
-  // Catálogos (con “Otro (especificar)”)
+  // Catálogos
   tiposActividad = [
     'Taller',
     'Seminario',
@@ -221,7 +221,7 @@ export class ActivityNewComponent {
     );
   };
 
-  /** Estilo visual en calendario (se usa en MULTI-DÍA) */
+  /** Estilo visual en calendario (si quieres aplicarlo en el datepicker) */
   dateClass = (d: Date): string => {
     return this.feriadosISO.has(this.toISO(d))
       ? 'holiday-cell'
@@ -323,6 +323,40 @@ export class ActivityNewComponent {
     this.specificDates.removeAt(i);
   }
 
+  // ==== Reset limpio (para el botón "Limpiar formulario") ====
+  onReset(): void {
+    this.form.reset({
+      descripcionAct: '',
+      fecha: new Date(),
+      tipo_actividad: this.tiposActividad[0],
+      tipo_actividad_otro: '',
+      estado: this.estados[0],
+      multi: {
+        enable: false,
+        mode: 'specific',
+        specificDates: [],
+        weekly: {
+          start: new Date(),
+          end: new Date(),
+          weekdays: {
+            mon: false,
+            tue: false,
+            wed: false,
+            thu: false,
+            fri: false,
+            sat: false,
+            sun: false,
+          },
+        },
+      },
+    });
+
+    // Vaciar el FormArray manualmente
+    while (this.specificDates.length > 0) {
+      this.specificDates.removeAt(0);
+    }
+  }
+
   // ==== Envío ====
   submit() {
     if (this.form.invalid) {
@@ -382,5 +416,8 @@ export class ActivityNewComponent {
       'Payload actividad (fecha principal libre; multi dentro del mes):',
       payload
     );
+
+    // 👉 Aquí después puedes integrar tu DataService:
+    // this.dataService.crearActividad(payload).subscribe(...)
   }
 }

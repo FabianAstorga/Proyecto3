@@ -1,4 +1,4 @@
-<app-layout [navItems]="secretariaNavItems" logoutLink="/login">
+<app-layout [title]="'Administración'" [logoutLink]="'/login'">
   <section class="max-w-7xl mx-auto px-6 py-8 space-y-8">
 
     <!-- Título -->
@@ -8,8 +8,6 @@
 
     <!-- Formulario -->
     <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-
-
       <form
         class="grid grid-cols-1 md:grid-cols-2 gap-5"
         [formGroup]="form"
@@ -17,31 +15,49 @@
       >
         <!-- Nombre -->
         <div>
-          <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre</label>
+          <label for="nombre" class="block text-sm font-medium text-gray-700"
+            >Nombre</label
+          >
           <input
             id="nombre"
             placeholder="Ingrese el nombre"
             class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400"
             formControlName="nombre"
           />
-          <p *ngIf="f['nombre'].touched && f['nombre'].invalid" class="text-xs text-red-600 mt-1">Obligatorio.</p>
+          <p
+            *ngIf="f['nombre'].touched && f['nombre'].invalid"
+            class="text-xs text-red-600 mt-1"
+          >
+            Obligatorio.
+          </p>
         </div>
 
         <!-- Apellidos -->
         <div>
-          <label for="apellidos" class="block text-sm font-medium text-gray-700">Apellidos</label>
+          <label
+            for="apellidos"
+            class="block text-sm font-medium text-gray-700"
+            >Apellidos</label
+          >
           <input
             id="apellidos"
             placeholder="Ingrese los apellidos"
             class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400"
             formControlName="apellidos"
           />
-          <p *ngIf="f['apellidos'].touched && f['apellidos'].invalid" class="text-xs text-red-600 mt-1">Obligatorio.</p>
+          <p
+            *ngIf="f['apellidos'].touched && f['apellidos'].invalid"
+            class="text-xs text-red-600 mt-1"
+          >
+            Obligatorio.
+          </p>
         </div>
 
         <!-- Correo -->
         <div>
-          <label for="correo" class="block text-sm font-medium text-gray-700">Correo</label>
+          <label for="correo" class="block text-sm font-medium text-gray-700"
+            >Correo</label
+          >
           <input
             id="correo"
             type="email"
@@ -49,12 +65,21 @@
             class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400"
             formControlName="correo"
           />
-          <p *ngIf="f['correo'].touched && f['correo'].invalid" class="text-xs text-red-600 mt-1">Correo inválido.</p>
+          <p
+            *ngIf="f['correo'].touched && f['correo'].invalid"
+            class="text-xs text-red-600 mt-1"
+          >
+            Correo inválido.
+          </p>
         </div>
 
         <!-- Teléfono -->
         <div>
-          <label for="telefono" class="block text-sm font-medium text-gray-700">Teléfono</label>
+          <label
+            for="telefono"
+            class="block text-sm font-medium text-gray-700"
+            >Teléfono</label
+          >
           <input
             id="telefono"
             placeholder="Ej: +56 9 1234 5678"
@@ -65,7 +90,9 @@
 
         <!-- Anexo -->
         <div>
-          <label for="anexo" class="block text-sm font-medium text-gray-700">Anexo</label>
+          <label for="anexo" class="block text-sm font-medium text-gray-700"
+            >Anexo</label
+          >
           <input
             id="anexo"
             placeholder="Ej: 1234"
@@ -76,7 +103,11 @@
 
         <!-- URL Horario -->
         <div>
-          <label for="url_horario" class="block text-sm font-medium text-gray-700">URL Horario</label>
+          <label
+            for="url_horario"
+            class="block text-sm font-medium text-gray-700"
+            >URL Horario</label
+          >
           <input
             id="url_horario"
             placeholder="https://..."
@@ -87,7 +118,11 @@
 
         <!-- Foto URL -->
         <div>
-          <label for="foto_url" class="block text-sm font-medium text-gray-700">Foto (URL)</label>
+          <label
+            for="foto_url"
+            class="block text-sm font-medium text-gray-700"
+            >Foto (URL)</label
+          >
           <input
             id="foto_url"
             placeholder="https://imagen-perfil.jpg"
@@ -98,7 +133,9 @@
 
         <!-- RUT -->
         <div>
-          <label for="rut" class="block text-sm font-medium text-gray-700">RUT</label>
+          <label for="rut" class="block text-sm font-medium text-gray-700"
+            >RUT</label
+          >
           <input
             id="rut"
             placeholder="Ej: 12.345.678-9"
@@ -109,7 +146,9 @@
 
         <!-- Estado -->
         <div>
-          <label for="estado" class="block text-sm font-medium text-gray-700">Estado</label>
+          <label for="estado" class="block text-sm font-medium text-gray-700"
+            >Estado</label
+          >
           <select
             id="estado"
             class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400"
@@ -125,7 +164,7 @@
             type="submit"
             class="px-5 py-2 rounded-md bg-yellow-400 text-[#0D1440] font-semibold hover:bg-yellow-300"
           >
-            {{ modo === "crear" ? "Crear" : "Actualizar" }}
+            {{ modo === 'crear' ? 'Crear' : 'Actualizar' }}
           </button>
           <button
             type="button"
@@ -140,7 +179,9 @@
 
     <!-- Tabla -->
     <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-      <h2 class="text-xl font-semibold text-[#0D1440] mb-5">Cambios recientes</h2>
+      <h2 class="text-xl font-semibold text-[#0D1440] mb-5">
+        Cambios recientes
+      </h2>
 
       <div class="overflow-x-auto">
         <table class="min-w-full text-sm">
@@ -154,7 +195,9 @@
           </thead>
           <tbody>
             <tr *ngFor="let u of usuarios()" class="border-t border-gray-100">
-              <td class="px-4 py-2">{{ u.nombre }} {{ u.apellidos }}</td>
+              <td class="px-4 py-2">
+                {{ u.nombre }} {{ u.apellidos }}
+              </td>
               <td class="px-4 py-2">{{ u.correo }}</td>
               <td class="px-4 py-2 text-center">
                 <span

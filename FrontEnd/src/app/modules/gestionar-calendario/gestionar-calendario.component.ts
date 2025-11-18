@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LayoutComponent } from '../../components/layout/layout.component';
-import { SECRETARIA_NAV_ITEMS } from '../secretaria/profile-home/secretaria.nav';
 
 type Block = { label: string; code: string; isLunch?: boolean };
 type DayKey = 'lun' | 'mar' | 'mie' | 'jue' | 'vie' | 'sab';
@@ -11,6 +10,7 @@ type Cell = { title: string; room?: string; note?: string } | null;
 function pad(n: number) {
   return n.toString().padStart(2, '0');
 }
+
 function weekKey(d: Date) {
   const tmp = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
   tmp.setUTCDate(tmp.getUTCDate() + 4 - (tmp.getUTCDay() || 7));
@@ -18,6 +18,7 @@ function weekKey(d: Date) {
   const week = Math.ceil(((+tmp - +yearStart) / 86400000 + 1) / 7);
   return `${tmp.getUTCFullYear()}-W${pad(week)}`;
 }
+
 function mondayOfISOWeek(iso: string) {
   const year = Number(iso.slice(0, 4));
   const week = Number(iso.slice(6));
@@ -35,8 +36,6 @@ function mondayOfISOWeek(iso: string) {
   templateUrl: './gestionar-calendario.component.html',
 })
 export class GestionarCalendarioComponent {
-  secretariaNavItems = SECRETARIA_NAV_ITEMS;
-
   // Semana actual (ISO week)
   current = weekKey(new Date());
 
@@ -62,7 +61,7 @@ export class GestionarCalendarioComponent {
     { key: 'sab', label: 'Sábado' },
   ];
 
-  // Horario “editable” en memoria
+  // Horario editable en memoria
   schedule: Record<DayKey, Cell[]> = {
     lun: Array(this.blocks.length).fill(null),
     mar: Array(this.blocks.length).fill(null),
@@ -80,7 +79,8 @@ export class GestionarCalendarioComponent {
     const monday = mondayOfISOWeek(this.current);
     const sunday = new Date(monday);
     sunday.setUTCDate(monday.getUTCDate() + 6);
-    const f = (d: Date) => `${pad(d.getUTCDate())}/${pad(d.getUTCMonth() + 1)}`;
+    const f = (d: Date) =>
+      `${pad(d.getUTCDate())}/${pad(d.getUTCMonth() + 1)}`;
     return `Del ${f(monday)} al ${f(sunday)}`;
   }
 
@@ -121,12 +121,12 @@ export class GestionarCalendarioComponent {
   }
 
   guardarSemana() {
-    console.log(
-      'Semana',
-      this.current,
-      'Horario:',
-      JSON.parse(JSON.stringify(this.schedule))
-    );
+    // Aquí en el futuro puedes llamar a un servicio para persistir
+    const payload = {
+      week: this.current,
+      schedule: this.schedule,
+    };
+    console.log('Guardando horario de la semana:', payload);
     alert('Horario de la semana guardado (demo).');
   }
 }
