@@ -11,7 +11,7 @@ import { Usuario } from './usuario.entity';
 @Entity('empleado_cargo')
 export class EmpleadoCargo {
   @PrimaryGeneratedColumn()
-  id: number; // Clave primaria simple para la relación
+  id: number; 
 
   @Column({ type: 'date' })
   fecha_inicio: Date;

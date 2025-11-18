@@ -7,6 +7,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { ActividadesModule } from './modules/actividades/actividades.module';
 import { EmpleadoCargosModule } from './modules/empleado-cargos/empleado-cargos.module';
 import { CargosModule } from './modules/cargos/cargos.module';
+import { InformesModule } from './informes/informes.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { CargosModule } from './modules/cargos/cargos.module';
     EmpleadoCargosModule,
     CargosModule,
     EmpleadoCargosModule,
+    InformesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

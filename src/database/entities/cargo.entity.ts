@@ -8,7 +8,7 @@ export class Cargo {
   id_cargo: number;
 
   @Column({ unique: true })
-  ocupacion: string; // Ejemplo: 'Profesor', 'Jefe de Dpto.', 'Secretario'
+  rol: string; 
 
   @Column({ type: 'text', nullable: true })
   descripcion: string;

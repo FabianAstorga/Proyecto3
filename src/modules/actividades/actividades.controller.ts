@@ -7,13 +7,13 @@ import {
   Param,
   Delete,
 } from '@nestjs/common';
-import { ActividadService } from './actividades.service';
+import { ActividadesService } from './actividades.service';
 import { CreateActividadDto } from './dto/create-actividad.dto';
 import { UpdateActividadDto } from './dto/update-actividad.dto';
 
 @Controller('actividad')
 export class ActividadController {
-  constructor(private readonly actividadService: ActividadService) {}
+  constructor(private readonly actividadService: ActividadesService) {}
 
   @Post()
   create(@Body() dto: CreateActividadDto) {

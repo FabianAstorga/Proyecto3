@@ -31,11 +31,11 @@ export class UpdateActividadDto {
   @IsOptional()
   es_repetitiva?: boolean;
 
-  @IsString()
+  @IsBoolean()
   @IsOptional()
-  estado?: string;
+  estado?: boolean;
 
   @IsNumber()
   @IsOptional()
-  informe?: number;
+  informe_id?: number;
 }

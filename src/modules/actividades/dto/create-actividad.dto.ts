@@ -27,12 +27,12 @@ export class CreateActividadDto {
   @IsOptional()
   es_repetitiva?: boolean;
 
-  @IsString()
+  @IsBoolean()
   @IsOptional()
-  estado?: string;
+  estado?: boolean;
 
-  // es el id_informe creo
   @IsNumber()
-  @IsNotEmpty()
-  informe: number;
+  @IsNotEmpty()
+  id_informe: number; 
 }
+

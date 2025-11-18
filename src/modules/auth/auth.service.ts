@@ -73,7 +73,7 @@ export class AuthService {
     const match = await bcrypt.compare(loginDto.contrasena, user.contrasena);
     if (!match) throw new UnauthorizedException('Credenciales inválidas.');
 
-    const roles = user.asignaciones?.map((a) => a.cargo.rol) || [];
+    const roles = user.cargos?.map((a) => a.cargo.rol) || [];
     const payload = { sub: user.id, correo: user.correo, roles };
     const token = this.jwtService.sign(payload);
 

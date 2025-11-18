@@ -18,7 +18,7 @@ export class CargosService {
 
   async create(dto: CreateCargoDto) {
     const existente = await this.cargoRepository.findOne({
-      where: { ocupacion: dto.ocupacion },
+      where: { rol: dto.ocupacion },
     });
     if (existente)
       throw new ConflictException(`El cargo ${dto.ocupacion} ya existe.`);
