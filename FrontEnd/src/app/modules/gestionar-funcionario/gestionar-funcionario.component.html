@@ -1,234 +1,221 @@
 <app-layout [title]="'Administración'" [logoutLink]="'/login'">
-  <section class="page-container space-y-8">
+  <section class="app-page space-y-8">
     <!-- Título -->
     <div>
-      <h1 class="text-3xl font-bold text-[#0D1440]">Gestionar funcionarios</h1>
+      <h1 class="app-section-title">Gestionar funcionarios</h1>
     </div>
 
     <!-- Formulario -->
-    <div class="card-base bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-      <form
-        class="grid grid-cols-1 md:grid-cols-2 gap-5"
-        [formGroup]="form"
-        (ngSubmit)="modo === 'crear' ? crear() : actualizar()"
-      >
-        <!-- Nombre -->
-        <div>
-          <label for="nombre" class="block text-sm font-medium text-gray-700">
-            Nombre
-          </label>
-          <input
-            id="nombre"
-            placeholder="Ingrese el nombre"
-            class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
-            formControlName="nombre"
-          />
-          <p
-            *ngIf="f['nombre'].touched && f['nombre'].invalid"
-            class="text-xs text-red-600 mt-1"
-          >
-            Obligatorio.
-          </p>
-        </div>
+    <div class="app-card">
+      <div class="app-card-header">
+        <h2 class="app-card-title">Datos del funcionario</h2>
+      </div>
 
-        <!-- Apellidos -->
-        <div>
-          <label for="apellidos" class="block text-sm font-medium text-gray-700">
-            Apellidos
-          </label>
-          <input
-            id="apellidos"
-            placeholder="Ingrese los apellidos"
-            class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
-            formControlName="apellidos"
-          />
-          <p
-            *ngIf="f['apellidos'].touched && f['apellidos'].invalid"
-            class="text-xs text-red-600 mt-1"
-          >
-            Obligatorio.
-          </p>
-        </div>
+      <div class="app-card-body">
+        <form
+          class="grid grid-cols-1 md:grid-cols-2 gap-5"
+          [formGroup]="form"
+          (ngSubmit)="modo === 'crear' ? crear() : actualizar()"
+        >
+          <!-- Nombre -->
+          <div>
+            <label for="nombre" class="block text-sm font-medium text-gray-700">
+              Nombre
+            </label>
+            <input
+              id="nombre"
+              placeholder="Ingrese el nombre"
+              class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
+              formControlName="nombre"
+            />
+            <p
+              *ngIf="f['nombre'].touched && f['nombre'].invalid"
+              class="text-xs text-red-600 mt-1"
+            >
+              Obligatorio.
+            </p>
+          </div>
 
-        <!-- Correo -->
-        <div>
-          <label for="correo" class="block text-sm font-medium text-gray-700">
-            Correo
-          </label>
-          <input
-            id="correo"
-            type="email"
-            placeholder="ejemplo@uta.cl"
-            class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
-            formControlName="correo"
-          />
-          <p
-            *ngIf="f['correo'].touched && f['correo'].invalid"
-            class="text-xs text-red-600 mt-1"
-          >
-            Correo inválido.
-          </p>
-        </div>
+          <!-- Apellidos -->
+          <div>
+            <label for="apellidos" class="block text-sm font-medium text-gray-700">
+              Apellidos
+            </label>
+            <input
+              id="apellidos"
+              placeholder="Ingrese los apellidos"
+              class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
+              formControlName="apellidos"
+            />
+            <p
+              *ngIf="f['apellidos'].touched && f['apellidos'].invalid"
+              class="text-xs text-red-600 mt-1"
+            >
+              Obligatorio.
+            </p>
+          </div>
 
-        <!-- Teléfono -->
-        <div>
-          <label for="telefono" class="block text-sm font-medium text-gray-700">
-            Teléfono
-          </label>
-          <input
-            id="telefono"
-            placeholder="Ej: +56 9 1234 5678"
-            class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
-            formControlName="telefono"
-          />
-        </div>
+          <!-- Correo -->
+          <div>
+            <label for="correo" class="block text-sm font-medium text-gray-700">
+              Correo
+            </label>
+            <input
+              id="correo"
+              type="email"
+              placeholder="ejemplo@uta.cl"
+              class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
+              formControlName="correo"
+            />
+            <p
+              *ngIf="f['correo'].touched && f['correo'].invalid"
+              class="text-xs text-red-600 mt-1"
+            >
+              Correo inválido.
+            </p>
+          </div>
 
-        <!-- Anexo -->
-        <div>
-          <label for="anexo" class="block text-sm font-medium text-gray-700">
-            Anexo
-          </label>
-          <input
-            id="anexo"
-            placeholder="Ej: 1234"
-            class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
-            formControlName="anexo"
-          />
-        </div>
+          <!-- Teléfono -->
+          <div>
+            <label for="telefono" class="block text-sm font-medium text-gray-700">
+              Teléfono
+            </label>
+            <input
+              id="telefono"
+              placeholder="Ej: +56 9 1234 5678"
+              class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
+              formControlName="telefono"
+            />
+          </div>
 
-        <!-- URL Horario -->
-        <div>
-          <label for="url_horario" class="block text-sm font-medium text-gray-700">
-            URL Horario
-          </label>
-          <input
-            id="url_horario"
-            placeholder="https://..."
-            class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
-            formControlName="url_horario"
-          />
-        </div>
+          <!-- Anexo -->
+          <div>
+            <label for="anexo" class="block text-sm font-medium text-gray-700">
+              Anexo
+            </label>
+            <input
+              id="anexo"
+              placeholder="Ej: 1234"
+              class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
+              formControlName="anexo"
+            />
+          </div>
 
-        <!-- Foto URL -->
-        <div>
-          <label for="foto_url" class="block text-sm font-medium text-gray-700">
-            Foto (URL)
-          </label>
-          <input
-            id="foto_url"
-            placeholder="https://imagen-perfil.jpg"
-            class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
-            formControlName="foto_url"
-          />
-        </div>
+          <!-- URL Horario -->
+          <div>
+            <label for="url_horario" class="block text-sm font-medium text-gray-700">
+              URL Horario
+            </label>
+            <input
+              id="url_horario"
+              placeholder="https://..."
+              class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
+              formControlName="url_horario"
+            />
+          </div>
 
-        <!-- RUT -->
-        <div>
-          <label for="rut" class="block text-sm font-medium text-gray-700">
-            RUT
-          </label>
-          <input
-            id="rut"
-            placeholder="Ej: 12.345.678-9"
-            class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
-            formControlName="rut"
-          />
-        </div>
+          <!-- Foto URL -->
+          <div>
+            <label for="foto_url" class="block text-sm font-medium text-gray-700">
+              Foto (URL)
+            </label>
+            <input
+              id="foto_url"
+              placeholder="https://imagen-perfil.jpg"
+              class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
+              formControlName="foto_url"
+            />
+          </div>
 
-        <!-- Estado -->
-        <div>
-          <label for="estado" class="block text-sm font-medium text-gray-700">
-            Estado
-          </label>
-          <select
-            id="estado"
-            class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
-            formControlName="estado"
-          >
-            <option *ngFor="let e of estados" [value]="e">{{ e }}</option>
-          </select>
-        </div>
+          <!-- RUT -->
+          <div>
+            <label for="rut" class="block text-sm font-medium text-gray-700">
+              RUT
+            </label>
+            <input
+              id="rut"
+              placeholder="Ej: 12.345.678-9"
+              class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
+              formControlName="rut"
+            />
+          </div>
 
-        <!-- Botones -->
-        <div class="md:col-span-2 flex flex-wrap gap-3 pt-4">
-          <button
-            type="submit"
-            class="px-5 py-2 rounded-md bg-yellow-400 text-[#0D1440] font-semibold hover:bg-yellow-300"
-          >
-            {{ modo === 'crear' ? 'Crear' : 'Actualizar' }}
-          </button>
-          <button
-            type="button"
-            (click)="resetForm()"
-            class="px-5 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50"
-          >
-            Limpiar
-          </button>
-        </div>
-      </form>
+          <!-- Estado -->
+          <div>
+            <label for="estado" class="block text-sm font-medium text-gray-700">
+              Estado
+            </label>
+            <select
+              id="estado"
+              class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none bg-white"
+              formControlName="estado"
+            >
+              <option *ngFor="let e of estados" [value]="e">{{ e }}</option>
+            </select>
+          </div>
+
+          <!-- Botones -->
+          <div class="md:col-span-2 flex flex-wrap gap-3 pt-4">
+            <button type="submit" class="btn-primary">
+              {{ modo === 'crear' ? 'Crear' : 'Actualizar' }}
+            </button>
+            <button type="button" (click)="resetForm()" class="btn-secondary">
+              Limpiar
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
 
     <!-- Tabla -->
-    <div class="card-base bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-      <h2 class="text-xl font-semibold text-[#0D1440] mb-5">
-        Cambios recientes
-      </h2>
+    <div class="app-card">
+      <div class="app-card-header">
+        <h2 class="app-card-title">Cambios recientes</h2>
+      </div>
 
-      <div class="overflow-x-auto">
-        <table class="min-w-full text-sm">
-          <thead>
-            <tr class="text-[#0D1440] border-b border-gray-200">
-              <th class="px-4 py-2 text-left">Nombre</th>
-              <th class="px-4 py-2 text-left">Correo</th>
-              <th class="px-4 py-2 text-center">Estado</th>
-              <th class="px-4 py-2 text-center">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let u of usuarios()" class="border-t border-gray-100">
-              <td class="px-4 py-2">
-                {{ u.nombre }} {{ u.apellidos }}
-              </td>
-              <td class="px-4 py-2">{{ u.correo }}</td>
-              <td class="px-4 py-2 text-center">
-                <span
-                  class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold"
-                  [ngClass]="
-                    u.estado === 'Activo'
-                      ? 'bg-green-50 text-green-700 ring-1 ring-green-200'
-                      : 'bg-gray-100 text-gray-700 ring-1 ring-gray-300'
-                  "
-                >
-                  {{ u.estado }}
-                </span>
-              </td>
-              <td class="px-4 py-2 text-center">
-                <div class="flex gap-2 justify-center">
-                  <button
-                    type="button"
-                    class="px-3 py-1.5 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50"
-                    (click)="editar(u)"
-                  >
-                    Editar
-                  </button>
-                  <button
-                    type="button"
-                    class="px-3 py-1.5 rounded-md bg-red-50 text-red-700 hover:bg-red-100"
-                    (click)="eliminar(u.id)"
-                  >
-                    Eliminar
-                  </button>
-                </div>
-              </td>
-            </tr>
+      <div class="app-card-body">
+        <div class="overflow-x-auto">
+          <table class="min-w-full text-sm">
+            <thead>
+              <tr class="text-[#0D1440] border-b border-gray-200">
+                <th class="px-4 py-2 text-left">Nombre</th>
+                <th class="px-4 py-2 text-left">Correo</th>
+                <th class="px-4 py-2 text-center">Estado</th>
+                <th class="px-4 py-2 text-center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let u of usuarios()" class="border-t border-gray-100">
+                <td class="px-4 py-2">{{ u.nombre }} {{ u.apellidos }}</td>
+                <td class="px-4 py-2">{{ u.correo }}</td>
+                <td class="px-4 py-2 text-center">
+                  <span [ngClass]="u.estado === 'Activo' ? 'pill-success' : 'pill-muted'">
+                    {{ u.estado }}
+                  </span>
+                </td>
+                <td class="px-4 py-2 text-center">
+                  <div class="flex gap-2 justify-center">
+                    <button class="btn-secondary px-3 py-1.5 text-xs" (click)="editar(u)">
+                      Editar
+                    </button>
+                    <button
+                      class="px-3 py-1.5 rounded-md bg-red-50 text-red-700 border border-red-200 text-xs hover:bg-red-100"
+                      (click)="eliminar(u.id)"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                </td>
+              </tr>
 
-            <tr *ngIf="usuarios().length === 0">
-              <td colspan="4" class="px-4 py-6 text-center text-gray-500">
-                Sin registros
-              </td>
-            </tr>
-          </tbody>
-        </table>
+              <tr *ngIf="usuarios().length === 0">
+                <td colspan="4" class="px-4 py-6 text-center text-gray-500">
+                  Sin registros
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </section>
