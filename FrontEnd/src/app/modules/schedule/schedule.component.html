@@ -7,10 +7,20 @@
       </div>
 
       <div class="overflow-x-auto">
-        <div class="grid w-full" [ngStyle]="{ 'grid-template-columns': '180px repeat(6, 1fr)' }">
+        <div
+          class="grid w-full"
+          [ngStyle]="{ 'grid-template-columns': '180px repeat(6, 1fr)' }"
+        >
           <!-- Encabezados -->
-          <div class="bg-[#EAF2FF] border border-gray-200 p-3 text-center font-semibold text-[#0D1440]">Bloque</div>
-          <div *ngFor="let d of days" class="bg-[#EAF2FF] border border-gray-200 p-3 text-center font-semibold text-[#0D1440]">
+          <div
+            class="bg-[#EAF2FF] border border-gray-200 p-3 text-center font-semibold text-[#0D1440]"
+          >
+            Bloque
+          </div>
+          <div
+            *ngFor="let d of days"
+            class="bg-[#EAF2FF] border border-gray-200 p-3 text-center font-semibold text-[#0D1440]"
+          >
             {{ d.label }}
           </div>
 
@@ -22,8 +32,12 @@
               [ngClass]="{ 'bg-yellow-50 font-semibold text-gray-900': b.isLunch }"
             >
               <div>{{ b.label }}</div>
-              <div class="text-[12px] text-gray-600" *ngIf="!b.isLunch">{{ b.code }}</div>
-              <div class="text-[12px] text-amber-700" *ngIf="b.isLunch">Almuerzo</div>
+              <div class="text-[12px] text-gray-600" *ngIf="!b.isLunch">
+                {{ b.code }}
+              </div>
+              <div class="text-[12px] text-amber-700" *ngIf="b.isLunch">
+                Almuerzo
+              </div>
             </div>
 
             <!-- Celdas por día -->
@@ -34,10 +48,14 @@
                 (click)="openModal(d.key, bi)"
                 title="Editar"
               >
-                <div class="h-24 flex items-center justify-center text-center px-2">
+                <div
+                  class="h-24 flex items-center justify-center text-center px-2"
+                >
                   <ng-container
                     [ngTemplateOutlet]="cellTpl"
-                    [ngTemplateOutletContext]="{ c: schedule[d.key][visibleIndexToDataIndex(bi)] }"
+                    [ngTemplateOutletContext]="{
+                      c: schedule[d.key][visibleIndexToDataIndex(bi)]
+                    }"
                   ></ng-container>
                 </div>
               </div>
@@ -45,7 +63,9 @@
 
             <ng-template #lunchRow>
               <div class="col-span-6 border border-gray-200">
-                <div class="h-16 bg-yellow-50 text-amber-800 font-medium flex items-center justify-center text-sm"></div>
+                <div
+                  class="h-16 bg-yellow-50 text-amber-800 font-medium flex items-center justify-center text-sm"
+                ></div>
               </div>
             </ng-template>
           </ng-container>
@@ -61,7 +81,9 @@
 
     <!-- Diálogo -->
     <div class="absolute inset-0 flex items-center justify-center p-4">
-      <div class="w-full max-w-md bg-white rounded-2xl shadow-xl border border-blue-200">
+      <div
+        class="w-full max-w-md bg-white rounded-2xl shadow-xl border border-blue-200"
+      >
         <div class="px-4 py-3 border-b flex items-center justify-between">
           <div>
             <div class="text-xs text-gray-500">Editando</div>
@@ -69,7 +91,13 @@
               {{ modal.dayLabel }} — {{ modal.blockLabel }}
             </div>
           </div>
-          <button class="p-2 rounded hover:bg-gray-100" (click)="closeModal()" aria-label="Cerrar">✕</button>
+          <button
+            class="p-2 rounded hover:bg-gray-100"
+            (click)="closeModal()"
+            aria-label="Cerrar"
+          >
+            ✕
+          </button>
         </div>
 
         <form (ngSubmit)="saveFromModal()" class="p-4 space-y-3">
@@ -107,16 +135,24 @@
           </div>
 
           <div class="flex items-center gap-2 pt-1">
-            <button type="submit" class="px-3 py-2 rounded-md bg-blue-600 text-white text-sm hover:bg-blue-700">
+            <button
+              type="submit"
+              class="px-3 py-2 rounded-md bg-blue-600 text-white text-sm hover:bg-blue-700"
+            >
               Guardar
             </button>
-            <button type="button" class="px-3 py-2 rounded-md bg-gray-100 border text-sm hover:bg-gray-200"
-                    (click)="closeModal()">
+            <button
+              type="button"
+              class="px-3 py-2 rounded-md bg-gray-100 border text-sm hover:bg-gray-200"
+              (click)="closeModal()"
+            >
               Cancelar
             </button>
-            <button type="button"
-                    class="ml-auto px-3 py-2 rounded-md bg-red-50 text-red-700 border border-red-200 text-sm hover:bg-red-100"
-                    (click)="clearFromModal()">
+            <button
+              type="button"
+              class="ml-auto px-3 py-2 rounded-md bg-red-50 text-red-700 border border-red-200 text-sm hover:bg-red-100"
+              (click)="clearFromModal()"
+            >
               Limpiar celda
             </button>
           </div>
@@ -128,9 +164,17 @@
   <!-- Vista de celda -->
   <ng-template #cellTpl let-c="c">
     <div *ngIf="c; else empty" class="px-2">
-      <div class="text-sm font-semibold text-[#0D1440] leading-tight">{{ c.title }}</div>
-      <div class="text-xs text-gray-600" *ngIf="c.room">Sala: {{ c.room }}</div>
-      <div class="text-xs text-gray-500" *ngIf="c.note">{{ c.note }}</div>
+      <div
+        class="text-sm font-semibold text-[#0D1440] leading-tight"
+      >
+        {{ c.title }}
+      </div>
+      <div class="text-xs text-gray-600" *ngIf="c.room">
+        Sala: {{ c.room }}
+      </div>
+      <div class="text-xs text-gray-500" *ngIf="c.note">
+        {{ c.note }}
+      </div>
     </div>
     <ng-template #empty>
       <div class="text-[11px] text-gray-400">—</div>

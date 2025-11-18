@@ -1,13 +1,12 @@
 <app-layout [title]="'Administración'" [logoutLink]="'/login'">
-  <section class="max-w-7xl mx-auto px-6 py-8 space-y-8">
-
+  <section class="page-container space-y-8">
     <!-- Título -->
     <div>
       <h1 class="text-3xl font-bold text-[#0D1440]">Gestionar funcionarios</h1>
     </div>
 
     <!-- Formulario -->
-    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+    <div class="card-base bg-white border border-gray-200 rounded-xl shadow-sm p-6">
       <form
         class="grid grid-cols-1 md:grid-cols-2 gap-5"
         [formGroup]="form"
@@ -15,13 +14,13 @@
       >
         <!-- Nombre -->
         <div>
-          <label for="nombre" class="block text-sm font-medium text-gray-700"
-            >Nombre</label
-          >
+          <label for="nombre" class="block text-sm font-medium text-gray-700">
+            Nombre
+          </label>
           <input
             id="nombre"
             placeholder="Ingrese el nombre"
-            class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400"
+            class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
             formControlName="nombre"
           />
           <p
@@ -34,15 +33,13 @@
 
         <!-- Apellidos -->
         <div>
-          <label
-            for="apellidos"
-            class="block text-sm font-medium text-gray-700"
-            >Apellidos</label
-          >
+          <label for="apellidos" class="block text-sm font-medium text-gray-700">
+            Apellidos
+          </label>
           <input
             id="apellidos"
             placeholder="Ingrese los apellidos"
-            class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400"
+            class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
             formControlName="apellidos"
           />
           <p
@@ -55,14 +52,14 @@
 
         <!-- Correo -->
         <div>
-          <label for="correo" class="block text-sm font-medium text-gray-700"
-            >Correo</label
-          >
+          <label for="correo" class="block text-sm font-medium text-gray-700">
+            Correo
+          </label>
           <input
             id="correo"
             type="email"
             placeholder="ejemplo@uta.cl"
-            class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400"
+            class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
             formControlName="correo"
           />
           <p
@@ -75,83 +72,77 @@
 
         <!-- Teléfono -->
         <div>
-          <label
-            for="telefono"
-            class="block text-sm font-medium text-gray-700"
-            >Teléfono</label
-          >
+          <label for="telefono" class="block text-sm font-medium text-gray-700">
+            Teléfono
+          </label>
           <input
             id="telefono"
             placeholder="Ej: +56 9 1234 5678"
-            class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400"
+            class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
             formControlName="telefono"
           />
         </div>
 
         <!-- Anexo -->
         <div>
-          <label for="anexo" class="block text-sm font-medium text-gray-700"
-            >Anexo</label
-          >
+          <label for="anexo" class="block text-sm font-medium text-gray-700">
+            Anexo
+          </label>
           <input
             id="anexo"
             placeholder="Ej: 1234"
-            class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400"
+            class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
             formControlName="anexo"
           />
         </div>
 
         <!-- URL Horario -->
         <div>
-          <label
-            for="url_horario"
-            class="block text-sm font-medium text-gray-700"
-            >URL Horario</label
-          >
+          <label for="url_horario" class="block text-sm font-medium text-gray-700">
+            URL Horario
+          </label>
           <input
             id="url_horario"
             placeholder="https://..."
-            class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400"
+            class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
             formControlName="url_horario"
           />
         </div>
 
         <!-- Foto URL -->
         <div>
-          <label
-            for="foto_url"
-            class="block text-sm font-medium text-gray-700"
-            >Foto (URL)</label
-          >
+          <label for="foto_url" class="block text-sm font-medium text-gray-700">
+            Foto (URL)
+          </label>
           <input
             id="foto_url"
             placeholder="https://imagen-perfil.jpg"
-            class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400"
+            class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
             formControlName="foto_url"
           />
         </div>
 
         <!-- RUT -->
         <div>
-          <label for="rut" class="block text-sm font-medium text-gray-700"
-            >RUT</label
-          >
+          <label for="rut" class="block text-sm font-medium text-gray-700">
+            RUT
+          </label>
           <input
             id="rut"
             placeholder="Ej: 12.345.678-9"
-            class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400"
+            class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
             formControlName="rut"
           />
         </div>
 
         <!-- Estado -->
         <div>
-          <label for="estado" class="block text-sm font-medium text-gray-700"
-            >Estado</label
-          >
+          <label for="estado" class="block text-sm font-medium text-gray-700">
+            Estado
+          </label>
           <select
             id="estado"
-            class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400"
+            class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
             formControlName="estado"
           >
             <option *ngFor="let e of estados" [value]="e">{{ e }}</option>
@@ -178,7 +169,7 @@
     </div>
 
     <!-- Tabla -->
-    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+    <div class="card-base bg-white border border-gray-200 rounded-xl shadow-sm p-6">
       <h2 class="text-xl font-semibold text-[#0D1440] mb-5">
         Cambios recientes
       </h2>
@@ -214,12 +205,14 @@
               <td class="px-4 py-2 text-center">
                 <div class="flex gap-2 justify-center">
                   <button
+                    type="button"
                     class="px-3 py-1.5 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50"
                     (click)="editar(u)"
                   >
                     Editar
                   </button>
                   <button
+                    type="button"
                     class="px-3 py-1.5 rounded-md bg-red-50 text-red-700 hover:bg-red-100"
                     (click)="eliminar(u.id)"
                   >

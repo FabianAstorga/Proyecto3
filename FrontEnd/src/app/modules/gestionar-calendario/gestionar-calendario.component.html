@@ -1,122 +1,124 @@
 <app-layout [title]="'Gestión de calendario'" [logoutLink]="'/login'">
-  <section class="w-full px-8 py-10 space-y-4">
-    <!-- Encabezado de semana -->
-    <div class="flex flex-wrap items-center justify-between gap-4">
-      <div class="flex items-center gap-3">
-        <span class="text-sm font-medium text-gray-700">Semana:</span>
-        <span class="text-base font-semibold text-[#0D1440]">
-          {{ weekIsoLabel() }}
-        </span>
-        <span class="text-sm text-gray-600">({{ weekLabel() }})</span>
+  <section class="page-container">
+    <div class="card-base p-6 md:p-8 space-y-6">
+      <!-- Encabezado de semana -->
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div class="flex flex-wrap items-center gap-3">
+          <span class="text-sm font-medium text-gray-700">Semana:</span>
+          <span class="text-base md:text-lg font-semibold text-[#0D1440]">
+            {{ weekIsoLabel() }}
+          </span>
+          <span class="text-sm text-gray-600">({{ weekLabel() }})</span>
+        </div>
+
+        <button
+          type="button"
+          (click)="guardarSemana()"
+          class="inline-flex items-center gap-2 rounded-md bg-[#FACC15] text-[#0D1440] font-semibold px-4 py-2 hover:bg-yellow-400 focus:outline-none focus:ring-4 ring-yellow-200 text-sm md:text-base"
+        >
+          Guardar cambios
+        </button>
       </div>
 
-      <button
-        type="button"
-        (click)="guardarSemana()"
-        class="inline-flex items-center gap-2 rounded-md bg-[#FACC15] text-[#0D1440] font-semibold px-4 py-2 hover:bg-yellow-400 focus:outline-none focus:ring-4 ring-yellow-200"
+      <!-- Tabla de horario -->
+      <div
+        class="bg-white rounded-2xl border border-blue-400 shadow-md overflow-hidden"
       >
-        Guardar cambios
-      </button>
-    </div>
-
-    <!-- Tabla de horario -->
-    <div
-      class="bg-white rounded-2xl border border-blue-400 shadow-md overflow-hidden"
-    >
-      <div class="overflow-x-auto">
-        <div
-          class="grid w-full"
-          [ngStyle]="{ 'grid-template-columns': '180px repeat(6, 1fr)' }"
-        >
-          <!-- Encabezados -->
+        <div class="overflow-x-auto">
           <div
-            class="bg-[#EAF2FF] border border-gray-200 p-3 text-center font-semibold text-[#0D1440]"
+            class="grid w-full min-w-[720px]"
+            [ngStyle]="{ 'grid-template-columns': '180px repeat(6, 1fr)' }"
           >
-            Bloque
-          </div>
-          <div
-            *ngFor="let d of days"
-            class="bg-[#EAF2FF] border border-gray-200 p-3 text-center font-semibold text-[#0D1440]"
-          >
-            {{ d.label }}
-          </div>
-
-          <!-- Filas -->
-          <ng-container *ngFor="let b of blocks; let bi = index">
-            <!-- Columna izquierda -->
+            <!-- Encabezados -->
             <div
-              class="border border-gray-200 p-3 text-center bg-gray-50 text-gray-800"
-              [ngClass]="{
-                'bg-yellow-50 font-semibold text-gray-900': b.isLunch
-              }"
+              class="bg-[#EAF2FF] border border-gray-200 p-3 text-center font-semibold text-[#0D1440]"
             >
-              <div>{{ b.label }}</div>
-              <div class="text-[12px] text-gray-600" *ngIf="!b.isLunch">
-                {{ b.code }}
-              </div>
-              <div class="text-[12px] text-amber-700" *ngIf="b.isLunch">
-                Almuerzo
-              </div>
+              Bloque
+            </div>
+            <div
+              *ngFor="let d of days"
+              class="bg-[#EAF2FF] border border-gray-200 p-3 text-center font-semibold text-[#0D1440]"
+            >
+              {{ d.label }}
             </div>
 
-            <!-- Celdas editables -->
-            <ng-container *ngIf="!b.isLunch; else lunchRow">
+            <!-- Filas -->
+            <ng-container *ngFor="let b of blocks; let bi = index">
+              <!-- Columna izquierda -->
               <div
-                *ngFor="let d of days"
-                class="border border-gray-200 bg-white hover:bg-blue-50 transition cursor-text"
-                (click)="startInlineEdit(d.key, bi)"
+                class="border border-gray-200 p-3 text-center bg-gray-50 text-gray-800"
+                [ngClass]="{
+                  'bg-yellow-50 font-semibold text-gray-900': b.isLunch
+                }"
               >
-                <div class="h-24 flex items-center justify-center text-center px-2">
-                  <!-- Edición inline -->
-                  <ng-container
-                    *ngIf="
-                      editingInline &&
-                      editingInline.day === d.key &&
-                      editingInline.bi === bi;
-                      else displayMode
-                    "
-                  >
-                    <input
-                      type="text"
-                      [(ngModel)]="editingInline.value"
-                      (keydown)="onInlineKeydown($event)"
-                      (blur)="commitInlineEdit()"
-                      placeholder="Escribe el título y Enter…"
-                      class="w-[95%] rounded-md border border-blue-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                      autofocus
-                    />
-                  </ng-container>
-
-                  <!-- Modo visual -->
-                  <ng-template #displayMode>
-                    <ng-container *ngIf="schedule[d.key][bi] as c; else empty">
-                      <div>
-                        <div
-                          class="text-sm font-semibold text-[#0D1440] leading-tight"
-                        >
-                          {{ c.title }}
-                        </div>
-                      </div>
-                    </ng-container>
-                    <ng-template #empty>
-                      <div class="text-[11px] text-gray-400">—</div>
-                    </ng-template>
-                  </ng-template>
+                <div>{{ b.label }}</div>
+                <div class="text-[12px] text-gray-600" *ngIf="!b.isLunch">
+                  {{ b.code }}
+                </div>
+                <div class="text-[12px] text-amber-700" *ngIf="b.isLunch">
+                  Almuerzo
                 </div>
               </div>
-            </ng-container>
 
-            <!-- Fila almuerzo -->
-            <ng-template #lunchRow>
-              <div class="col-span-6 border border-gray-200">
+              <!-- Celdas editables -->
+              <ng-container *ngIf="!b.isLunch; else lunchRow">
                 <div
-                  class="h-16 bg-yellow-50 text-amber-800 font-medium flex items-center justify-center text-sm"
+                  *ngFor="let d of days"
+                  class="border border-gray-200 bg-white hover:bg-blue-50 transition cursor-text"
+                  (click)="startInlineEdit(d.key, bi)"
                 >
-                  <!-- Franja de almuerzo -->
+                  <div class="h-24 flex items-center justify-center text-center px-2">
+                    <!-- Edición inline -->
+                    <ng-container
+                      *ngIf="
+                        editingInline &&
+                        editingInline.day === d.key &&
+                        editingInline.bi === bi;
+                        else displayMode
+                      "
+                    >
+                      <input
+                        type="text"
+                        [(ngModel)]="editingInline.value"
+                        (keydown)="onInlineKeydown($event)"
+                        (blur)="commitInlineEdit()"
+                        placeholder="Escribe el título y Enter…"
+                        class="w-[95%] rounded-md border border-blue-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        autofocus
+                      />
+                    </ng-container>
+
+                    <!-- Modo visual -->
+                    <ng-template #displayMode>
+                      <ng-container *ngIf="schedule[d.key][bi] as c; else empty">
+                        <div>
+                          <div
+                            class="text-sm font-semibold text-[#0D1440] leading-tight"
+                          >
+                            {{ c.title }}
+                          </div>
+                        </div>
+                      </ng-container>
+                      <ng-template #empty>
+                        <div class="text-[11px] text-gray-400">—</div>
+                      </ng-template>
+                    </ng-template>
+                  </div>
                 </div>
-              </div>
-            </ng-template>
-          </ng-container>
+              </ng-container>
+
+              <!-- Fila almuerzo -->
+              <ng-template #lunchRow>
+                <div class="col-span-6 border border-gray-200">
+                  <div
+                    class="h-16 bg-yellow-50 text-amber-800 font-medium flex items-center justify-center text-sm"
+                  >
+                    <!-- Franja de almuerzo -->
+                  </div>
+                </div>
+              </ng-template>
+            </ng-container>
+          </div>
         </div>
       </div>
     </div>

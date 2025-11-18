@@ -1,17 +1,16 @@
-<app-layout [title]="'Académico'"
-            
-            [logoutLink]="'/login'">
-
+<app-layout [title]="'Académico'" [logoutLink]="'/login'">
   <!-- SECCIÓN IDENTIDAD -->
   <section
-    class="relative bg-gradient-to-r from-[#0D1440]/90 to-[#1E2768]/80 text-white rounded-2xl shadow-xl p-8 flex flex-col md:flex-row items-center justify-between gap-8 overflow-hidden">
+    class="relative bg-gradient-to-r from-[#0D1440]/90 to-[#1E2768]/80 text-white rounded-2xl shadow-xl p-8 flex flex-col md:flex-row items-center justify-between gap-8 overflow-hidden"
+  >
     <!-- Avatar + Información -->
     <div class="relative flex items-center gap-6 z-10">
       <img
         [src]="user?.photoUrl"
         (error)="onAvatarError($event)"
         alt="avatar"
-        class="h-24 w-24 rounded-full ring-4 ring-yellow-400 object-cover shadow-lg" />
+        class="h-24 w-24 rounded-full ring-4 ring-yellow-400 object-cover shadow-lg"
+      />
       <div>
         <h1 class="text-3xl font-bold leading-tight tracking-tight">
           {{ user?.firstName }} {{ user?.lastName }}
@@ -24,7 +23,8 @@
     <button
       type="button"
       (click)="openDetails()"
-      class="relative z-10 inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-yellow-400 text-[#0D1440] font-semibold shadow-lg hover:bg-yellow-300 focus:outline-none focus:ring-4 ring-yellow-200 transition">
+      class="relative z-10 inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-yellow-400 text-[#0D1440] font-semibold shadow-lg hover:bg-yellow-300 focus:outline-none focus:ring-4 ring-yellow-200 transition"
+    >
       Ver detalles
     </button>
   </section>
@@ -57,48 +57,84 @@
     </div>
 
     <div class="bg-blue-50 px-6 py-4 max-h-[400px] overflow-y-auto">
-      <ul class="divide-y divide-blue-100">
-        <li *ngFor="let a of recent; let i = index"
-            class="py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-          <div class="min-w-0">
-            <p class="text-base font-semibold text-gray-900 truncate">
-              Actividad {{ i + 1 }} — {{ a.titulo }}
-            </p>
-            <p class="text-sm text-gray-600 truncate">
-              {{ a.detalle }} · {{ a.fecha }} · {{ a.horas }} h
-            </p>
-          </div>
+      <ng-container *ngIf="recent && recent.length > 0; else emptyActivities">
+        <ul class="divide-y divide-blue-100">
+          <li
+            *ngFor="let a of recent; let i = index"
+            class="py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3"
+          >
+            <div class="min-w-0">
+              <p class="text-base font-semibold text-gray-900 truncate">
+                Actividad {{ i + 1 }} — {{ a.titulo }}
+              </p>
+              <p class="text-sm text-gray-600 truncate">
+                {{ a.detalle }} · {{ formatDMY(a.fecha) }} · {{ a.horas }} h
+              </p>
+            </div>
 
-          <span class="text-xs px-3 py-1 rounded-full border font-medium"
-                [ngClass]="{
-                  'bg-emerald-100 text-emerald-800 border-emerald-200': a.estado === 'Aprobada',
-                  'bg-amber-100 text-amber-800 border-amber-200': a.estado === 'Pendiente',
-                  'bg-red-100 text-red-800 border-red-200': a.estado === 'Rechazada'
-                }">
-            {{ a.estado }}
-          </span>
-        </li>
-      </ul>
+            <span
+              class="text-xs px-3 py-1 rounded-full border font-medium"
+              [ngClass]="{
+                'bg-emerald-100 text-emerald-800 border-emerald-200': a.estado === 'Aprobada',
+                'bg-amber-100 text-amber-800 border-amber-200': a.estado === 'Pendiente',
+                'bg-red-100 text-red-800 border-red-200': a.estado === 'Rechazada'
+              }"
+            >
+              {{ a.estado }}
+            </span>
+          </li>
+        </ul>
+      </ng-container>
+
+      <ng-template #emptyActivities>
+        <div class="py-6 text-center text-sm text-gray-500">
+          Aún no tienes actividades registradas.
+        </div>
+      </ng-template>
     </div>
   </section>
 
   <!-- MODAL: Descripción del cargo -->
-  <div *ngIf="showDetails" class="fixed inset-0 z-[100] flex items-center justify-center" role="dialog"
-       aria-modal="true" aria-labelledby="dialog-title">
+  <div
+    *ngIf="showDetails"
+    class="fixed inset-0 z-[100] flex items-center justify-center"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="dialog-title"
+  >
     <div class="absolute inset-0 bg-black/40" (click)="closeDetails()"></div>
     <div class="relative bg-white rounded-2xl shadow-2xl border border-gray-200 max-w-xl w-[90%]">
       <div class="px-6 py-4 bg-yellow-400 rounded-t-2xl text-center">
-        <h3 id="dialog-title" class="text-xl md:text-2xl font-extrabold text-[#0D1440]">Descripción del cargo</h3>
+        <h3
+          id="dialog-title"
+          class="text-xl md:text-2xl font-extrabold text-[#0D1440]"
+        >
+          Descripción del cargo
+        </h3>
       </div>
       <div class="px-6 py-5">
-        <p class="text-sm text-gray-600 mb-4">Rol y responsabilidades del funcionario</p>
-        <ul class="list-disc pl-5 space-y-2 text-gray-700 text-sm md:text-base">
-          <li *ngFor="let punto of cargoDescripcion">{{ punto }}</li>
-        </ul>
+        <p class="text-sm text-gray-600 mb-4">
+          Rol y responsabilidades del funcionario
+        </p>
+
+        <ng-container *ngIf="cargoDescripcion?.length; else noDescripcion">
+          <ul class="list-disc pl-5 space-y-2 text-gray-700 text-sm md:text-base">
+            <li *ngFor="let punto of cargoDescripcion">{{ punto }}</li>
+          </ul>
+        </ng-container>
+
+        <ng-template #noDescripcion>
+          <p class="text-sm text-gray-500">
+            No se encontró una descripción de cargo asociada a este rol.
+          </p>
+        </ng-template>
       </div>
       <div class="px-6 pb-6">
-        <button type="button" (click)="closeDetails()"
-                class="w-full inline-flex items-center justify-center px-4 py-2.5 rounded-lg bg-[#0D1440] text-white font-semibold hover:bg-[#1E2768] focus:outline-none focus:ring-4 ring-blue-200">
+        <button
+          type="button"
+          (click)="closeDetails()"
+          class="w-full inline-flex items-center justify-center px-4 py-2.5 rounded-lg bg-[#0D1440] text-white font-semibold hover:bg-[#1E2768] focus:outline-none focus:ring-4 ring-blue-200"
+        >
           Cerrar
         </button>
       </div>

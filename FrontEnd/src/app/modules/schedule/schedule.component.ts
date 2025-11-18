@@ -1,8 +1,8 @@
 // v3-modal-centrado (front puro, sin persistencia y sin panel lateral)
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+
 import { LayoutComponent } from '../../components/layout/layout.component';
 
 type Block = { label: string; code: string; isLunch?: boolean };
@@ -12,7 +12,7 @@ type Cell = { title: string; room?: string; note?: string } | null;
 @Component({
   standalone: true,
   selector: 'app-schedule',
-  imports: [CommonModule, RouterLink, LayoutComponent, FormsModule],
+  imports: [CommonModule, LayoutComponent, FormsModule],
   templateUrl: './schedule.component.html',
 })
 export class ScheduleComponent {
@@ -41,12 +41,60 @@ export class ScheduleComponent {
 
   // 7 slots (todos menos almuerzo) por día
   schedule: Record<DayKey, Cell[]> = {
-    lun: [{ title: 'Cálculo I', room: 'A-201' }, null, null, { title: 'Física', room: 'Lab 3' }, null, null, null],
-    mar: [null, { title: 'Programación', room: 'B-105' }, null, null, null, null, null],
-    mie: [null, null, { title: 'CAD', room: 'Lab CAD' }, null, null, null, null],
-    jue: [null, null, null, { title: 'Materiales', room: 'C-301' }, null, null, null],
-    vie: [null, null, null, null, { title: 'Electrónica', room: 'D-102' }, null, null],
-    sab: [null, null, null, null, null, { title: 'Taller Proyecto', room: 'Makerspace' }, null],
+    lun: [
+      { title: 'Cálculo I', room: 'A-201' },
+      null,
+      null,
+      { title: 'Física', room: 'Lab 3' },
+      null,
+      null,
+      null,
+    ],
+    mar: [
+      null,
+      { title: 'Programación', room: 'B-105' },
+      null,
+      null,
+      null,
+      null,
+      null,
+    ],
+    mie: [
+      null,
+      null,
+      { title: 'CAD', room: 'Lab CAD' },
+      null,
+      null,
+      null,
+      null,
+    ],
+    jue: [
+      null,
+      null,
+      null,
+      { title: 'Materiales', room: 'C-301' },
+      null,
+      null,
+      null,
+    ],
+    vie: [
+      null,
+      null,
+      null,
+      null,
+      { title: 'Electrónica', room: 'D-102' },
+      null,
+      null,
+    ],
+    sab: [
+      null,
+      null,
+      null,
+      null,
+      null,
+      { title: 'Taller Proyecto', room: 'Makerspace' },
+      null,
+    ],
   };
 
   // ===== Modal centrado =====
@@ -70,7 +118,7 @@ export class ScheduleComponent {
     return -1; // almuerzo
   }
 
-  openModal(day: DayKey, visibleIndex: number) {
+  openModal(day: DayKey, visibleIndex: number): void {
     if (!this.canEdit) return;
     const dataIndex = this.visibleIndexToDataIndex(visibleIndex);
     if (dataIndex === -1) return; // almuerzo no editable
@@ -88,7 +136,7 @@ export class ScheduleComponent {
     };
   }
 
-  saveFromModal() {
+  saveFromModal(): void {
     if (!this.modal.open || !this.modal.day) return;
     const t = this.modal.model.title.trim();
     const payload: Cell = t
@@ -102,13 +150,13 @@ export class ScheduleComponent {
     this.closeModal();
   }
 
-  clearFromModal() {
+  clearFromModal(): void {
     if (!this.modal.open || !this.modal.day) return;
     this.schedule[this.modal.day][this.modal.index] = null;
     this.closeModal();
   }
 
-  closeModal() {
+  closeModal(): void {
     this.modal.open = false;
     this.modal.day = null;
     this.modal.index = -1;

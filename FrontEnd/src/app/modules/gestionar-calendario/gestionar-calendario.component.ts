@@ -121,7 +121,6 @@ export class GestionarCalendarioComponent {
   }
 
   guardarSemana() {
-    // Aquí en el futuro puedes llamar a un servicio para persistir
     const payload = {
       week: this.current,
       schedule: this.schedule,

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
+
 import { LayoutComponent } from '../../components/layout/layout.component';
 import { User } from '../../models/user.model';
 import { Activity } from '../../models/activity.model';
@@ -10,7 +11,7 @@ import { DataService } from '../../services/data.service';
 @Component({
   standalone: true,
   selector: 'app-profile-home',
-  imports: [CommonModule, RouterLink, LayoutComponent],
+  imports: [CommonModule, LayoutComponent],
   templateUrl: './profile-home.component.html',
 })
 export class ProfileHomeComponent implements OnInit {
@@ -19,8 +20,11 @@ export class ProfileHomeComponent implements OnInit {
   recent: Activity[] = [];
   activitiesCount = 0;
   cargoDescripcion: string[] = [];
+
+  // Por ahora estático; luego lo puedes alimentar desde backend
   notificationLabel = 'Urgente';
   lastSession = '2025-10-16 14:22';
+
   showDetails = false;
 
   constructor(
@@ -28,8 +32,7 @@ export class ProfileHomeComponent implements OnInit {
     private dataService: DataService
   ) {}
 
-  ngOnInit() {
-    // Tomamos el :id de la ruta y cargamos el usuario desde DataService
+  ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
     const id = idParam ? Number(idParam) : NaN;
 
@@ -38,45 +41,74 @@ export class ProfileHomeComponent implements OnInit {
       return;
     }
 
-    this.dataService.getUserById(id).subscribe(user => {
-      this.user = user;
-      if (!this.user) {
-        console.error('Usuario no encontrado para id =', id);
-        return;
-      }
+    this.dataService.getUserById(id).subscribe({
+      next: user => {
+        this.user = user;
+        if (!this.user) {
+          console.error('Usuario no encontrado para id =', id);
+          return;
+        }
 
-      // Una vez que tenemos usuario, cargamos actividades y descripción del cargo
-      this.loadActivities();
-      this.loadCargos();
+        this.loadActivities();
+        this.loadCargos();
+      },
+      error: err => {
+        console.error('Error cargando usuario por id:', err);
+      },
     });
   }
 
-  loadActivities() {
+  private loadActivities(): void {
     if (!this.user) return;
 
     this.dataService.getActivitiesByUser(this.user.id).subscribe({
-      next: (activities) => {
-        this.recent = activities;
+      next: activities => {
+        // total KPIs
         this.activitiesCount = activities.length;
+
+        // últimas 10 actividades ordenadas por fecha descendente
+        this.recent = [...activities]
+          .sort((a, b) => (a.fecha < b.fecha ? 1 : a.fecha > b.fecha ? -1 : 0))
+          .slice(0, 10);
       },
-      error: (err) =>
-        console.error('Error cargando actividades desde DataService:', err),
+      error: err => {
+        console.error('Error cargando actividades desde DataService:', err);
+      },
     });
   }
 
-  loadCargos() {
+  private loadCargos(): void {
     if (!this.user) return;
 
     this.dataService.getCargoByRole(this.user.role as any).subscribe({
       next: (cargo: Cargo | undefined) => {
-        this.cargoDescripcion = cargo ? cargo.descripcion : [];
+        this.cargoDescripcion = cargo?.descripcion ?? [];
       },
-      error: (err) =>
-        console.error('Error cargando cargos desde DataService:', err),
+      error: err => {
+        console.error('Error cargando cargos desde DataService:', err);
+      },
     });
   }
 
-  openDetails() { this.showDetails = true; }
-  closeDetails() { this.showDetails = false; }
-  onAvatarError(e: Event) { (e.target as HTMLImageElement).src = '/avatar.png'; }
+  // Utilidad para mostrar fecha en dd/mm/aaaa
+  formatDMY(iso: string): string {
+    if (!iso) return '';
+    const [y, m, d] = iso.split('-').map(Number);
+    if (!y || !m || !d) return iso;
+    const dd = String(d).padStart(2, '0');
+    const mm = String(m).padStart(2, '0');
+    return `${dd}/${mm}/${y}`;
+  }
+
+  openDetails(): void {
+    this.showDetails = true;
+  }
+
+  closeDetails(): void {
+    this.showDetails = false;
+  }
+
+  onAvatarError(e: Event): void {
+    (e.target as HTMLImageElement).src = '/avatar.png';
+  }
 }

@@ -107,33 +107,31 @@ export class ActivitiesHistoryComponent implements OnInit {
 
   ngOnInit(): void {
     // Cargar usuarios y actividades, luego construir la vista
-    this.dataService
-      .getUsers()
-      .subscribe({
-        next: (users) => {
-          this.allUsers = users;
+    this.dataService.getUsers().subscribe({
+      next: (users) => {
+        this.allUsers = users;
 
-          // Intentar obtener la secretaria logueada
-          const currentId = this.authService.getUserId();
-          const secretary = users.find(
-            (u) => u.id === currentId && u.role === 'Secretaria'
-          );
-          this.secretaryName = secretary
-            ? `${secretary.firstName} ${secretary.lastName}`
-            : '';
+        // Intentar obtener la secretaria logueada
+        const currentId = this.authService.getUserId();
+        const secretary = users.find(
+          (u) => u.id === currentId && u.role === 'Secretaria'
+        );
+        this.secretaryName = secretary
+          ? `${secretary.firstName} ${secretary.lastName}`
+          : '';
 
-          // Ahora cargar actividades
-          this.dataService.getAllActivities().subscribe({
-            next: (acts) => {
-              this.allActivities = acts;
-              this.rebuildView();
-            },
-            error: (err) =>
-              console.error('Error cargando actividades:', err),
-          });
-        },
-        error: (err) => console.error('Error cargando usuarios:', err),
-      });
+        // Ahora cargar actividades
+        this.dataService.getAllActivities().subscribe({
+          next: (acts) => {
+            this.allActivities = acts;
+            this.rebuildView();
+          },
+          error: (err) =>
+            console.error('Error cargando actividades:', err),
+        });
+      },
+      error: (err) => console.error('Error cargando usuarios:', err),
+    });
 
     // Reconstruir vista cuando cambian los filtros
     this.filters.valueChanges.subscribe(() => this.rebuildView());
@@ -270,13 +268,13 @@ export class ActivitiesHistoryComponent implements OnInit {
   statusPillClass(est: '' | Estado): string {
     switch (est) {
       case 'Aprobada':
-        return 'bg-emerald-500/10 text-emerald-700 border-emerald-300';
+        return 'pill-status-aprobada';
       case 'Pendiente':
-        return 'bg-amber-500/10 text-amber-700 border-amber-300';
+        return 'pill-status-pendiente';
       case 'Rechazada':
-        return 'bg-red-500/10 text-red-700 border-red-300';
+        return 'pill-status-rechazada';
       default:
-        return 'bg-gray-500/10 text-gray-700 border-gray-300';
+        return 'pill-status-default';
     }
   }
 

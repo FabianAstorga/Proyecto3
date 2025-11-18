@@ -1,309 +1,320 @@
 <app-layout [title]="'Académico'" [logoutLink]="'/login'">
-  <section class="max-w-3xl mx-auto px-6 py-8 space-y-8">
-    <!-- CABECERA -->
-    <header class="flex items-center justify-between gap-4">
-      <div>
-        <h1 class="text-2xl md:text-3xl font-bold text-[#0D1440]">
-          Registrar nueva actividad
-        </h1>
-        <p class="text-sm text-gray-600 mt-1">
-          Ingresa la actividad y, si corresponde, genera múltiples fechas dentro del mes.
-        </p>
-      </div>
+  <section class="page-container">
+    <div class="card-base max-w-3xl mx-auto p-6 md:p-8 space-y-8">
+      <!-- CABECERA -->
+      <header class="flex items-center justify-between gap-4">
+        <div>
+          <h1 class="text-2xl md:text-3xl font-bold text-[#0D1440]">
+            Registrar nueva actividad
+          </h1>
+          <p class="text-sm text-gray-600 mt-1">
+            Ingresa la actividad y, si corresponde, genera múltiples fechas dentro del mes.
+          </p>
+        </div>
 
-      <a
-        [routerLink]="perfilLink"
-        class="inline-flex items-center gap-2 text-sm font-semibold text-[#0D1440] border border-[#0D1440] rounded-md px-3 py-2 hover:bg-[#0D1440] hover:text-white transition"
-      >
-        Volver al perfil
-      </a>
-    </header>
-
-    <!-- FORMULARIO PRINCIPAL -->
-    <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-6">
-      <!-- DESCRIPCIÓN -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">
-          Descripción de la actividad *
-        </label>
-        <textarea
-          formControlName="descripcionAct"
-          rows="3"
-          class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
-          placeholder="Ej.: Participación en taller de actualización docente…"
-        ></textarea>
-        <p
-          *ngIf="f.descripcionAct.touched && f.descripcionAct.invalid"
-          class="text-xs text-red-600 mt-1"
+        <a
+          [routerLink]="perfilLink"
+          class="inline-flex items-center gap-2 text-sm font-semibold text-[#0D1440] border border-[#0D1440] rounded-md px-3 py-2 hover:bg-[#0D1440] hover:text-white transition"
         >
-          La descripción es obligatoria (máx. 500 caracteres).
-        </p>
-      </div>
+          Volver al perfil
+        </a>
+      </header>
 
-      <!-- FECHA PRINCIPAL -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">
-          Fecha principal *
-        </label>
-        <mat-form-field appearance="outline" class="w-full">
-          <input
-            matInput
-            [matDatepicker]="dpMain"
-            formControlName="fecha"
-            [matDatepickerFilter]="dateFilterMain"
-            placeholder="dd/mm/aaaa"
-          />
-          <mat-datepicker-toggle matSuffix [for]="dpMain"></mat-datepicker-toggle>
-          <mat-datepicker #dpMain></mat-datepicker>
-        </mat-form-field>
-      </div>
-
-      <!-- TIPO DE ACTIVIDAD -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- FORMULARIO PRINCIPAL -->
+      <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-6">
+        <!-- DESCRIPCIÓN -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">
-            Tipo de actividad *
+            Descripción de la actividad *
+          </label>
+          <textarea
+            formControlName="descripcionAct"
+            rows="3"
+            class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
+            placeholder="Ej.: Participación en taller de actualización docente…"
+          ></textarea>
+          <p
+            *ngIf="f.descripcionAct.touched && f.descripcionAct.invalid"
+            class="text-xs text-red-600 mt-1"
+          >
+            La descripción es obligatoria (máx. 500 caracteres).
+          </p>
+        </div>
+
+        <!-- FECHA PRINCIPAL -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Fecha principal *
           </label>
           <mat-form-field appearance="outline" class="w-full">
-            <mat-select formControlName="tipo_actividad">
-              <mat-option *ngFor="let t of tiposActividad" [value]="t">
-                {{ t }}
+            <input
+              matInput
+              [matDatepicker]="dpMain"
+              formControlName="fecha"
+              [matDatepickerFilter]="dateFilterMain"
+              placeholder="dd/mm/aaaa"
+            />
+            <mat-datepicker-toggle matSuffix [for]="dpMain"></mat-datepicker-toggle>
+            <mat-datepicker #dpMain></mat-datepicker>
+          </mat-form-field>
+        </div>
+
+        <!-- TIPO DE ACTIVIDAD -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Tipo de actividad *
+            </label>
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-select formControlName="tipo_actividad">
+                <mat-option *ngFor="let t of tiposActividad" [value]="t">
+                  {{ t }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div *ngIf="form.get('tipo_actividad')?.value === 'Otro (especificar)'">
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Especificar tipo *
+            </label>
+            <input
+              type="text"
+              formControlName="tipo_actividad_otro"
+              class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              placeholder="Ej.: Actividad de vinculación…"
+            />
+          </div>
+        </div>
+
+        <!-- ESTADO -->
+        <div class="max-w-xs">
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Estado *
+          </label>
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-select formControlName="estado">
+              <mat-option *ngFor="let e of estados" [value]="e">
+                {{ e }}
               </mat-option>
             </mat-select>
           </mat-form-field>
         </div>
 
-        <div *ngIf="form.get('tipo_actividad')?.value === 'Otro (especificar)'">
-          <label class="block text-sm font-medium text-gray-700 mb-1">
-            Especificar tipo *
-          </label>
-          <input
-            type="text"
-            formControlName="tipo_actividad_otro"
-            class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
-            placeholder="Ej.: Actividad de vinculación…"
-          />
-        </div>
-      </div>
-
-      <!-- ESTADO -->
-      <div class="max-w-xs">
-        <label class="block text-sm font-medium text-gray-700 mb-1">
-          Estado *
-        </label>
-        <mat-form-field appearance="outline" class="w-full">
-          <mat-select formControlName="estado">
-            <mat-option *ngFor="let e of estados" [value]="e">
-              {{ e }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-
-      <!-- MULTI-DÍA -->
-      <div
-        class="border border-gray-200 rounded-xl p-4 space-y-4 bg-gray-50"
-        formGroupName="multi"
-      >
-        <div class="flex items-center justify-between gap-4">
-          <div>
-            <h2 class="text-sm font-semibold text-gray-800">
-              Registrar múltiples fechas en el mes actual
-            </h2>
-            <p class="text-xs text-gray-600">
-              Se generarán copias de la actividad para varias fechas dentro del mes
-              vigente (se excluyen feriados y fechas fuera del mes).
-            </p>
-          </div>
-          <label class="inline-flex items-center gap-2 text-sm font-medium text-gray-700">
-            <input type="checkbox" formControlName="enable" />
-            <span>Activar multi-día</span>
-          </label>
-        </div>
-
-        <!-- Contenido multi sólo si está activo -->
-        <div class="space-y-4" *ngIf="multi.get('enable')?.value">
-          <!-- MODO -->
-          <div class="flex flex-wrap items-center gap-4 text-sm">
-            <span class="font-semibold text-gray-700">Modo de selección:</span>
-
-            <label class="inline-flex items-center gap-2">
-              <input type="radio" value="specific" formControlName="mode" />
-              <span>Fechas específicas</span>
-            </label>
-
-            <label class="inline-flex items-center gap-2">
-              <input type="radio" value="weekly" formControlName="mode" />
-              <span>Repetición semanal</span>
+        <!-- MULTI-DÍA -->
+        <div
+          class="border border-gray-200 rounded-xl p-4 space-y-4 bg-gray-50"
+          formGroupName="multi"
+        >
+          <div class="flex items-center justify-between gap-4">
+            <div>
+              <h2 class="text-sm font-semibold text-gray-800">
+                Registrar múltiples fechas en el mes actual
+              </h2>
+              <p class="text-xs text-gray-600">
+                Se generarán copias de la actividad para varias fechas dentro del mes vigente
+                (se excluyen feriados y fechas fuera del mes).
+              </p>
+            </div>
+            <label
+              class="inline-flex items-center gap-2 text-sm font-medium text-gray-700"
+            >
+              <input type="checkbox" formControlName="enable" />
+              <span>Activar multi-día</span>
             </label>
           </div>
 
-          <!-- MODO: FECHAS ESPECÍFICAS -->
-          <div *ngIf="multi.get('mode')?.value === 'specific'" class="space-y-3">
-            <div class="flex items-center justify-between">
-              <span class="text-xs text-gray-600">
-                Solo se permiten fechas dentro del mes actual y no feriados.
-              </span>
-              <button
-                type="button"
-                (click)="addSpecificDate()"
-                class="px-3 py-1.5 text-xs rounded-md bg-yellow-400 text-[#0D1440] font-semibold hover:bg-yellow-300"
-              >
-                Agregar fecha
-              </button>
+          <!-- Contenido multi sólo si está activo -->
+          <div class="space-y-4" *ngIf="multi.get('enable')?.value">
+            <!-- MODO -->
+            <div class="flex flex-wrap items-center gap-4 text-sm">
+              <span class="font-semibold text-gray-700">Modo de selección:</span>
+
+              <label class="inline-flex items-center gap-2">
+                <input type="radio" value="specific" formControlName="mode" />
+                <span>Fechas específicas</span>
+              </label>
+
+              <label class="inline-flex items-center gap-2">
+                <input type="radio" value="weekly" formControlName="mode" />
+                <span>Repetición semanal</span>
+              </label>
             </div>
 
-            <div formArrayName="specificDates" class="space-y-3">
-              <div
-                *ngFor="let c of specificDates.controls; let i = index"
-                class="flex items-center gap-2"
-              >
-                <mat-form-field appearance="outline" class="flex-1">
-                  <input
-                    matInput
-                    [matDatepicker]="dpSpec"
-                    [formControlName]="i"
-                    [matDatepickerFilter]="dateFilterMulti"
-                    placeholder="dd/mm/aaaa"
-                  />
-                  <mat-datepicker-toggle
-                    matSuffix
-                    [for]="dpSpec"
-                  ></mat-datepicker-toggle>
-                  <mat-datepicker #dpSpec></mat-datepicker>
-                </mat-form-field>
-
+            <!-- MODO: FECHAS ESPECÍFICAS -->
+            <div *ngIf="multi.get('mode')?.value === 'specific'" class="space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs text-gray-600">
+                  Solo se permiten fechas dentro del mes actual y no feriados.
+                </span>
                 <button
                   type="button"
-                  (click)="removeSpecificDate(i)"
-                  class="px-2 py-1 text-xs rounded-md bg-red-50 text-red-700 border border-red-200 hover:bg-red-100"
+                  (click)="addSpecificDate()"
+                  class="px-3 py-1.5 text-xs rounded-md bg-yellow-400 text-[#0D1440] font-semibold hover:bg-yellow-300"
                 >
-                  Eliminar
+                  Agregar fecha
                 </button>
+              </div>
 
-                <span
-                  class="text-[11px] text-red-600"
-                  *ngIf="c.invalid && c.touched"
+              <div formArrayName="specificDates" class="space-y-3">
+                <div
+                  *ngFor="let c of specificDates.controls; let i = index"
+                  class="flex items-center gap-2"
                 >
-                  Fecha fuera del mes o no válida.
-                </span>
-              </div>
-
-              <p
-                *ngIf="specificDates.length === 0"
-                class="text-xs text-gray-500"
-              >
-                No hay fechas adicionales; se usará solo la fecha principal.
-              </p>
-            </div>
-          </div>
-
-          <!-- MODO: SEMANAL -->
-          <div *ngIf="multi.get('mode')?.value === 'weekly'" class="space-y-3">
-            <div formGroupName="weekly" class="space-y-3">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">
-                    Desde *
-                  </label>
-                  <mat-form-field appearance="outline" class="w-full">
+                  <mat-form-field appearance="outline" class="flex-1">
                     <input
                       matInput
-                      [matDatepicker]="dpFrom"
-                      formControlName="start"
+                      [matDatepicker]="dpSpec"
+                      [formControlName]="i"
                       [matDatepickerFilter]="dateFilterMulti"
                       placeholder="dd/mm/aaaa"
                     />
                     <mat-datepicker-toggle
                       matSuffix
-                      [for]="dpFrom"
+                      [for]="dpSpec"
                     ></mat-datepicker-toggle>
-                    <mat-datepicker #dpFrom></mat-datepicker>
+                    <mat-datepicker #dpSpec></mat-datepicker>
                   </mat-form-field>
+
+                  <button
+                    type="button"
+                    (click)="removeSpecificDate(i)"
+                    class="px-2 py-1 text-xs rounded-md bg-red-50 text-red-700 border border-red-200 hover:bg-red-100"
+                  >
+                    Eliminar
+                  </button>
+
+                  <span
+                    class="text-[11px] text-red-600"
+                    *ngIf="c.invalid && c.touched"
+                  >
+                    Fecha fuera del mes o no válida.
+                  </span>
                 </div>
 
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">
-                    Hasta *
+                <p
+                  *ngIf="specificDates.length === 0"
+                  class="text-xs text-gray-500"
+                >
+                  No hay fechas adicionales; se usará solo la fecha principal.
+                </p>
+              </div>
+            </div>
+
+            <!-- MODO: SEMANAL -->
+            <div *ngIf="multi.get('mode')?.value === 'weekly'" class="space-y-3">
+              <div formGroupName="weekly" class="space-y-3">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                      Desde *
+                    </label>
+                    <mat-form-field appearance="outline" class="w-full">
+                      <input
+                        matInput
+                        [matDatepicker]="dpFrom"
+                        formControlName="start"
+                        [matDatepickerFilter]="dateFilterMulti"
+                        placeholder="dd/mm/aaaa"
+                      />
+                      <mat-datepicker-toggle
+                        matSuffix
+                        [for]="dpFrom"
+                      ></mat-datepicker-toggle>
+                      <mat-datepicker #dpFrom></mat-datepicker>
+                    </mat-form-field>
+                  </div>
+
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                      Hasta *
+                    </label>
+                    <mat-form-field appearance="outline" class="w-full">
+                      <input
+                        matInput
+                        [matDatepicker]="dpTo"
+                        formControlName="end"
+                        [matDatepickerFilter]="dateFilterMulti"
+                        placeholder="dd/mm/aaaa"
+                      />
+                      <mat-datepicker-toggle
+                        matSuffix
+                        [for]="dpTo"
+                      ></mat-datepicker-toggle>
+                      <mat-datepicker #dpTo></mat-datepicker>
+                    </mat-form-field>
+                  </div>
+                </div>
+
+                <!-- DÍAS DE LA SEMANA -->
+                <div formGroupName="weekdays" class="flex flex-wrap gap-3 text-xs">
+                  <span class="w-full text-gray-600 mb-1">
+                    Selecciona los días de la semana:
+                  </span>
+
+                  <label class="inline-flex items-center gap-1">
+                    <input type="checkbox" formControlName="mon" />
+                    <span>Lunes</span>
                   </label>
-                  <mat-form-field appearance="outline" class="w-full">
-                    <input
-                      matInput
-                      [matDatepicker]="dpTo"
-                      formControlName="end"
-                      [matDatepickerFilter]="dateFilterMulti"
-                      placeholder="dd/mm/aaaa"
-                    />
-                    <mat-datepicker-toggle
-                      matSuffix
-                      [for]="dpTo"
-                    ></mat-datepicker-toggle>
-                    <mat-datepicker #dpTo></mat-datepicker>
-                  </mat-form-field>
+                  <label class="inline-flex items-center gap-1">
+                    <input type="checkbox" formControlName="tue" />
+                    <span>Martes</span>
+                  </label>
+                  <label class="inline-flex items-center gap-1">
+                    <input type="checkbox" formControlName="wed" />
+                    <span>Miércoles</span>
+                  </label>
+                  <label class="inline-flex items-center gap-1">
+                    <input type="checkbox" formControlName="thu" />
+                    <span>Jueves</span>
+                  </label>
+                  <label class="inline-flex items-center gap-1">
+                    <input type="checkbox" formControlName="fri" />
+                    <span>Viernes</span>
+                  </label>
+                  <label class="inline-flex items-center gap-1">
+                    <input type="checkbox" formControlName="sat" />
+                    <span>Sábado</span>
+                  </label>
+                  <label class="inline-flex items-center gap-1">
+                    <input type="checkbox" formControlName="sun" />
+                    <span>Domingo</span>
+                  </label>
                 </div>
+
+                <p class="text-xs text-gray-500">
+                  Solo se considerarán fechas dentro del mes actual y que no sean feriados.
+                </p>
               </div>
-
-              <!-- DÍAS DE LA SEMANA -->
-              <div formGroupName="weekdays" class="flex flex-wrap gap-3 text-xs">
-                <span class="w-full text-gray-600 mb-1">
-                  Selecciona los días de la semana:
-                </span>
-
-                <label class="inline-flex items-center gap-1">
-                  <input type="checkbox" formControlName="mon" /> <span>Lunes</span>
-                </label>
-                <label class="inline-flex items-center gap-1">
-                  <input type="checkbox" formControlName="tue" /> <span>Martes</span>
-                </label>
-                <label class="inline-flex items-center gap-1">
-                  <input type="checkbox" formControlName="wed" /> <span>Miércoles</span>
-                </label>
-                <label class="inline-flex items-center gap-1">
-                  <input type="checkbox" formControlName="thu" /> <span>Jueves</span>
-                </label>
-                <label class="inline-flex items-center gap-1">
-                  <input type="checkbox" formControlName="fri" /> <span>Viernes</span>
-                </label>
-                <label class="inline-flex items-center gap-1">
-                  <input type="checkbox" formControlName="sat" /> <span>Sábado</span>
-                </label>
-                <label class="inline-flex items-center gap-1">
-                  <input type="checkbox" formControlName="sun" /> <span>Domingo</span>
-                </label>
-              </div>
-
-              <p class="text-xs text-gray-500">
-                Solo se considerarán fechas dentro del mes actual y que no sean feriados.
-              </p>
             </div>
           </div>
+
+          <p
+            *ngIf="multi.invalid && multi.touched"
+            class="text-xs text-red-600"
+          >
+            Revisa las fechas del bloque multi-día (rango válido y dentro del mes).
+          </p>
         </div>
 
-        <p
-          *ngIf="multi.invalid && multi.touched"
-          class="text-xs text-red-600"
-        >
-          Revisa las fechas del bloque multi-día (rango válido y dentro del mes).
-        </p>
-      </div>
+        <!-- BOTONES -->
+        <div class="flex flex-wrap gap-3 pt-2">
+          <button
+            type="submit"
+            class="px-5 py-2 rounded-md bg-yellow-400 text-[#0D1440] font-semibold hover:bg-yellow-300"
+          >
+            Guardar actividad
+          </button>
 
-      <!-- BOTONES -->
-      <div class="flex flex-wrap gap-3 pt-2">
-        <button
-          type="submit"
-          class="px-5 py-2 rounded-md bg-yellow-400 text-[#0D1440] font-semibold hover:bg-yellow-300"
-        >
-          Guardar actividad
-        </button>
-
-        <button
-          type="button"
-          (click)="onReset()"
-          class="px-5 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 text-sm"
-        >
-          Limpiar formulario
-        </button>
-      </div>
-    </form>
+          <button
+            type="button"
+            (click)="onReset()"
+            class="btn-secondary"
+          >
+            Limpiar formulario
+          </button>
+        </div>
+      </form>
+    </div>
   </section>
 </app-layout>
