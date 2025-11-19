@@ -1,42 +1,44 @@
 import {
-  IsBoolean,
-  isBoolean,
-  IsEnum,
-  IsNotEmpty,
-  IsOptional,
-  IsPhoneNumber,
-  IsString,
-  MinLength,
+  IsBoolean,
+  IsNotEmpty,
+  IsOptional,
+  IsPhoneNumber,
+  IsString,
+  MinLength,
+  IsEmail 
 } from 'class-validator';
 
 export class UpdateUsuarioDto {
-  @IsOptional()
-  @IsString()
-  nombre?: string;
+  @IsOptional()
+  @IsString()
+  nombre?: string;
 
-  @IsOptional()
-  @IsString()
-  apellido?: string;
+  @IsOptional()
+  @IsString()
+  apellido?: string;
 
-  correo: string;
-  @IsOptional()
-  @MinLength(8)
-  contrasena?: string;
 
-  @IsBoolean()
-  @IsOptional()
-  estado?: boolean;
+  @IsOptional() 
+  @IsEmail()      
+  correo?: string; 
+  // -----------------------
 
-  @IsOptional()
-  @IsPhoneNumber()
-  @IsString()
-  telefono?: string;
+  @IsOptional()
+  @MinLength(8)
+  contrasena?: string;
 
-  @IsOptional()
-  @IsString()
-  anexo?: string;
+  @IsBoolean()
+  @IsOptional()
+  estado?: boolean; 
 
-  @IsOptional()
-  @IsString()
-  foto_url?: string;
+  @IsOptional()
+  telefono?: string;
+
+  @IsOptional()
+  @IsString()
+  anexo?: string;
+
+  @IsOptional()
+  @IsString()
+  foto_url?: string;
 }

@@ -20,7 +20,7 @@ export class EmpleadoCargo {
   fecha_fin: Date;
 
   // --- Relaciones ---
-  @ManyToOne(() => Usuario, (usuario) => usuario.cargos, {
+  @ManyToOne(() => Usuario, (usuario) => usuario.asignaciones, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'usuario_id' })

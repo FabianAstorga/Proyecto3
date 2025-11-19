@@ -27,7 +27,7 @@ export class Usuario {
   @Column({ type: 'varchar', length: 100 })
   correo: string;
 
-  @Column({ type: 'varchar', length: 8, select: false })
+  @Column({ type: 'varchar', length: 255, select: false })
   contrasena: string;
 
   @Column({ type: 'boolean', default: true })
@@ -47,7 +47,7 @@ export class Usuario {
 
   // Relaciones
   @OneToMany(() => EmpleadoCargo, (ec) => ec.usuario)
-  cargos: EmpleadoCargo[];
+  asignaciones: EmpleadoCargo[];
 
   @OneToMany(() => Informe, (i) => i.usuario)
   informes: Informe[];

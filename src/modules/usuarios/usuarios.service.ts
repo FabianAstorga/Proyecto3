@@ -121,6 +121,7 @@ export class UsuariosService {
     return this.usuarioRepository.findOne({
       where: { correo },
       select: ['id', 'correo', 'contrasena', 'estado', 'nombre', 'apellido'],
+      relations: ['asignaciones', 'asignaciones.cargo'],
     });
   }
 }
