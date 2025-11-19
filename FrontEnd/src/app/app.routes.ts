@@ -78,13 +78,6 @@ export const routes: Routes = [
           ).then(m => m.GestionarCalendarioComponent),
       },
       {
-        path: 'funcionarios',
-        loadComponent: () =>
-          import(
-            './modules/gestionar-funcionario/gestionar-funcionario.component'
-          ).then(m => m.GestionarFuncionarioComponent),
-      },
-      {
         path: '',
         pathMatch: 'full',
         redirectTo: 'perfil',

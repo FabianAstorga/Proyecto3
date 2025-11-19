@@ -82,18 +82,21 @@ export class ActivitiesHistoryComponent implements OnInit {
   private dataService = inject(DataService);
   private authService = inject(AuthService);
 
-  // Nombre de la secretaria logueada (para PDF y cabecera)
+  // Nombre de la secretaria logueada (para PDF)
   secretaryName = '';
 
   // Datos crudos
   private allUsers: User[] = [];
   private allActivities: Activity[] = [];
 
-  // Vista agrupada
+  // Vista agrupada por mes
   groupedMonths: MonthGroup[] = [];
   totalActivities = 0;
 
-  // Filtros
+  // Índice del mes actualmente visible (0 = más reciente)
+  currentMonthIndex = 0;
+
+  // Filtros (aunque ya no tengan UI, se mantienen por si se usan luego)
   filters = this.fb.group({
     q: this.fb.control<string>(''),
     desde: this.fb.control<Date | null>(null),
@@ -103,6 +106,22 @@ export class ActivitiesHistoryComponent implements OnInit {
 
   get estadoValue(): '' | Estado {
     return (this.filters.controls.estado.value ?? '') as '' | Estado;
+  }
+
+  /** Mes actualmente visible en la UI */
+  get currentMonthGroup(): MonthGroup | null {
+    if (!this.groupedMonths.length) return null;
+    return this.groupedMonths[this.currentMonthIndex] ?? null;
+  }
+
+  /** ¿Hay mes anterior? (más antiguo) */
+  get hasPrevMonth(): boolean {
+    return this.currentMonthIndex < this.groupedMonths.length - 1;
+  }
+
+  /** ¿Hay mes siguiente? (más reciente) */
+  get hasNextMonth(): boolean {
+    return this.currentMonthIndex > 0;
   }
 
   ngOnInit(): void {
@@ -137,12 +156,27 @@ export class ActivitiesHistoryComponent implements OnInit {
     this.filters.valueChanges.subscribe(() => this.rebuildView());
   }
 
+  // ================== NAVEGACIÓN ENTRE MESES ==================
+
+  goPrevMonth(): void {
+    if (this.hasPrevMonth) {
+      this.currentMonthIndex++;
+    }
+  }
+
+  goNextMonth(): void {
+    if (this.hasNextMonth) {
+      this.currentMonthIndex--;
+    }
+  }
+
   // ================== LÓGICA DE VISTA ==================
 
   private rebuildView(): void {
     if (!this.allUsers.length || !this.allActivities.length) {
       this.groupedMonths = [];
       this.totalActivities = 0;
+      this.currentMonthIndex = 0;
       return;
     }
 
@@ -227,12 +261,15 @@ export class ActivitiesHistoryComponent implements OnInit {
       });
     }
 
-    // Ordenar meses descendente
+    // Ordenar meses descendente (más reciente primero)
     months.sort((a, b) =>
       a.monthKey < b.monthKey ? 1 : a.monthKey > b.monthKey ? -1 : 0
     );
 
     this.groupedMonths = months;
+
+    // Siempre mostrar el mes más reciente al reconstruir
+    this.currentMonthIndex = this.groupedMonths.length ? 0 : 0;
   }
 
   // ================== UTILIDADES ==================

@@ -1,55 +1,72 @@
-<!-- v3-modal-centrado (sin panel lateral, editor en ventana modal) -->
-<app-layout [title]="'Académico'" [logoutLink]="'/login'">
-  <section class="w-full px-4 md:px-8 py-6 md:py-10">
-    <div class="bg-white rounded-2xl border border-blue-400 shadow-md overflow-hidden">
-      <div class="px-4 py-2 text-[12px] text-gray-500">
-        Haz clic en una celda para editar.
+<app-layout [logoutLink]="'/login'">
+  <section class="page-container">
+    <!-- CARD ÚNICA -->
+    <div class="card-base overflow-hidden">
+      <!-- Franja superior: título + ayuda -->
+      <div
+        class="px-6 py-4 border-b border-gray-200 flex flex-wrap items-center justify-between gap-4"
+      >
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-900">
+          Horario {{ userFirstName }}
+        </h1>
+
+        <span class="text-xs md:text-sm text-gray-500">
+          Haz clic en una celda para editar tu horario.
+        </span>
       </div>
 
+      <!-- Horario: ocupa todo el espacio de la card -->
       <div class="overflow-x-auto">
         <div
           class="grid w-full"
-          [ngStyle]="{ 'grid-template-columns': '180px repeat(6, 1fr)' }"
+          [ngStyle]="{ 'grid-template-columns': '180px repeat(5, 1fr)' }"
         >
           <!-- Encabezados -->
           <div
-            class="bg-[#EAF2FF] border border-gray-200 p-3 text-center font-semibold text-[#0D1440]"
+            class="bg-gray-50 border border-gray-200 p-3 text-center font-semibold text-gray-900"
           >
             Bloque
           </div>
           <div
             *ngFor="let d of days"
-            class="bg-[#EAF2FF] border border-gray-200 p-3 text-center font-semibold text-[#0D1440]"
+            class="bg-gray-50 border border-gray-200 p-3 text-center font-semibold text-gray-900"
           >
             {{ d.label }}
           </div>
 
           <!-- Filas -->
           <ng-container *ngFor="let b of blocks; let bi = index">
-            <!-- Columna bloque -->
+            <!-- Columna izquierda: bloque -->
             <div
-              class="border border-gray-200 p-3 text-center bg-gray-50 text-gray-800"
-              [ngClass]="{ 'bg-yellow-50 font-semibold text-gray-900': b.isLunch }"
+              class="border border-gray-200 p-3 text-center bg-white text-gray-800"
+              [ngClass]="{
+                'bg-gray-100 font-semibold text-gray-900': b.isLunch
+              }"
             >
-              <div>{{ b.label }}</div>
-              <div class="text-[12px] text-gray-600" *ngIf="!b.isLunch">
-                {{ b.code }}
-              </div>
-              <div class="text-[12px] text-amber-700" *ngIf="b.isLunch">
-                Almuerzo
-              </div>
+              <!-- Para bloques normales: hora + código -->
+              <ng-container *ngIf="!b.isLunch; else almuerzoLabel">
+                <div>{{ b.label }}</div>
+                <div class="text-[12px] text-gray-500">
+                  {{ b.code }}
+                </div>
+              </ng-container>
+
+              <!-- Para almuerzo: solo la palabra -->
+              <ng-template #almuerzoLabel>
+                <div class="text-sm">Almuerzo</div>
+              </ng-template>
             </div>
 
-            <!-- Celdas por día -->
+            <!-- Celdas editables (no almuerzo) -->
             <ng-container *ngIf="!b.isLunch; else lunchRow">
               <div
                 *ngFor="let d of days"
-                class="border border-gray-200 bg-white hover:bg-blue-50 transition cursor-pointer"
+                class="border border-gray-200 bg-white hover:bg-gray-50 transition cursor-pointer"
                 (click)="openModal(d.key, bi)"
                 title="Editar"
               >
                 <div
-                  class="h-24 flex items-center justify-center text-center px-2"
+                  class="h-20 flex items-center justify-center text-center px-2"
                 >
                   <ng-container
                     [ngTemplateOutlet]="cellTpl"
@@ -61,11 +78,14 @@
               </div>
             </ng-container>
 
+            <!-- Fila de almuerzo: banda completa -->
             <ng-template #lunchRow>
-              <div class="col-span-6 border border-gray-200">
+              <div class="col-span-5 border border-gray-200">
                 <div
-                  class="h-16 bg-yellow-50 text-amber-800 font-medium flex items-center justify-center text-sm"
-                ></div>
+                  class="h-14 bg-gray-100 text-gray-800 font-medium flex items-center justify-center text-sm"
+                >
+                  <!-- Franja de almuerzo visual -->
+                </div>
               </div>
             </ng-template>
           </ng-container>
@@ -164,9 +184,7 @@
   <!-- Vista de celda -->
   <ng-template #cellTpl let-c="c">
     <div *ngIf="c; else empty" class="px-2">
-      <div
-        class="text-sm font-semibold text-[#0D1440] leading-tight"
-      >
+      <div class="text-sm font-semibold text-[#0D1440] leading-tight">
         {{ c.title }}
       </div>
       <div class="text-xs text-gray-600" *ngIf="c.room">

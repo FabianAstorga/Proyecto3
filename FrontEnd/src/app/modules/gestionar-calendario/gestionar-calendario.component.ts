@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { LayoutComponent } from '../../components/layout/layout.component';
 
 type Block = { label: string; code: string; isLunch?: boolean };
-type DayKey = 'lun' | 'mar' | 'mie' | 'jue' | 'vie' | 'sab';
+type DayKey = 'lun' | 'mar' | 'mie' | 'jue' | 'vie';
 type Cell = { title: string; room?: string; note?: string } | null;
 
 function pad(n: number) {
@@ -51,14 +51,13 @@ export class GestionarCalendarioComponent {
     { label: '19:30 - 21:00', code: '(15 - 16)' },
   ];
 
-  // Días
+  // Días (sin sábado)
   days: { key: DayKey; label: string }[] = [
     { key: 'lun', label: 'Lunes' },
     { key: 'mar', label: 'Martes' },
     { key: 'mie', label: 'Miércoles' },
     { key: 'jue', label: 'Jueves' },
     { key: 'vie', label: 'Viernes' },
-    { key: 'sab', label: 'Sábado' },
   ];
 
   // Horario editable en memoria
@@ -68,7 +67,6 @@ export class GestionarCalendarioComponent {
     mie: Array(this.blocks.length).fill(null),
     jue: Array(this.blocks.length).fill(null),
     vie: Array(this.blocks.length).fill(null),
-    sab: Array(this.blocks.length).fill(null),
   };
 
   // Edición inline

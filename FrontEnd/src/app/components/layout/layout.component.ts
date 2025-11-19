@@ -79,10 +79,7 @@ export class LayoutComponent implements OnInit {
             label: 'Gestionar calendario',
             link: `/secretaria/${id}/calendario`,
           },
-          {
-            label: 'Gestionar funcionarios',
-            link: `/secretaria/${id}/funcionarios`,
-          },
+          // 👇 Se elimina "Gestionar funcionarios" aquí
         ];
         break;
 

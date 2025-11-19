@@ -1,12 +1,14 @@
-// v3-modal-centrado (front puro, sin persistencia y sin panel lateral)
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 
 import { LayoutComponent } from '../../components/layout/layout.component';
+import { User } from '../../models/user.model';
+import { DataService } from '../../services/data.service';
 
 type Block = { label: string; code: string; isLunch?: boolean };
-type DayKey = 'lun' | 'mar' | 'mie' | 'jue' | 'vie' | 'sab';
+type DayKey = 'lun' | 'mar' | 'mie' | 'jue' | 'vie';
 type Cell = { title: string; room?: string; note?: string } | null;
 
 @Component({
@@ -15,7 +17,15 @@ type Cell = { title: string; room?: string; note?: string } | null;
   imports: [CommonModule, LayoutComponent, FormsModule],
   templateUrl: './schedule.component.html',
 })
-export class ScheduleComponent {
+export class ScheduleComponent implements OnInit {
+  // ===== Usuario =====
+  user: User | undefined;
+
+  // getter cómodo para el título
+  get userFirstName(): string {
+    return this.user?.firstName ?? '';
+  }
+
   // ya no usamos nav por rol, el horario es común
   canEdit = true; // front puro
 
@@ -36,7 +46,6 @@ export class ScheduleComponent {
     { key: 'mie', label: 'Miércoles' },
     { key: 'jue', label: 'Jueves' },
     { key: 'vie', label: 'Viernes' },
-    { key: 'sab', label: 'Sábado' },
   ];
 
   // 7 slots (todos menos almuerzo) por día
@@ -86,15 +95,6 @@ export class ScheduleComponent {
       null,
       null,
     ],
-    sab: [
-      null,
-      null,
-      null,
-      null,
-      null,
-      { title: 'Taller Proyecto', room: 'Makerspace' },
-      null,
-    ],
   };
 
   // ===== Modal centrado =====
@@ -106,6 +106,33 @@ export class ScheduleComponent {
     index: -1, // índice de datos (0..6)
     model: { title: '', room: '', note: '' },
   };
+
+  constructor(
+    private route: ActivatedRoute,
+    private dataService: DataService
+  ) {}
+
+  ngOnInit(): void {
+    const idParam = this.route.snapshot.paramMap.get('id');
+    const id = idParam ? Number(idParam) : NaN;
+
+    if (!Number.isFinite(id)) {
+      console.error('ID de usuario inválido en la ruta de horario');
+      return;
+    }
+
+    this.dataService.getUserById(id).subscribe({
+      next: user => {
+        this.user = user;
+        if (!this.user) {
+          console.error('Usuario no encontrado para id =', id);
+        }
+      },
+      error: err => {
+        console.error('Error cargando usuario para horario:', err);
+      },
+    });
+  }
 
   // índice visible (incluye lunch) → índice real (sin lunch)
   visibleIndexToDataIndex(visibleIndex: number): number {

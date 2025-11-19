@@ -35,6 +35,8 @@ type WeekFlags = {
   sun: boolean;
 };
 
+type MultiMode = 'none' | 'specific' | 'weekly';
+
 /** Semana parte en lunes */
 class MondayFirstDateAdapter extends NativeDateAdapter {
   override getFirstDayOfWeek(): number {
@@ -78,7 +80,7 @@ export class ActivityNewComponent {
   private fb = inject(FormBuilder);
   private auth = inject(AuthService);
 
-  // 📌 Link para volver al perfil del funcionario logueado
+  // 📌 Link para volver al perfil del funcionario logueado (por si lo necesitas luego)
   get perfilLink(): string {
     const id = this.auth.getUserId();
     return id != null ? `/funcionario/perfil/${id}` : '/funcionario/perfil';
@@ -148,8 +150,7 @@ export class ActivityNewComponent {
       estado: [this.estados[0], Validators.required],
 
       multi: this.fb.group({
-        enable: [false],
-        mode: ['specific' as 'specific' | 'weekly'],
+        mode: ['none' as MultiMode],
         specificDates: this.fb.array<Date>([]),
         weekly: this.fb.group({
           start: [new Date(), Validators.required],
@@ -232,11 +233,10 @@ export class ActivityNewComponent {
   private validateMultiSection(
     group: AbstractControl
   ): ValidationErrors | null {
-    const enable = group.get('enable')?.value as boolean;
-    if (!enable) return null;
+    const mode = group.get('mode')?.value as MultiMode;
+    if (!mode || mode === 'none') return null;
 
     let anyError = false;
-    const mode = group.get('mode')?.value as 'specific' | 'weekly';
 
     const inMonth = (dt: Date | null | undefined) =>
       !!dt &&
@@ -323,7 +323,7 @@ export class ActivityNewComponent {
     this.specificDates.removeAt(i);
   }
 
-  // ==== Reset limpio (para el botón "Limpiar formulario") ====
+  // ==== Reset limpio (por si lo usas desde otro lado) ====
   onReset(): void {
     this.form.reset({
       descripcionAct: '',
@@ -332,8 +332,7 @@ export class ActivityNewComponent {
       tipo_actividad_otro: '',
       estado: this.estados[0],
       multi: {
-        enable: false,
-        mode: 'specific',
+        mode: 'none' as MultiMode,
         specificDates: [],
         weekly: {
           start: new Date(),
@@ -374,8 +373,10 @@ export class ActivityNewComponent {
 
     const fechas = new Set<string>([this.toISO(base.fecha as Date)]);
     const multi = base.multi!;
-    if (multi.enable) {
-      if (multi.mode === 'specific') {
+    const mode = multi.mode as MultiMode | undefined;
+
+    if (mode && mode !== 'none') {
+      if (mode === 'specific') {
         for (const c of this.specificDates.controls) {
           const v = (c as AbstractControl).value as Date;
           const iso = this.toISO(v);
@@ -387,7 +388,7 @@ export class ActivityNewComponent {
             fechas.add(iso);
           }
         }
-      } else {
+      } else if (mode === 'weekly') {
         const s = multi.weekly!.start as Date;
         const e = multi.weekly!.end as Date;
         const wdays = this.selectedWeekdays();
@@ -417,7 +418,6 @@ export class ActivityNewComponent {
       payload
     );
 
-    // 👉 Aquí después puedes integrar tu DataService:
     // this.dataService.crearActividad(payload).subscribe(...)
   }
 }
