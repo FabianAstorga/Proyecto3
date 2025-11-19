@@ -12,7 +12,7 @@ export class ActividadService {
     private readonly actividadRepository: Repository<Actividad>,
   ) {}
 
-  create(dto: CreateActividadDto) {
+  async create(dto: CreateActividadDto) {
     const actividad = this.actividadRepository.create(dto);
     return this.actividadRepository.save(actividad);
   }
@@ -24,7 +24,7 @@ export class ActividadService {
   findOne(id: number) {
     return this.actividadRepository.findOne({
       //corregido?
-      where: { id_actividad: id },
+      where: { id_actividad: id }, // Correcto para buscar por una clave no llamada 'id'
       relations: ['informe'],
     });
   }

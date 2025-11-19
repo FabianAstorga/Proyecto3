@@ -8,8 +8,8 @@ import {
   JoinColumn,
 } from 'typeorm';
 
-@Entity('agenda')
-export class Agenda {
+@Entity('horario')
+export class Horario {
 
   @PrimaryGeneratedColumn()
   id_agenda: number;
@@ -32,7 +32,7 @@ export class Agenda {
   esDisponible: boolean;
 
   // CLAVE FORÁNEA FALTANTE: Relación con el Usuario
-  @ManyToOne(() => Usuario, usuario => usuario.agendas) // Define la relación
+  @ManyToOne(() => Usuario, usuario => usuario.horarios) // Define la relación
   @JoinColumn({ name: 'usuario_id' }) // Columna de la clave foránea en la tabla 'agenda'
   usuario: Usuario;
 }

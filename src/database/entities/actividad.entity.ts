@@ -26,11 +26,11 @@ export class Actividad {
   @Column({ type: 'varchar', length: 100 })
   tipo: string;
 
-  @Column({ type: 'boolean', default: true })
-  estado: boolean;
+  @Column({ type: 'varchar', length: 50, default: 'Pendiente' })
+  estado: string;
 
   @Column({ type: 'boolean', default: true })
-  es_repetitiva: boolean;
+  esRepetitiva: boolean;
   // Relación: Actividad "pertenece a" Formulario
   @ManyToOne(() => Informe, (informe) => informe.actividades, {
     onDelete: 'CASCADE',

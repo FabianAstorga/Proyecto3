@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 import { EmpleadoCargo } from './empleado-cargo.entity';
 import { Informe } from './informe.entity';
-import { Agenda } from './agenda.entity';
+import { Horario } from './horario.entity';
 
 
 @Entity('usuario')
@@ -56,7 +56,7 @@ export class Usuario {
   @OneToMany(() => Informe, (i) => i.usuario)
   informes: Informe[];
 
-  @OneToMany(() => Agenda, agenda => agenda.usuario)
-  agendas: Agenda[];
+  @OneToMany(() => Horario, horario => horario.usuario)
+  horarios: Horario[];
 
 }

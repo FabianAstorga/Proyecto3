@@ -7,9 +7,6 @@ import {
 } from 'class-validator';
 
 export class UpdateActividadDto {
-  @IsNumber()
-  @IsOptional()
-  id?: number;
 
   @IsString()
   @IsOptional()
@@ -21,7 +18,7 @@ export class UpdateActividadDto {
 
   @IsDateString()
   @IsOptional()
-  fecha?: Date;
+  fecha?: string;
 
   @IsString()
   @IsOptional()
@@ -29,13 +26,6 @@ export class UpdateActividadDto {
 
   @IsBoolean()
   @IsOptional()
-  es_repetitiva?: boolean;
+  esRepetitiva?: boolean;
 
-  @IsString()
-  @IsOptional()
-  estado?: string;
-
-  @IsNumber()
-  @IsOptional()
-  informe?: number;
 }

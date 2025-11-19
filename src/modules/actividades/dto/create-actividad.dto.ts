@@ -17,7 +17,7 @@ export class CreateActividadDto {
   descripcion: string;
 
   @IsDateString()
-  fecha: Date;
+  fecha: string;
 
   @IsString()
   @IsNotEmpty()
@@ -25,14 +25,8 @@ export class CreateActividadDto {
 
   @IsBoolean()
   @IsOptional()
-  es_repetitiva?: boolean;
-
-  @IsString()
-  @IsOptional()
-  estado?: string;
+  esRepetitiva?: boolean;
 
   // es el id_informe creo
-  @IsNumber()
-  @IsNotEmpty()
-  informe: number;
+
 }

@@ -17,9 +17,6 @@ export class Informe {
   @Column({ length: 20 })
   periodo: string;
 
-  @Column({ type: 'varchar', length: 255 })
-  url_pdf: string;
-
   @Column({ type: 'date', nullable: true })
   fechaEnvio: Date;
 
