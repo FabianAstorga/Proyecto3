@@ -1,7 +1,7 @@
 import {
   Injectable,
   ConflictException,
-  NotFoundException,
+  BadRequestException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -19,12 +19,19 @@ export class AuthService {
   ) {}
 
   async register(registerDto: RegisterDto) {
+    // Validación: correo ya existe
     const existingUser = await this.usuariosService.findOneByEmail(
       registerDto.correo,
     );
-    if (existingUser) throw new ConflictException('Correo ya registrado.');
+    if (existingUser) {
+      throw new ConflictException('❌ Este correo ya está registrado.');
+    }
 
-    // El rol viene directamente del DTO
+    // Validaciones adicionales opcionales
+    if (registerDto.contrasena.length < 8) {
+      throw new BadRequestException('❌ La contraseña debe tener al menos 8 caracteres.');
+    }
+
     const rol = registerDto.rol || 'funcionario';
 
     const createUsuarioDto: CreateUsuarioDto = {
@@ -36,8 +43,10 @@ export class AuthService {
       rol: rol,
     };
 
+    // Crear usuario
     const usuario = await this.usuariosService.create(createUsuarioDto);
 
+    // Generar token
     const payload = {
       sub: usuario.id,
       correo: usuario.correo,
@@ -47,7 +56,11 @@ export class AuthService {
     const token = this.jwtService.sign(payload);
     const { contrasena, ...usuarioSinContrasena } = usuario;
 
-    return { user: usuarioSinContrasena, access_token: token };
+    return {
+      message: '✔ Usuario registrado exitosamente.',
+      user: usuarioSinContrasena,
+      access_token: token,
+    };
   }
 
   async login(loginDto: LoginDto) {
@@ -55,20 +68,25 @@ export class AuthService {
       loginDto.correo,
     );
 
-    if (!user) throw new UnauthorizedException('Credenciales inválidas.');
+    if (!user) throw new UnauthorizedException('❌ Correo o contraseña incorrectos.');
 
     const match = await bcrypt.compare(loginDto.contrasena, user.contrasena);
-    if (!match) throw new UnauthorizedException('Credenciales inválidas.');
+    if (!match) throw new UnauthorizedException('❌ Correo o contraseña incorrectos.');
 
     const payload = {
       sub: user.id,
       correo: user.correo,
-      rol: user.rol, // 👈 aquí usamos el rol del usuario
+      rol: user.rol,
     };
 
     const token = this.jwtService.sign(payload);
 
     const { contrasena, ...usuarioSinContrasena } = user;
-    return { user: usuarioSinContrasena, access_token: token };
+
+    return {
+      message: '✔ Inicio de sesión exitoso.',
+      user: usuarioSinContrasena,
+      access_token: token,
+    };
   }
 }

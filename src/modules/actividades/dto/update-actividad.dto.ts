@@ -26,6 +26,10 @@ export class UpdateActividadDto {
 
   @IsBoolean()
   @IsOptional()
+  estado?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
   esRepetitiva?: boolean;
 
 }

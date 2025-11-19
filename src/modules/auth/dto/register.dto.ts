@@ -25,8 +25,9 @@ export class RegisterDto {
   telefono!: string;
 
   @IsOptional()
-  estado?: boolean;
-
+  @IsNotEmpty()
+  foto_url?: string;
+  
   @IsOptional()
   @IsIn(['funcionario', 'secretaria', 'administrador'])
   rol?: string;

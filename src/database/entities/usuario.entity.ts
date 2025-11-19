@@ -34,7 +34,7 @@ export class Usuario {
   @Column({ type: 'varchar', length: 100 })
   correo: string;
 
-  @Column({ type: 'varchar', length: 8, select: false })
+  @Column({ type: 'varchar', length: 255, select: false })
   contrasena: string;
 
   @Column({ type: 'boolean', default: true })

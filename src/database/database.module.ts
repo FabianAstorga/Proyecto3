@@ -20,8 +20,10 @@ import { join } from 'path';
           username: db.username,
           password: db.password,
           database: db.name,
-          entities: [join(__dirname, '..', '**/*.entity.{ts,js}')],
-          synchronize: false,
+          entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+          autoLoadEntities: true, 
+          synchronize: true,
+          logging: true,
         };
       },
     }),

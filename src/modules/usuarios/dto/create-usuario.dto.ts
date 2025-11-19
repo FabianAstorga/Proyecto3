@@ -14,7 +14,7 @@ import {
 export class CreateUsuarioDto {
   @IsString()
   @IsNotEmpty()
-  nombre: string;
+  nombre!: string;
 
   @IsString()
   @IsNotEmpty()

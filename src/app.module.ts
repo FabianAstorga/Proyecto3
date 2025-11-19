@@ -15,8 +15,7 @@ import { CargosModule } from './modules/cargos/cargos.module';
     AuthModule,
     ActividadesModule,
     EmpleadoCargosModule,
-    CargosModule,
-    EmpleadoCargosModule,
+    CargosModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -16,7 +16,10 @@ export class UpdateUsuarioDto {
   @IsString()
   apellido?: string;
 
-  correo: string;
+  @IsOptional()
+  @IsString()
+  correo?: string;
+
   @IsOptional()
   @MinLength(8)
   contrasena?: string;

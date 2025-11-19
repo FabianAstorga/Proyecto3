@@ -3,7 +3,7 @@ import {
   Injectable,
   ConflictException,
   NotFoundException,
-  BadRequestException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -19,18 +19,21 @@ export class UsuariosService {
     private readonly usuarioRepository: Repository<Usuario>,
   ) {}
 
+  /**
+   * Crear usuario — Solo administrador (según tu controlador)
+   */
   async create(createUsuarioDto: CreateUsuarioDto) {
-    // Verificar duplicado de correo
     const existente = await this.usuarioRepository.findOne({
       where: { correo: createUsuarioDto.correo },
     });
+
     if (existente) {
       throw new ConflictException(
         `El correo ${createUsuarioDto.correo} ya está registrado.`,
       );
     }
 
-    // Encriptar contraseña si se envía
+    // Encriptar contraseña
     if (createUsuarioDto.contrasena) {
       const salt = await bcrypt.genSalt(10);
       createUsuarioDto.contrasena = await bcrypt.hash(
@@ -39,32 +42,61 @@ export class UsuariosService {
       );
     }
 
-    // instancia del usuario
     const nuevoUsuario = this.usuarioRepository.create(createUsuarioDto);
-    // Guardar
     return this.usuarioRepository.save(nuevoUsuario);
   }
 
+  /**
+   * Obtener todos los usuarios — Solo administrador
+   */
   findAll() {
     return this.usuarioRepository.find();
   }
 
+  /**
+   * Obtener un usuario por ID
+   */
   async findOne(id: number) {
     const usuario = await this.usuarioRepository.findOne({ where: { id } });
+
     if (!usuario) {
       throw new NotFoundException(`Usuario con ID ${id} no encontrado.`);
     }
+
     return usuario;
   }
 
-  // Actualizar o Encripta aaun usuario existente.
-  async update(id: number, updateUsuarioDto: UpdateUsuarioDto) {
+  /**
+   * Actualizar MIS datos (ruta PATCH /me)
+   */
+  async updateMyProfile(id: number, dto: UpdateUsuarioDto) {
     const usuario = await this.usuarioRepository.findOne({ where: { id } });
+
     if (!usuario) {
       throw new NotFoundException(`Usuario con ID ${id} no encontrado.`);
     }
 
     // Encriptar contraseña si se envía
+    if (dto.contrasena) {
+      const salt = await bcrypt.genSalt(10);
+      dto.contrasena = await bcrypt.hash(dto.contrasena, salt);
+    }
+
+    await this.usuarioRepository.update(id, dto);
+    return this.usuarioRepository.findOne({ where: { id } });
+  }
+
+  /**
+   * Actualizar cualquier usuario (Solo admin)
+   */
+  async update(id: number, updateUsuarioDto: UpdateUsuarioDto) {
+    const usuario = await this.usuarioRepository.findOne({ where: { id } });
+
+    if (!usuario) {
+      throw new NotFoundException(`Usuario con ID ${id} no encontrado.`);
+    }
+
+    // Encriptar contraseña si llega
     if (updateUsuarioDto.contrasena) {
       const salt = await bcrypt.genSalt(10);
       updateUsuarioDto.contrasena = await bcrypt.hash(
@@ -73,54 +105,63 @@ export class UsuariosService {
       );
     }
 
-    // Actualizar registro
     await this.usuarioRepository.update(id, updateUsuarioDto);
     return this.usuarioRepository.findOne({ where: { id } });
   }
 
   /**
-   * Eliminar un usuario por ID.
-   * - Verifica existencia antes de eliminar.
+   * Eliminar usuario — Solo administrador
    */
   async remove(id: number) {
     const usuario = await this.usuarioRepository.findOne({ where: { id } });
+
     if (!usuario) {
       throw new NotFoundException(`Usuario con ID ${id} no encontrado.`);
     }
 
     await this.usuarioRepository.delete(id);
+
     return { message: `Usuario con ID ${id} eliminado correctamente.` };
   }
 
   /**
-   * Actualizar solo la foto del usuario (por URL).
-   * Se podría usar cuando subes una imagen y obtienes la URL.
+   * Actualizar solo foto del usuario
    */
   async updateFoto(id: number, fotoUrl: string) {
     const usuario = await this.usuarioRepository.findOne({ where: { id } });
+
     if (!usuario) {
       throw new NotFoundException(`Usuario con ID ${id} no encontrado.`);
     }
 
     usuario.foto_url = fotoUrl;
     await this.usuarioRepository.save(usuario);
+
     return usuario;
   }
+
   /**
-   * Buscar usuario por correo electrónico.
-   * Se usa para validaciones y autenticación.
+   * Buscar usuario por correo (para registro, validaciones, etc.)
    */
   findOneByEmail(correo: string) {
     return this.usuarioRepository.findOne({ where: { correo } });
   }
 
   /**
-   * Buscar usuario por correo e incluir contraseña (para login).
+   * Buscar usuario por correo + incluir contraseña (para login)
    */
   findOneByEmailWithPassword(correo: string) {
     return this.usuarioRepository.findOne({
       where: { correo },
-      select: ['id', 'correo', 'contrasena', 'estado', 'nombre', 'apellido'],
+      select: [
+        'id',
+        'correo',
+        'contrasena',
+        'estado',
+        'nombre',
+        'apellido',
+        'rol',
+      ],
     });
   }
 }

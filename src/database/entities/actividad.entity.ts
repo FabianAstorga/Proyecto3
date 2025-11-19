@@ -26,10 +26,11 @@ export class Actividad {
   @Column({ type: 'varchar', length: 100 })
   tipo: string;
 
-  @Column({ type: 'varchar', length: 50, default: 'Pendiente' })
-  estado: string;
+  // Para el checklist
+  @Column({ type: 'boolean', default: false })
+  estado: boolean;
 
-  @Column({ type: 'boolean', default: true })
+  @Column({ type: 'boolean', default: false})
   esRepetitiva: boolean;
   // Relación: Actividad "pertenece a" Formulario
   @ManyToOne(() => Informe, (informe) => informe.actividades, {
