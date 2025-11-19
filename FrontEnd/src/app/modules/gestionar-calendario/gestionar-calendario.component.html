@@ -1,0 +1,114 @@
+<app-layout [title]="'Gestión de calendario'" [logoutLink]="'/login'">
+  <section class="page-container">
+    <!-- Card única -->
+    <div class="card-base overflow-hidden">
+      <!-- Franja superior: título + botón -->
+      <div
+        class="px-6 py-4 border-b border-gray-200 flex flex-wrap items-center justify-between gap-4"
+      >
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-900">
+          Gestión horario
+        </h1>
+
+        <button
+          type="button"
+          (click)="guardarSemana()"
+          class="inline-flex items-center gap-2 rounded-md border border-gray-800 bg-white text-gray-900 font-semibold px-4 py-2 text-sm md:text-base hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300"
+        >
+          Guardar cambios
+        </button>
+      </div>
+
+      <!-- Horario: panel sin scroll interno -->
+      <div class="overflow-x-auto">
+        <div
+          class="grid w-full"
+          [ngStyle]="{ 'grid-template-columns': '180px repeat(5, 1fr)' }"
+        >
+          <!-- Encabezados -->
+          <div
+            class="bg-gray-50 border border-gray-200 px-3 py-2 text-center font-semibold text-gray-900"
+          >
+            Bloque
+          </div>
+          <div
+            *ngFor="let d of days"
+            class="bg-gray-50 border border-gray-200 px-3 py-2 text-center font-semibold text-gray-900"
+          >
+            {{ d.label }}
+          </div>
+
+          <!-- Filas -->
+          <ng-container *ngFor="let b of blocks; let bi = index">
+            <!-- Fila normal (no almuerzo) -->
+            <ng-container *ngIf="!b.isLunch; else almuerzoRow">
+              <!-- Columna izquierda -->
+              <div
+                class="border border-gray-200 px-3 py-2 text-center bg-white text-gray-800"
+              >
+                <div>{{ b.label }}</div>
+                <div class="text-[12px] text-gray-500">
+                  {{ b.code }}
+                </div>
+              </div>
+
+              <!-- Celdas editables -->
+              <div
+                *ngFor="let d of days"
+                class="border border-gray-200 bg-white hover:bg-gray-50 transition cursor-text"
+                (click)="startInlineEdit(d.key, bi)"
+              >
+                <div
+                  class="h-20 flex items-center justify-center text-center px-2"
+                >
+                  <!-- Edición inline -->
+                  <ng-container
+                    *ngIf="
+                      editingInline &&
+                      editingInline.day === d.key &&
+                      editingInline.bi === bi;
+                      else displayMode
+                    "
+                  >
+                    <input
+                      type="text"
+                      [(ngModel)]="editingInline.value"
+                      (keydown)="onInlineKeydown($event)"
+                      (blur)="commitInlineEdit()"
+                      placeholder="Escribe el título y Enter…"
+                      class="w-[95%] rounded-md border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-gray-400"
+                      autofocus
+                    />
+                  </ng-container>
+
+                  <!-- Modo visual -->
+                  <ng-template #displayMode>
+                    <ng-container
+                      *ngIf="schedule[d.key][bi] as c; else empty"
+                    >
+                      <div class="text-sm font-semibold text-gray-900 leading-tight">
+                        {{ c.title }}
+                      </div>
+                    </ng-container>
+                    <ng-template #empty>
+                      <div class="text-[11px] text-gray-400">—</div>
+                    </ng-template>
+                  </ng-template>
+                </div>
+              </div>
+            </ng-container>
+
+            <!-- Fila almuerzo (una sola celda que ocupa todo) -->
+            <ng-template #almuerzoRow>
+              <div
+                class="border border-gray-200 bg-gray-100 text-gray-800 font-semibold flex items-center justify-center text-sm col-span-6 h-12"
+              >
+                Almuerzo
+              </div>
+            </ng-template>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </section>
+</app-layout>

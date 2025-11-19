@@ -1,0 +1,19 @@
+.nav-arrow {
+  @apply absolute top-1/2 -translate-y-1/2 flex items-center justify-center
+         h-12 w-12 rounded-full bg-white shadow border border-gray-200
+         text-gray-700 text-xl cursor-pointer transition
+         hover:bg-blue-600 hover:text-white hover:border-blue-600;
+}
+
+.nav-arrow-left {
+  @apply -left-10 md:-left-12;
+}
+
+.nav-arrow-right {
+  @apply -right-10 md:-right-12;
+}
+
+.nav-arrow-disabled {
+  @apply opacity-40 cursor-default
+         hover:bg-white hover:text-gray-700 hover:border-gray-200;
+}
