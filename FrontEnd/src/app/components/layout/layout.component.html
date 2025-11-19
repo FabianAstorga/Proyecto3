@@ -2,24 +2,17 @@
   class="fixed inset-y-0 left-0 z-30 flex flex-col shadow transition-[width,background-color] duration-300 ease-in-out"
   (mouseenter)="onEnterSidebar()"
   (mouseleave)="onLeaveSidebar()"
-  [ngClass]="isCollapsed ? 'w-14 bg-yellow-400' : 'w-72 bg-white'"
+  [ngClass]="isCollapsed ? 'w-24 bg-yellow-400' : 'w-72 bg-yellow-400'"
 >
   <ng-container *ngIf="!isCollapsed; else collapsedRail">
-    <div
-      class="bg-yellow-400 text-black px-5 py-3 flex items-center gap-3 transition-all duration-300"
-      [ngClass]="
-        showMenu ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-1'
-      "
+    <!-- Navbar amarillo sólido, items centrados y más espaciados -->
+    <nav
+      class="flex-1 flex flex-col items-stretch justify-center p-4 text-base space-y-5"
     >
-      <img src="/logouta.png" alt="Logo" class="h-12 w-auto" />
-      <div class="text-sm font-semibold tracking-wide">Registro UTA</div>
-    </div>
-
-    <nav class="p-4 pt-6 text-base space-y-3 flex-1">
       <a
         *ngFor="let item of navItems; let i = index"
         [routerLink]="item.link"
-        class="block px-4 py-2.5 rounded-md border border-gray-300 font-semibold text-black hover:bg-gray-100 transition-all duration-300"
+        class="block px-4 py-2.5 rounded-md border border-gray-300 font-semibold text-black bg-white hover:bg-gray-100 transition-all duration-300 text-center"
         [ngStyle]="{ 'transition-delay.ms': showMenu ? 40 * (i + 1) : 0 }"
         [ngClass]="
           showMenu ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-2'
@@ -27,7 +20,8 @@
       >
         {{ item.label }}
       </a>
-      <div class="pt-3 mt-3 border-t border-gray-200"></div>
+
+      <div class="pt-3 mt-3 border-t border-yellow-400"></div>
     </nav>
 
     <div
@@ -48,14 +42,12 @@
 
   <ng-template #collapsedRail>
     <div class="flex-1 flex flex-col items-center justify-center relative">
-      <img src="/logouta.png" alt="Logo" class="h-15 w-auto mb-6" />
+      <img src="/logouta.png" alt="Logo" class="h-18 w-auto mb-6" />
 
       <div
         class="flex flex-col items-center justify-center space-y-1 absolute top-1/2 -translate-y-1/2 right-1"
       >
-        <div class="w-[3px] h-4 bg-white rounded-full"></div>
-        <div class="w-[3px] h-4 bg-white rounded-full"></div>
-        <div class="w-[3px] h-4 bg-white rounded-full"></div>
+
       </div>
     </div>
   </ng-template>
@@ -63,7 +55,7 @@
 
 <main
   class="min-h-screen transition-[margin] duration-300 ease-in-out main-bg"
-  [ngClass]="isCollapsed ? 'ml-14' : 'ml-72'"
+  [ngClass]="isCollapsed ? 'ml-24' : 'ml-72'"
 >
   <section class="max-w-7xl mx-auto px-6 py-6">
     <ng-content></ng-content>
