@@ -363,48 +363,256 @@ export class ActivitiesHistoryComponent implements OnInit {
   // ================== PDF POR MES ==================
 
   downloadMonthPdf(month: MonthGroup): void {
-    const doc = new jsPDF();
-    let y = 20;
-    const marginX = 14;
+  const doc = new jsPDF();
 
-    // Cabecera
-    doc.setFontSize(14);
-    const title = `Historial de actividades - ${month.monthLabel}`;
-    doc.text(title, marginX, y);
-    y += 8;
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
 
-    doc.setFontSize(11);
-    const secName =
-      this.secretaryName || 'Secretaría (sin identificar)';
-    doc.text(`Secretaria: ${secName}`, marginX, y);
-    y += 10;
+  const marginX = 14;
+  let y = 20;
 
-    // Contenido: por usuario
-    month.users.forEach((ug) => {
-      if (y > 270) {
-        doc.addPage();
-        y = 20;
-      }
+  // Helper para fecha corta tipo 17-oct
+  const formatShort = (iso: string): string => {
+    const [yearStr, monthStr, dayStr] = iso.split('-');
+    const d = Number(dayStr);
+    const m = Number(monthStr);
+    const meses = [
+      'ene', 'feb', 'mar', 'abr', 'may', 'jun',
+      'jul', 'ago', 'sept', 'oct', 'nov', 'dic',
+    ];
+    return `${String(d).padStart(2, '0')}-${meses[m - 1] ?? ''}`;
+  };
 
-      doc.setFontSize(12);
-      doc.text(ug.userName, marginX, y);
-      y += 6;
+  // ========================
+  // TÍTULO PRINCIPAL
+  // ========================
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(18);
+  doc.setTextColor(0, 0, 0);
+  doc.text('Resumen de actividades', pageWidth / 2, y, { align: 'center' });
+  y += 8;
 
-      doc.setFontSize(10);
-      ug.activities.forEach((a) => {
-        if (y > 280) {
-          doc.addPage();
-          y = 20;
-        }
-        const line = `- ${this.formatDMY(a.fecha)} · ${a.titulo} · ${a.horas} h (${a.estado})`;
-        doc.text(line, marginX, y);
-        y += 5;
-      });
+  // Subtítulo: mes + secretaria
+  const secName = this.secretaryName || 'Secretaría (sin identificar)';
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(11);
+  doc.setTextColor(90, 90, 90);
+  doc.text(
+    `${month.monthLabel.toLowerCase()} — Informe creado por ${secName}`,
+    pageWidth / 2,
+    y,
+    { align: 'center' }
+  );
+  y += 10;
 
-      y += 4;
+  // Línea suave debajo del subtítulo
+  doc.setDrawColor(220, 220, 220);
+  doc.setLineWidth(0.5);
+  doc.line(marginX, y, pageWidth - marginX, y);
+  y += 8;
+
+  // ========================
+  // CONFIG TABLA
+  // ========================
+  const tableMarginX = marginX;
+  const tableWidth = pageWidth - tableMarginX * 2;
+  const headerHeight = 8;
+  const lineHeight = 6;
+
+  const dateColWidth = 26;
+  const statusColWidth = 32;
+  const activityColWidth = tableWidth - dateColWidth - statusColWidth;
+
+  const bottomMargin = 20;
+
+  // ========================
+  // POR CADA USUARIO
+  // ========================
+  month.users.forEach((ug) => {
+    if (y > pageHeight - bottomMargin - 40) {
+      doc.addPage();
+      y = 20;
+    }
+
+    // Nombre del usuario
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(13);
+    doc.setTextColor(0, 0, 0);
+    doc.text(ug.userName, tableMarginX, y);
+    y += 6;
+
+    // ---- calcular altos de filas ----
+    let bodyHeight = 0;
+    const rowHeights: number[] = [];
+
+    ug.activities.forEach((a) => {
+      const lineaBase = `${a.titulo} — ${a.detalle || ''}`.trim();
+      const wrapped = doc.splitTextToSize(
+        lineaBase,
+        activityColWidth - 4
+      );
+      const rowHeight = Math.max(lineHeight, wrapped.length * lineHeight);
+      rowHeights.push(rowHeight);
+      bodyHeight += rowHeight;
     });
 
-    const cleanKey = month.monthKey.replace('-', '');
-    doc.save(`reporte_actividades_${cleanKey}.pdf`);
-  }
+    const tableHeight = headerHeight + bodyHeight + 6;
+
+    if (y + tableHeight > pageHeight - bottomMargin) {
+      doc.addPage();
+      y = 20;
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(13);
+      doc.setTextColor(0, 0, 0);
+      doc.text(ug.userName, tableMarginX, y);
+      y += 6;
+    }
+
+    const tableY = y;
+
+    // Contenedor redondeado (solo borde)
+    doc.setDrawColor(210, 210, 210);
+    doc.setLineWidth(0.6);
+    doc.setFillColor(255, 255, 255);
+    doc.roundedRect(tableMarginX, tableY, tableWidth, tableHeight, 4, 4, 'S');
+
+    // --- “zona segura” interna para no tocar las esquinas ---
+    const innerX = tableMarginX + 1;
+    const innerWidth = tableWidth - 2;
+    const innerTop = tableY + 0.8;
+    const innerBottom = tableY + tableHeight - 0.8;
+
+    // Header de la tabla (rectángulo un poco más pequeño)
+    doc.setFillColor(245, 245, 245);
+    doc.rect(innerX, innerTop, innerWidth, headerHeight - 0.3, 'F');
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(0, 0, 0);
+
+    const headerBaseline = innerTop + headerHeight - 2;
+    doc.text('Fecha', innerX + 4, headerBaseline);
+    doc.text(
+      'Actividad',
+      innerX + dateColWidth + 4,
+      headerBaseline
+    );
+    doc.text(
+      'Estado',
+      innerX + dateColWidth + activityColWidth + 4,
+      headerBaseline
+    );
+
+    // Líneas verticales (un poco más cortas para no pisar las esquinas)
+    doc.setDrawColor(230, 230, 230);
+    const v1 = innerX + dateColWidth;
+    const v2 = innerX + dateColWidth + activityColWidth;
+    doc.line(v1, innerTop, v1, innerBottom);
+    doc.line(v2, innerTop, v2, innerBottom);
+
+    // ---- CUERPO DE LA TABLA ----
+    let currentY = innerTop + headerHeight + 4;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(11);
+    doc.setTextColor(0, 0, 0);
+    doc.setDrawColor(235, 235, 235);
+
+    ug.activities.forEach((a, idx) => {
+      const rowHeight = rowHeights[idx];
+
+      // Fecha
+      const fechaTxt = formatShort(a.fecha);
+      doc.text(
+        fechaTxt,
+        innerX + 4,
+        currentY + lineHeight
+      );
+
+      // Actividad
+      const actividadTxt = `${a.titulo} — ${a.detalle || ''}`.trim();
+      const wrapped = doc.splitTextToSize(
+        actividadTxt,
+        activityColWidth - 4
+      );
+      doc.text(
+        wrapped,
+        innerX + dateColWidth + 4,
+        currentY + lineHeight
+      );
+
+      // Estado como pill
+      const estadoLabel = a.estado;
+      let pillFill: [number, number, number];
+      let pillText: [number, number, number];
+
+      switch (a.estado) {
+        case 'Aprobada':
+          pillFill = [222, 247, 236];
+          pillText = [22, 101, 52];
+          break;
+        case 'Pendiente':
+          pillFill = [255, 243, 205];
+          pillText = [133, 77, 14];
+          break;
+        case 'Rechazada':
+          pillFill = [254, 226, 226];
+          pillText = [153, 27, 27];
+          break;
+        default:
+          pillFill = [229, 231, 235];
+          pillText = [55, 65, 81];
+          break;
+      }
+
+      const estadoX = innerX + dateColWidth + activityColWidth;
+      const pillPaddingX = 3;
+      const pillHeight = lineHeight + 2;
+      const textWidth = doc.getTextWidth(estadoLabel);
+      const pillWidth = textWidth + pillPaddingX * 2;
+
+      const pillX =
+        estadoX + (statusColWidth - pillWidth) / 2;
+      const pillY =
+        currentY + (rowHeight - pillHeight) / 2;
+
+      doc.setFillColor(...pillFill);
+      doc.roundedRect(
+        pillX,
+        pillY,
+        pillWidth,
+        pillHeight,
+        3,
+        3,
+        'F'
+      );
+
+      doc.setTextColor(...pillText);
+      doc.setFont('helvetica', 'bold');
+      doc.text(
+        estadoLabel,
+        pillX + pillPaddingX,
+        pillY + pillHeight - 2
+      );
+
+      // reset
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(0, 0, 0);
+
+      // Línea horizontal de la fila (también dentro de la zona segura)
+      const rowBottom = currentY + rowHeight;
+      doc.setDrawColor(235, 235, 235);
+      doc.line(innerX, rowBottom, innerX + innerWidth, rowBottom);
+
+      currentY += rowHeight;
+    });
+
+    y = tableY + tableHeight + 10;
+  });
+
+  const cleanKey = month.monthKey.replace('-', '');
+  doc.save(`reporte_actividades_${cleanKey}.pdf`);
+}
+
+
 }

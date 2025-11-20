@@ -7,6 +7,7 @@ import { User } from '../../models/user.model';
 import { Activity } from '../../models/activity.model';
 import { Cargo } from '../../models/charge.model';
 import { DataService } from '../../services/data.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   standalone: true,
@@ -21,18 +22,32 @@ export class ProfileHomeComponent implements OnInit {
   activitiesCount = 0;
   cargoDescripcion: string[] = [];
 
-  // Por ahora estático; luego lo puedes alimentar desde backend
-  notificationLabel = 'Urgente';
-  lastSession = '2025-10-16 14:22';
+  // Dinámicos
+  notificationLabel = '';
+  lastSession = '';
 
   showDetails = false;
 
   constructor(
     private route: ActivatedRoute,
-    private dataService: DataService
+    private dataService: DataService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
+    // 1) Calcula la próxima fecha de entrega
+    this.notificationLabel = this.computeNextDeliveryLabel();
+
+    // 2) Última sesión real registrada en este navegador
+    const lastIso = this.authService.getLastSessionISO();
+    if (lastIso) {
+      const d = new Date(lastIso);
+      this.lastSession = this.formatDateTime(d); // dd/mm/aaaa HH:MM
+    } else {
+      this.lastSession = 'Sin registro de sesión';
+    }
+
+    // 3) Carga de usuario + datos
     const idParam = this.route.snapshot.paramMap.get('id');
     const id = idParam ? Number(idParam) : NaN;
 
@@ -56,6 +71,61 @@ export class ProfileHomeComponent implements OnInit {
         console.error('Error cargando usuario por id:', err);
       },
     });
+  }
+
+  /** Calcula la próxima fecha de entrega (5 días antes del fin de mes) */
+  private computeNextDeliveryLabel(): string {
+    const today = new Date();
+    const nextDue = this.getNextDueDate(today);
+    const formatted = this.formatDate(nextDue);
+    return `La entrega es el ${formatted}`;
+  }
+
+  /**
+   * Devuelve la próxima fecha de entrega:
+   * - Fijada a 5 días antes del último día del mes.
+   * - Si la fecha actual ya pasó la entrega de este mes, usa el mes siguiente.
+   */
+  private getNextDueDate(from: Date): Date {
+    let year = from.getFullYear();
+    let month = from.getMonth(); // 0 = enero
+
+    // Último día del mes actual
+    let lastDayOfMonth = new Date(year, month + 1, 0);
+    let due = new Date(lastDayOfMonth);
+    due.setDate(lastDayOfMonth.getDate() - 5);
+
+    // Si ya pasó la fecha de entrega de este mes, se usa el próximo mes
+    if (from > due) {
+      month += 1;
+      if (month > 11) {
+        month = 0;
+        year += 1;
+      }
+      lastDayOfMonth = new Date(year, month + 1, 0);
+      due = new Date(lastDayOfMonth);
+      due.setDate(lastDayOfMonth.getDate() - 5);
+    }
+
+    return due;
+  }
+
+  /** Formatea Date a dd/mm/aaaa */
+  private formatDate(d: Date): string {
+    const y = d.getFullYear();
+    const m = d.getMonth() + 1;
+    const day = d.getDate();
+    const dd = String(day).padStart(2, '0');
+    const mm = String(m).padStart(2, '0');
+    return `${dd}/${mm}/${y}`;
+  }
+
+  /** Formatea Date a dd/mm/aaaa HH:MM */
+  private formatDateTime(d: Date): string {
+    const datePart = this.formatDate(d);
+    const hh = String(d.getHours()).padStart(2, '0');
+    const mi = String(d.getMinutes()).padStart(2, '0');
+    return `${datePart} ${hh}:${mi}`;
   }
 
   private loadActivities(): void {
@@ -90,7 +160,7 @@ export class ProfileHomeComponent implements OnInit {
     });
   }
 
-  // Utilidad para mostrar fecha en dd/mm/aaaa
+  // Utilidad para mostrar fecha en dd/mm/aaaa (para las actividades)
   formatDMY(iso: string): string {
     if (!iso) return '';
     const [y, m, d] = iso.split('-').map(Number);

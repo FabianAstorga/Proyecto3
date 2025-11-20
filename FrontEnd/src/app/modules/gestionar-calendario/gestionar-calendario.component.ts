@@ -3,9 +3,20 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LayoutComponent } from '../../components/layout/layout.component';
 
-type Block = { label: string; code: string; isLunch?: boolean };
 type DayKey = 'lun' | 'mar' | 'mie' | 'jue' | 'vie';
-type Cell = { title: string; room?: string; note?: string } | null;
+
+interface Block {
+  label: string;
+  code: string;
+}
+
+interface ScheduleEvent {
+  title: string;
+  blockIndex: number; // índice al arreglo blocks[]
+  note?: string;
+}
+
+/* ==== Helpers para semana ISO ==== */
 
 function pad(n: number) {
   return n.toString().padStart(2, '0');
@@ -39,19 +50,18 @@ export class GestionarCalendarioComponent {
   // Semana actual (ISO week)
   current = weekKey(new Date());
 
-  // Bloques
+  // Bloques disponibles para los eventos
   blocks: Block[] = [
     { label: '08:00 - 09:30', code: '(1 - 2)' },
     { label: '09:40 - 11:10', code: '(3 - 4)' },
     { label: '11:20 - 12:50', code: '(5 - 6)' },
-    { label: '13:00 - 14:30', code: '(7 - 8)', isLunch: true },
+    { label: '13:00 - 14:30', code: '(7 - 8)' },
     { label: '14:45 - 16:15', code: '(9 - 10)' },
     { label: '16:20 - 17:50', code: '(11 - 12)' },
     { label: '17:55 - 19:25', code: '(13 - 14)' },
     { label: '19:30 - 21:00', code: '(15 - 16)' },
   ];
 
-  // Días (sin sábado)
   days: { key: DayKey; label: string }[] = [
     { key: 'lun', label: 'Lunes' },
     { key: 'mar', label: 'Martes' },
@@ -60,19 +70,40 @@ export class GestionarCalendarioComponent {
     { key: 'vie', label: 'Viernes' },
   ];
 
-  // Horario editable en memoria
-  schedule: Record<DayKey, Cell[]> = {
-    lun: Array(this.blocks.length).fill(null),
-    mar: Array(this.blocks.length).fill(null),
-    mie: Array(this.blocks.length).fill(null),
-    jue: Array(this.blocks.length).fill(null),
-    vie: Array(this.blocks.length).fill(null),
+  // Eventos transversales por día
+  eventsByDay: Record<DayKey, ScheduleEvent[]> = {
+    lun: [],
+    mar: [],
+    mie: [],
+    jue: [],
+    vie: [],
   };
 
-  // Edición inline
-  editingInline: { day: DayKey; bi: number; value: string } | null = null;
+  // Estado del modal
+  modal: {
+    open: boolean;
+    dayKey: DayKey | null;
+    dayLabel: string;
+    model: {
+      title: string;
+      blockIndex: number | null;
+      note: string;
+    };
+    availableBlocks: number[];
+  } = {
+    open: false,
+    dayKey: null,
+    dayLabel: '',
+    model: {
+      title: '',
+      blockIndex: null,
+      note: '',
+    },
+    availableBlocks: [],
+  };
 
-  // Label “Del dd/mm al dd/mm”
+  /* ===== Etiquetas semana ===== */
+
   weekLabel(): string {
     const monday = mondayOfISOWeek(this.current);
     const sunday = new Date(monday);
@@ -82,48 +113,81 @@ export class GestionarCalendarioComponent {
     return `Del ${f(monday)} al ${f(sunday)}`;
   }
 
-  // Muestra "año 2025 - semana 44"
   weekIsoLabel(): string {
     const [anio, w] = this.current.split('-W');
     const semana = Number(w);
     return `año ${anio} - semana ${semana}`;
   }
 
-  // Inline edit
-  startInlineEdit(day: DayKey, bi: number) {
-    if (this.blocks[bi].isLunch) return;
-    const current = this.schedule[day][bi];
-    this.editingInline = { day, bi, value: current?.title ?? '' };
+  /* ===== Bloques libres por día ===== */
+
+  private getFreeBlocks(dayKey: DayKey): number[] {
+    const used = new Set(
+      this.eventsByDay[dayKey].map(ev => ev.blockIndex)
+    );
+    return this.blocks
+      .map((_, i) => i)
+      .filter(i => !used.has(i));
   }
 
-  commitInlineEdit() {
-    if (!this.editingInline) return;
-    const { day, bi, value } = this.editingInline;
-    const title = (value || '').trim();
-    this.schedule[day][bi] = title ? { title } : null;
-    this.editingInline = null;
+  hasFreeBlocks(dayKey: DayKey): boolean {
+    return this.getFreeBlocks(dayKey).length > 0;
   }
 
-  cancelInlineEdit() {
-    this.editingInline = null;
-  }
+  /* ===== Modal ===== */
 
-  onInlineKeydown(e: KeyboardEvent) {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      this.commitInlineEdit();
-    } else if (e.key === 'Escape') {
-      e.preventDefault();
-      this.cancelInlineEdit();
+  openModal(dayKey: DayKey) {
+    const free = this.getFreeBlocks(dayKey);
+    if (!free.length) {
+      alert('Todos los bloques de este día ya tienen un evento.');
+      return;
     }
+
+    const day = this.days.find(d => d.key === dayKey);
+    this.modal.open = true;
+    this.modal.dayKey = dayKey;
+    this.modal.dayLabel = day ? day.label : '';
+    this.modal.availableBlocks = free;
+    this.modal.model = {
+      title: '',
+      blockIndex: null,
+      note: '',
+    };
   }
+
+  closeModal() {
+    this.modal.open = false;
+    this.modal.dayKey = null;
+    this.modal.availableBlocks = [];
+  }
+
+  saveFromModal() {
+    const { dayKey, model } = this.modal;
+    if (!dayKey) return;
+
+    const title = model.title.trim();
+    if (!title || model.blockIndex === null) {
+      return; // podrías agregar validación visual si quieres
+    }
+
+    const ev: ScheduleEvent = {
+      title,
+      blockIndex: model.blockIndex,
+      note: model.note.trim() || undefined,
+    };
+
+    this.eventsByDay[dayKey].push(ev);
+    this.closeModal();
+  }
+
+  /* ===== Guardar semana (demo) ===== */
 
   guardarSemana() {
     const payload = {
       week: this.current,
-      schedule: this.schedule,
+      events: this.eventsByDay,
     };
-    console.log('Guardando horario de la semana:', payload);
-    alert('Horario de la semana guardado (demo).');
+    console.log('Guardando eventos transversales de la semana:', payload);
+    alert('Eventos de la semana guardados (demo).');
   }
 }

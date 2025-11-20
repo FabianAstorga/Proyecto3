@@ -1,19 +1,15 @@
 <app-layout [logoutLink]="'/login'">
   <section class="page-container">
     <!-- CARD ÚNICA -->
-    <div class="card-base overflow-hidden">
+    <div class="card-base overflow-hidden border-blue-400">
       <!-- Franja superior: título + ayuda -->
       <div
-        class="px-6 py-4 border-b border-gray-200 flex flex-wrap items-center justify-between gap-4"
-      >
-        <h1 class="text-2xl md:text-3xl font-bold text-gray-900">
-          Horario {{ userFirstName }}
-        </h1>
-
-        <span class="text-xs md:text-sm text-gray-500">
-          Haz clic en una celda para editar tu horario.
-        </span>
-      </div>
+  class="px-6 py-4 border-b border-[#0D1440] bg-[#EAF2FF] flex flex-wrap items-center justify-between gap-4"
+>
+  <h1 class="text-2xl md:text-3xl font-bold text-[#0D1440]">
+    Horario {{ userFirstName }}
+  </h1>
+</div>
 
       <!-- Horario: ocupa todo el espacio de la card -->
       <div class="overflow-x-auto">

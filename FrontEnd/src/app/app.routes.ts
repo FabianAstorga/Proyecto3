@@ -40,6 +40,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'actividades/historial',
+        loadComponent: () =>
+          import(
+            './modules/my-activities-history/my-activities-history.component'
+          ).then(m => m.MyActivitiesHistoryComponent),
+      },
+      {
         path: '',
         pathMatch: 'full',
         redirectTo: 'perfil',
@@ -76,6 +83,13 @@ export const routes: Routes = [
           import(
             './modules/gestionar-calendario/gestionar-calendario.component'
           ).then(m => m.GestionarCalendarioComponent),
+      },
+      {
+        path: 'horario',
+        loadComponent: () =>
+          import('./modules/schedule/schedule.component').then(
+            m => m.ScheduleComponent
+          ),
       },
       {
         path: '',

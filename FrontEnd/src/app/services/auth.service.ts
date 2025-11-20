@@ -13,16 +13,21 @@ interface DecodedToken {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly TOKEN_KEY = 'authToken';
+  private readonly LAST_SESSION_KEY = 'lastSession';
 
   constructor(private router: Router) {}
 
   // Guarda el token (cuando el backend te lo entrega)
   login(token: string): void {
     localStorage.setItem(this.TOKEN_KEY, token);
+    // registra fecha/hora de esta sesión
+    localStorage.setItem(this.LAST_SESSION_KEY, new Date().toISOString());
   }
 
   logout(): void {
     localStorage.removeItem(this.TOKEN_KEY);
+    // si quieres mantener la última sesión, NO borres LAST_SESSION_KEY
+    // localStorage.removeItem(this.LAST_SESSION_KEY);
     this.router.navigate(['/login']);
   }
 
@@ -63,6 +68,11 @@ export class AuthService {
   getUserEmail(): string | null {
     const decodedToken = this.getDecodedToken();
     return decodedToken ? decodedToken.email : null;
+  }
+
+  /** Última sesión guardada en este navegador (ISO string) */
+  getLastSessionISO(): string | null {
+    return localStorage.getItem(this.LAST_SESSION_KEY);
   }
 
   // -------- Ruta home según rol --------
