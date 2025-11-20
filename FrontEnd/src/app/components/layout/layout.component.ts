@@ -58,6 +58,10 @@ export class LayoutComponent implements OnInit {
             link: `/funcionario/${id}/actividades/nueva`,
           },
           {
+            label: 'Mi historial',
+            link: `/funcionario/${id}/actividades/historial`,
+          },
+          {
             label: 'Mi horario',
             link: `/funcionario/${id}/horario`,
           },
@@ -72,14 +76,18 @@ export class LayoutComponent implements OnInit {
             link: `/secretaria/${id}/perfil`,
           },
           {
-            label: 'Historial actividades',
+            label: 'Historial funcionarios',
             link: `/secretaria/${id}/actividades/historial`,
+          },
+          {
+            label: 'Mi horario',
+            link: `/secretaria/${id}/horario`,
           },
           {
             label: 'Gestionar calendario',
             link: `/secretaria/${id}/calendario`,
           },
-          // 👇 Se elimina "Gestionar funcionarios" aquí
+          
         ];
         break;
 
