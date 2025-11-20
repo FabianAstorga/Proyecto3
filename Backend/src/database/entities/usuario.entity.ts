@@ -43,7 +43,7 @@ export class Usuario {
   @Column({ type: 'varchar', length: 20 })
   telefono: string;
 
-  @Column({ nullable: true })
+  @Column({ default: null })
   foto_url: string;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })

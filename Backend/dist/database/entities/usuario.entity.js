@@ -67,7 +67,7 @@ __decorate([
     __metadata("design:type", String)
 ], Usuario.prototype, "telefono", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ nullable: true }),
+    (0, typeorm_1.Column)({ default: null }),
     __metadata("design:type", String)
 ], Usuario.prototype, "foto_url", void 0);
 __decorate([

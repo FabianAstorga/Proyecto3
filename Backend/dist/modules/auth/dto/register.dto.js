@@ -22,34 +22,36 @@ class RegisterDto {
 }
 exports.RegisterDto = RegisterDto;
 __decorate([
-    (0, class_validator_1.IsEmail)(),
+    (0, class_validator_1.IsEmail)({}, { message: 'El correo debe tener un formato válido.' }),
     __metadata("design:type", String)
 ], RegisterDto.prototype, "correo", void 0);
 __decorate([
-    (0, class_validator_1.IsNotEmpty)(),
-    (0, class_validator_1.MinLength)(8),
+    (0, class_validator_1.IsNotEmpty)({ message: 'La contraseña no puede estar vacía.' }),
+    (0, class_validator_1.MinLength)(8, { message: 'La contraseña debe tener al menos 8 caracteres.' }),
     __metadata("design:type", String)
 ], RegisterDto.prototype, "contrasena", void 0);
 __decorate([
-    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsNotEmpty)({ message: 'El nombre es obligatorio.' }),
     __metadata("design:type", String)
 ], RegisterDto.prototype, "nombre", void 0);
 __decorate([
-    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsNotEmpty)({ message: 'El apellido es obligatorio.' }),
     __metadata("design:type", String)
 ], RegisterDto.prototype, "apellido", void 0);
 __decorate([
-    (0, class_validator_1.IsPhoneNumber)(),
+    (0, class_validator_1.IsPhoneNumber)('CL', { message: 'Debe ingresar un número de teléfono válido de Chile.' }),
     __metadata("design:type", String)
 ], RegisterDto.prototype, "telefono", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsNotEmpty)({ message: 'La URL de la foto no puede estar vacía.' }),
     __metadata("design:type", String)
 ], RegisterDto.prototype, "foto_url", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsIn)(['funcionario', 'secretaria', 'administrador']),
+    (0, class_validator_1.IsIn)(['funcionario', 'secretaria', 'administrador'], {
+        message: 'El rol debe ser funcionario, secretaria o administrador.',
+    }),
     __metadata("design:type", String)
 ], RegisterDto.prototype, "rol", void 0);
 //# sourceMappingURL=register.dto.js.map

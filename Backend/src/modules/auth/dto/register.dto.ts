@@ -8,27 +8,30 @@ import {
 } from 'class-validator';
 
 export class RegisterDto {
-  @IsEmail()
+  
+  @IsEmail({}, { message: 'El correo debe tener un formato válido.' })
   correo!: string;
 
-  @IsNotEmpty()
-  @MinLength(8)
+  @IsNotEmpty({ message: 'La contraseña no puede estar vacía.' })
+  @MinLength(8, { message: 'La contraseña debe tener al menos 8 caracteres.' })
   contrasena!: string;
 
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'El nombre es obligatorio.' })
   nombre!: string;
 
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'El apellido es obligatorio.' })
   apellido!: string;
 
-  @IsPhoneNumber()
+  @IsPhoneNumber('CL', { message: 'Debe ingresar un número de teléfono válido de Chile.' })
   telefono!: string;
 
   @IsOptional()
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'La URL de la foto no puede estar vacía.' })
   foto_url?: string;
-  
+
   @IsOptional()
-  @IsIn(['funcionario', 'secretaria', 'administrador'])
+  @IsIn(['funcionario', 'secretaria', 'administrador'], {
+    message: 'El rol debe ser funcionario, secretaria o administrador.',
+  })
   rol?: string;
 }

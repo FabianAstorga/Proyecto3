@@ -79,11 +79,7 @@ let AuthService = class AuthService {
         };
         const token = this.jwtService.sign(payload);
         const { contrasena, ...usuarioSinContrasena } = usuario;
-        return {
-            message: '✔ Usuario registrado exitosamente.',
-            user: usuarioSinContrasena,
-            access_token: token,
-        };
+        return '✔ Usuario registrado exitosamente. ';
     }
     async login(loginDto) {
         const user = await this.usuariosService.findOneByEmailWithPassword(loginDto.correo);
@@ -99,11 +95,7 @@ let AuthService = class AuthService {
         };
         const token = this.jwtService.sign(payload);
         const { contrasena, ...usuarioSinContrasena } = user;
-        return {
-            message: '✔ Inicio de sesión exitoso.',
-            user: usuarioSinContrasena,
-            access_token: token,
-        };
+        return '✔ Inicio de sesión exitoso.' + '\n' + '✔ Token de autenticación: ' + token;
     }
 };
 exports.AuthService = AuthService;
