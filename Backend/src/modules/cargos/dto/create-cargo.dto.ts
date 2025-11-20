@@ -1,11 +1,15 @@
-import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsBoolean } from 'class-validator';
 
 export class CreateCargoDto {
   @IsString()
   @IsNotEmpty()
-  ocupacion: string;
+  ocupacion!: string;
 
   @IsString()
-  @IsOptional()
-  descripcion: string;
+  @IsNotEmpty()
+  descripcion!: string;
+
+  @IsBoolean()
+  @IsNotEmpty()
+  esActivo!: boolean;
 }

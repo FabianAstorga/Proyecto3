@@ -1,4 +1,4 @@
 export declare class UpdateCargoDto {
-    ocupacion: string;
+    ocupacion?: string;
     descripcion?: string;
 }

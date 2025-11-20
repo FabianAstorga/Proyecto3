@@ -14,6 +14,7 @@ const class_validator_1 = require("class-validator");
 class CreateCargoDto {
     ocupacion;
     descripcion;
+    esActivo;
 }
 exports.CreateCargoDto = CreateCargoDto;
 __decorate([
@@ -23,7 +24,12 @@ __decorate([
 ], CreateCargoDto.prototype, "ocupacion", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], CreateCargoDto.prototype, "descripcion", void 0);
+__decorate([
+    (0, class_validator_1.IsBoolean)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", Boolean)
+], CreateCargoDto.prototype, "esActivo", void 0);
 //# sourceMappingURL=create-cargo.dto.js.map

@@ -3,7 +3,7 @@ import { IsString, IsOptional } from 'class-validator';
 export class UpdateCargoDto {
   @IsOptional()
   @IsString()
-  ocupacion: string;
+  ocupacion?: string;
 
   @IsOptional()
   @IsString()

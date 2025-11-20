@@ -1,5 +1,5 @@
 // src/roles/entities/role.entity.ts
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn } from 'typeorm';
 import { EmpleadoCargo } from './empleado-cargo.entity';
 
 @Entity('cargo')
@@ -12,6 +12,9 @@ export class Cargo {
 
   @Column({ type: 'text', nullable: true })
   descripcion: string;
+
+  @Column({ type: 'boolean', default: true })
+  esActivo: boolean;
 
   @OneToMany(() => EmpleadoCargo, (ec) => ec.cargo)
   empleados: EmpleadoCargo[];

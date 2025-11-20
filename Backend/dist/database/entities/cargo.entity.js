@@ -16,6 +16,7 @@ let Cargo = class Cargo {
     id_cargo;
     ocupacion;
     descripcion;
+    esActivo;
     empleados;
 };
 exports.Cargo = Cargo;
@@ -31,6 +32,10 @@ __decorate([
     (0, typeorm_1.Column)({ type: 'text', nullable: true }),
     __metadata("design:type", String)
 ], Cargo.prototype, "descripcion", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'boolean', default: true }),
+    __metadata("design:type", Boolean)
+], Cargo.prototype, "esActivo", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => empleado_cargo_entity_1.EmpleadoCargo, (ec) => ec.cargo),
     __metadata("design:type", Array)
