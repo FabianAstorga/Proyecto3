@@ -41,7 +41,7 @@ export class AuthService {
 
   logout(): void {
     localStorage.removeItem(this.TOKEN_KEY);
-    // si quieres mantener la última sesión, NO borres LAST_SESSION_KEY
+
     // localStorage.removeItem(this.LAST_SESSION_KEY);
     this.router.navigate(['/login']);
   }

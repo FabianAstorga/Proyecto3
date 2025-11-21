@@ -43,7 +43,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private route: ActivatedRoute, // para leer returnUrl
+    private route: ActivatedRoute, 
     private authService: AuthService,
     private dataService: DataService
   ) {}
@@ -135,15 +135,14 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
       contrasena: this.form.value.password.trim(),
     };
 
-    // Usamos DataService.login (lee users.json internamente)
+    
     this.authService.loginUser(credentials).subscribe({
       next: () => {
-        // <--- CAMBIO: El token JWT real ya fue guardado automáticamente en localStorage
-        // por el método loginUser() del AuthService (dentro del pipe tap)
+    
         
         this.closeLogin();
 
-        // Verificar si hay una URL de retorno (por ejemplo, si fue redirigido por el guard)
+        // Verificar si hay una URL de retorno 
         const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
         
         if (returnUrl && returnUrl.trim().length > 0) {
@@ -151,13 +150,12 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
           return;
         }
 
-        // <--- CAMBIO: Usar la lógica centralizada del servicio para navegar según el rol
-        // El método getHomeRouteForRole() lee el token JWT real y devuelve la ruta correcta
+        
         const targetRoute = this.authService.getHomeRouteForRole();
         this.router.navigate([targetRoute]);
       },
       error: (err) => {
-        // <--- CAMBIO: Manejo de errores HTTP reales
+        
         console.error('Login error:', err);
         
         if (err.status === 401 || err.status === 404) {
