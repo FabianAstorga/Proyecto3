@@ -32,7 +32,7 @@ export class UsuariosController {
   // SOLO administrador puede ver todos
   @Get('getAll')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('administrador')
+  @Roles('administrador', 'secretaria')
   findAll() {
     return this.usuariosService.findAll();
   }

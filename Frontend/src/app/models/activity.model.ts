@@ -1,8 +1,11 @@
 export interface Activity {
-  fecha: string;
+  id: number;
   titulo: string;
   detalle: string;
-  estado: 'Aprobada' | 'Pendiente' | 'Rechazada';
+  fecha: string;
+  tipo: string;
   horas: number;
-  userId: number;
+  estado: 'Aprobada' | 'Pendiente' | 'Rechazada';
+  userId: number | null;
+  userName: string;
 }

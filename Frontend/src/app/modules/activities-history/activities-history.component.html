@@ -25,32 +25,84 @@
     </button>
 
     <div class="card-base mb-6 overflow-hidden border-blue-400">
-      <!-- Cabecera: título + botón (sin doble encabezado) -->
-      <div
-        class="px-6 py-5 border-b border-[#0D1440] bg-[#EAF2FF] flex flex-col md:flex-row md:items-center md:justify-between gap-3"
-      >
-        <ng-container *ngIf="currentMonthGroup as month; else tituloGenerico">
-          <h1 class="text-2xl md:text-3xl font-bold text-[#0D1440]">
-            Historial {{ month.monthLabel }}
-          </h1>
+      <!-- CABECERA PRINCIPAL + FILTROS -->
+      <div class="px-6 pt-5 pb-3 border-b border-[#0D1440] bg-[#EAF2FF]">
+        
+        <!-- Título y Botón de PDF (Fila superior) -->
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+          <ng-container *ngIf="currentMonthGroup as month; else tituloGenerico">
+            <h1 class="text-2xl md:text-3xl font-bold text-[#0D1440]">
+              Historial {{ month.monthLabel }}
+            </h1>
 
+            <button
+              type="button"
+              (click)="downloadMonthPdf(month)"
+              class="inline-flex items-center px-3 py-2 rounded-md bg-blue-600 text-white text-xs md:text-sm font-semibold hover:bg-blue-700"
+            >
+              Descargar PDF
+            </button>
+          </ng-container>
+
+          <ng-template #tituloGenerico>
+            <h1 class="text-2xl md:text-3xl font-bold text-[#0D1440]">
+              Historial de actividades
+            </h1>
+          </ng-template>
+        </div>
+
+        <!-- SECCIÓN DE FILTROS (Fila inferior) -->
+        <form [formGroup]="filters" class="flex flex-wrap items-end gap-4 pb-2">
+          
+          <!-- Filtro por Usuario / Actividad (ANCHO AMPLIADO) -->
+          <mat-form-field 
+            appearance="outline" 
+            class="w-full sm:w-[280px] bg-white relative z-10"
+          >
+            <mat-label>Buscar Usuario / Actividad</mat-label>
+            <input matInput type="text" formControlName="q" placeholder="Ej: Juan Pérez">
+          </mat-form-field>
+          
+          <!-- Filtro por Estado -->
+          <mat-form-field appearance="outline" class="w-full sm:w-[150px] bg-white relative z-10">
+            <mat-label>Estado</mat-label>
+            <mat-select formControlName="estado">
+              <mat-option value="">Todos</mat-option>
+              <mat-option value="Aprobada">Aprobada</mat-option>
+              <mat-option value="Pendiente">Pendiente</mat-option>
+              <mat-option value="Rechazada">Rechazada</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Filtro por Fecha 'Desde' -->
+          <mat-form-field appearance="outline" class="w-full sm:w-[150px] bg-white relative z-10">
+            <mat-label>Desde</mat-label>
+            <input matInput [matDatepicker]="pickerDesde" formControlName="desde">
+            <mat-datepicker-toggle matSuffix [for]="pickerDesde"></mat-datepicker-toggle>
+            <mat-datepicker #pickerDesde></mat-datepicker>
+          </mat-form-field>
+
+          <!-- Filtro por Fecha 'Hasta' -->
+          <mat-form-field appearance="outline" class="w-full sm:w-[150px] bg-white relative z-10">
+            <mat-label>Hasta</mat-label>
+            <input matInput [matDatepicker]="pickerHasta" formControlName="hasta">
+            <mat-datepicker-toggle matSuffix [for]="pickerHasta"></mat-datepicker-toggle>
+            <mat-datepicker #pickerHasta></mat-datepicker>
+          </mat-form-field>
+
+          <!-- Botón de Limpiar Filtros -->
           <button
             type="button"
-            (click)="downloadMonthPdf(month)"
-            class="inline-flex items-center px-3 py-2 rounded-md bg-blue-600 text-white text-xs md:text-sm font-semibold hover:bg-blue-700"
+            (click)="clearFilters()"
+            class="inline-flex items-center justify-center h-[56px] rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50 focus:outline-none"
           >
-            Descargar PDF
+            Limpiar
           </button>
-        </ng-container>
-
-        <ng-template #tituloGenerico>
-          <h1 class="text-2xl md:text-3xl font-bold text-[#0D1440]">
-            Historial de actividades
-          </h1>
-        </ng-template>
+        </form>
       </div>
+      <!-- FIN CABECERA/FILTROS -->
 
-      <!-- Contenido -->
+      <!-- Contenido (LISTADO DE ACTIVIDADES) -->
       <div class="px-6 py-4">
         <!-- Sin actividades / sin mes -->
         <div

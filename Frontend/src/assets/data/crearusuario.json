@@ -1,0 +1,19 @@
+
+[{
+  "nombre": "María",
+  "apellido": "González Pérez",
+  "correo": "maria.gonzalez@uta.cl",
+  "contrasena": "12345678",
+  "telefono": "+56922222222",
+  "foto_url": "/usuario(1).png",
+  "rol": "secretaria"
+},
+{
+  "nombre": "Carlos",
+  "apellido": "Fuentes Rojas",
+  "correo": "carlos.fuentes@uta.cl",
+  "contrasena": "12345678",
+  "telefono": "+56933333333",
+  "foto_url": "/usuario(1).png",
+  "rol": "funcionario"
+}]

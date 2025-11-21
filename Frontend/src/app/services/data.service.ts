@@ -1,23 +1,25 @@
 // src/app/services/data.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http'; // 👈 agrega HttpHeaders
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 
 import { User } from '../models/user.model';
 import { Activity } from '../models/activity.model';
 import { Cargo } from '../models/charge.model';
-import { AuthService } from './auth.service'; // 👈 importante
+import { AuthService } from './auth.service';
 
 export type UserRole = User['role'];
+
+// ====== Interfaces que representan lo que manda el BACKEND ======
 
 interface BackendUser {
   id: number;
   nombre: string;
   apellido: string;
   correo: string;
-  rol: string;
+  rol: string;        // 'funcionario' | 'secretaria' | 'administrador'
   telefono: string;
-  foto_url?: string;
+  foto_url?: string | null;
 }
 
 interface LoginResponse {
@@ -26,16 +28,29 @@ interface LoginResponse {
   access_token: string;
 }
 
-// 👉 payload que enviaremos al backend para crear actividad
+interface BackendActividad {
+  id_actividad: number;
+  titulo: string;
+  descripcion: string;
+  fecha: string;       // 'YYYY-MM-DD'
+  tipo: string;
+  estado: boolean;     // true / false
+  esRepetitiva: boolean;
+  usuario: BackendUser | null; // puede venir null si no hay usuario
+  informe: any | null;
+}
+
+// payload ejemplo para crear actividad
 export interface CreateActividadPayload {
   titulo: string;
   descripcion: string;
   fecha: string;      // 'YYYY-MM-DD'
   tipo: string;
-  estado: boolean;    // o number, según tu DTO (ajústalo si es 0/1)
+  estado: boolean;    // o number, según tu DTO
   esRepetitiva: boolean;
 }
 
+// ================================================================
 @Injectable({ providedIn: 'root' })
 export class DataService {
   private readonly apiUrl = 'http://localhost:3000';
@@ -47,7 +62,7 @@ export class DataService {
 
   constructor(
     private http: HttpClient,
-    private authService: AuthService   // 👈 para sacar el token
+    private authService: AuthService
   ) {}
 
   // ------- helpers auth -------
@@ -68,13 +83,41 @@ export class DataService {
       firstName: u.nombre,
       lastName: u.apellido,
       email: u.correo,
+      // pasa de 'funcionario' -> 'Funcionario', etc.
       role: u.rol.charAt(0).toUpperCase() + u.rol.slice(1),
       password: undefined,
       photoUrl: u.foto_url ?? '/usuario(1).png',
     };
   }
 
-  // ------- usuarios -------
+  // ------- mapeo actividad backend -> front -------
+  private mapBackendActividad(a: BackendActividad): Activity {
+    // 1) estado boolean -> string para el front
+    const estado: Activity['estado'] =
+      a.estado === true ? 'Aprobada' : 'Pendiente'; // ajusta si quieres otro texto
+
+    // 2) nombre del usuario
+    const userId = a.usuario ? a.usuario.id : null;
+    const userName = a.usuario
+      ? `${a.usuario.nombre} ${a.usuario.apellido}`
+      : 'Usuario sin asignar';
+
+    return {
+      // estos campos deben existir en tu Activity model
+      id: a.id_actividad,
+      titulo: a.titulo,
+      detalle: a.descripcion ?? '',
+      fecha: a.fecha,
+      tipo: a.tipo,
+      horas: 0, // si aún no manejan horas reales, deja 0
+      estado,
+      userId,
+      userName,
+    };
+  }
+
+  // ================= USUARIOS =================
+
   getUsers(): Observable<User[]> {
     return this.http
       .get<BackendUser[]>(this.usuariosEndpoint, this.getAuthOptions())
@@ -87,7 +130,8 @@ export class DataService {
     );
   }
 
-  // ------- login real -------
+  // ================= LOGIN REAL =================
+
   login(
     email: string,
     password: string
@@ -105,21 +149,25 @@ export class DataService {
       );
   }
 
-  // ------- actividades -------
+  // ================= ACTIVIDADES =================
+
   getAllActivities(): Observable<Activity[]> {
-    return this.http.get<Activity[]>(
-      this.actividadesEndpoint,
-      this.getAuthOptions()
-    );
+    return this.http
+      .get<BackendActividad[]>(this.actividadesEndpoint, this.getAuthOptions())
+      .pipe(map((list) => list.map((a) => this.mapBackendActividad(a))));
   }
+
+
 
   getActivitiesByUser(userId: number): Observable<Activity[]> {
-    return this.http.get<Activity[]>(`${this.actividadesEndpoint}/usuario/${userId}`);
-    // o, si tu endpoint es distinto:
-    // return this.http.get<Activity[]>(`${this.actividadesEndpoint}/user/${userId}`);
+    return this.http
+      .get<BackendActividad[]>(
+        `${this.actividadesEndpoint}/usuario/${userId}`,
+        this.getAuthOptions()
+      )
+      .pipe(map((list) => list.map((a) => this.mapBackendActividad(a))));
   }
 
-  // ⚠️ esto es ejemplo. Ajusta campos al DTO real de Nest (CreateActividadDto)
   crearActividad(payload: CreateActividadPayload): Observable<any> {
     return this.http.post(
       this.actividadesEndpoint,
@@ -128,9 +176,13 @@ export class DataService {
     );
   }
 
-  // ------- cargos -------
+  // ================= CARGOS =================
+
   getCargos(): Observable<Cargo[]> {
-    return this.http.get<Cargo[]>(this.cargosEndpoint, this.getAuthOptions());
+    return this.http.get<Cargo[]>(
+      this.cargosEndpoint,
+      this.getAuthOptions()
+    );
   }
 
   getCargoByRole(role: UserRole): Observable<Cargo | undefined> {

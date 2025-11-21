@@ -8,6 +8,10 @@ node_modules/
 Backend/node_modules/
 FrontEnd/node_modules/
 
+echo "**/.angular/" >> .gitignore
+**/.angular/
+
+
 # Logs
 logs
 *.log

@@ -49,7 +49,7 @@ interface UserGroup {
 }
 
 interface MonthGroup {
-  monthKey: string;   // '2025-10'
+  monthKey: string;  // '2025-10'
   monthLabel: string; // 'Octubre 2025'
   users: UserGroup[];
 }
@@ -66,7 +66,7 @@ interface MonthGroup {
     MatDatepickerModule,
     MatNativeDateModule,
     MatSelectModule,
-    MatOptionModule,
+    MatOptionModule, // NECESARIO para mat-option en el template
     LayoutComponent,
   ],
   templateUrl: './activities-history.component.html',
@@ -171,7 +171,6 @@ export class ActivitiesHistoryComponent implements OnInit {
   }
 
   // ================== LÓGICA DE VISTA ==================
-
   private rebuildView(): void {
     if (!this.allUsers.length || !this.allActivities.length) {
       this.groupedMonths = [];
@@ -191,6 +190,10 @@ export class ActivitiesHistoryComponent implements OnInit {
     const term = (q ?? '').trim().toLowerCase();
 
     const filtered = this.allActivities.filter((a) => {
+      // si no tiene usuario asociado, la descartamos
+      if (a.userId == null) return false;
+
+      // solo actividades de funcionarios
       if (!funcionarioIds.has(a.userId)) return false;
 
       if (!this.inRange(a.fecha, desde ?? null, hasta ?? null)) return false;
@@ -232,7 +235,11 @@ export class ActivitiesHistoryComponent implements OnInit {
     for (const [monthKey, acts] of byMonth.entries()) {
       // agrupar por usuario
       const byUser = new Map<number, Activity[]>();
+
       for (const a of acts) {
+        // si por alguna razón llega sin userId, la saltamos
+        if (a.userId == null) continue;
+
         const ua = byUser.get(a.userId) ?? [];
         ua.push(a);
         byUser.set(a.userId, ua);
@@ -271,6 +278,7 @@ export class ActivitiesHistoryComponent implements OnInit {
     // Siempre mostrar el mes más reciente al reconstruir
     this.currentMonthIndex = this.groupedMonths.length ? 0 : 0;
   }
+
 
   // ================== UTILIDADES ==================
 
