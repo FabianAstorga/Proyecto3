@@ -424,14 +424,14 @@ export class ActivitiesHistoryComponent implements OnInit {
   // ========================
   const tableMarginX = marginX;
   const tableWidth = pageWidth - tableMarginX * 2;
-  const headerHeight = 8;
-  const lineHeight = 6;
+  const headerHeight = 10;
+  const lineHeight = 8;
 
-  const dateColWidth = 26;
-  const statusColWidth = 32;
+  const dateColWidth = 36;
+  const statusColWidth = 42;
   const activityColWidth = tableWidth - dateColWidth - statusColWidth;
 
-  const bottomMargin = 20;
+  const bottomMargin = 30;
 
   // ========================
   // POR CADA USUARIO
@@ -485,10 +485,10 @@ export class ActivitiesHistoryComponent implements OnInit {
     doc.roundedRect(tableMarginX, tableY, tableWidth, tableHeight, 4, 4, 'S');
 
     // --- “zona segura” interna para no tocar las esquinas ---
-    const innerX = tableMarginX + 1;
+    const innerX = tableMarginX + 4;
     const innerWidth = tableWidth - 2;
-    const innerTop = tableY + 0.8;
-    const innerBottom = tableY + tableHeight - 0.8;
+    const innerTop = tableY + 1;
+    const innerBottom = tableY + tableHeight - 1;
 
     // Header de la tabla (rectángulo un poco más pequeño)
     doc.setFillColor(245, 245, 245);

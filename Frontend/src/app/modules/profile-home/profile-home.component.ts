@@ -179,6 +179,6 @@ export class ProfileHomeComponent implements OnInit {
   }
 
   onAvatarError(e: Event): void {
-    (e.target as HTMLImageElement).src = '/avatar.png';
+    (e.target as HTMLImageElement).src = '/avatar.jpg';
   }
 }

@@ -1,6 +1,5 @@
 <app-layout [logoutLink]="'/login'">
   <section class="page-container relative">
-    <!-- Flecha izquierda -->
     <button
       type="button"
       class="nav-arrow nav-arrow-left"
@@ -12,7 +11,6 @@
       ‹
     </button>
 
-    <!-- Flecha derecha -->
     <button
       type="button"
       class="nav-arrow nav-arrow-right"
@@ -25,10 +23,8 @@
     </button>
 
     <div class="card-base mb-6 overflow-hidden border-blue-400">
-      <!-- CABECERA PRINCIPAL + FILTROS -->
       <div class="px-6 pt-5 pb-3 border-b border-[#0D1440] bg-[#EAF2FF]">
         
-        <!-- Título y Botón de PDF (Fila superior) -->
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
           <ng-container *ngIf="currentMonthGroup as month; else tituloGenerico">
             <h1 class="text-2xl md:text-3xl font-bold text-[#0D1440]">
@@ -51,46 +47,66 @@
           </ng-template>
         </div>
 
-        <!-- SECCIÓN DE FILTROS (Fila inferior) -->
         <form [formGroup]="filters" class="flex flex-wrap items-end gap-4 pb-2">
           
-          <!-- Filtro por Usuario / Actividad (ANCHO AMPLIADO) -->
-          <mat-form-field 
-            appearance="outline" 
-            class="w-full sm:w-[280px] bg-white relative z-10"
-          >
-            <mat-label>Buscar Usuario / Actividad</mat-label>
-            <input matInput type="text" formControlName="q" placeholder="Ej: Juan Pérez">
-          </mat-form-field>
+          <div class="relative flex flex-col w-full sm:w-[280px]">
+            <label for="search-user" class="text-xs font-semibold text-gray-500 absolute top-[-8px] left-3 bg-[#EAF2FF] px-1 z-10">Buscar Usuario / Actividad</label>
+            <input 
+              id="search-user"
+              type="text" 
+              formControlName="q" 
+              placeholder="Ej: Juan Pérez"
+              class="h-[56px] px-4 py-2 border border-gray-300 rounded-md bg-white text-sm focus:ring-blue-500 focus:border-blue-500"
+            >
+          </div>
           
-          <!-- Filtro por Estado -->
-          <mat-form-field appearance="outline" class="w-full sm:w-[150px] bg-white relative z-10">
-            <mat-label>Estado</mat-label>
-            <mat-select formControlName="estado">
-              <mat-option value="">Todos</mat-option>
-              <mat-option value="Aprobada">Aprobada</mat-option>
-              <mat-option value="Pendiente">Pendiente</mat-option>
-              <mat-option value="Rechazada">Rechazada</mat-option>
-            </mat-select>
-          </mat-form-field>
+          <div class="relative flex flex-col w-full sm:w-[150px]">
+            <label for="filter-status" class="text-xs font-semibold text-gray-500 absolute top-[-8px] left-3 bg-[#EAF2FF] px-1 z-10">Estado</label>
+            <select 
+              id="filter-status"
+              formControlName="estado"
+              class="h-[56px] px-4 py-2 border border-gray-300 rounded-md bg-white text-sm focus:ring-blue-500 focus:border-blue-500 appearance-none pr-8"
+            >
+              <option value="">Todos</option>
+              <option value="Aprobada">Aprobada</option>
+              <option value="Pendiente">Pendiente</option>
+              <option value="Rechazada">Rechazada</option>
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+              <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+            </div>
+          </div>
 
-          <!-- Filtro por Fecha 'Desde' -->
-          <mat-form-field appearance="outline" class="w-full sm:w-[150px] bg-white relative z-10">
-            <mat-label>Desde</mat-label>
-            <input matInput [matDatepicker]="pickerDesde" formControlName="desde">
-            <mat-datepicker-toggle matSuffix [for]="pickerDesde"></mat-datepicker-toggle>
-            <mat-datepicker #pickerDesde></mat-datepicker>
-          </mat-form-field>
+          <div class="relative flex flex-col w-full sm:w-[150px]">
+            <label for="filter-from" class="text-xs font-semibold text-gray-500 absolute top-[-8px] left-3 bg-[#EAF2FF] px-1 z-10">Desde</label>
+            <div class="relative">
+              <input 
+                id="filter-from"
+                type="date" 
+                formControlName="desde"
+                class="h-[56px] w-full px-4 py-2 border border-gray-300 rounded-md bg-white text-sm focus:ring-blue-500 focus:border-blue-500"
+              >
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-700">
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+              </div>
+            </div>
+          </div>
 
-          <!-- Filtro por Fecha 'Hasta' -->
-          <mat-form-field appearance="outline" class="w-full sm:w-[150px] bg-white relative z-10">
-            <mat-label>Hasta</mat-label>
-            <input matInput [matDatepicker]="pickerHasta" formControlName="hasta">
-            <mat-datepicker-toggle matSuffix [for]="pickerHasta"></mat-datepicker-toggle>
-            <mat-datepicker #pickerHasta></mat-datepicker>
-          </mat-form-field>
+          <div class="relative flex flex-col w-full sm:w-[150px]">
+            <label for="filter-to" class="text-xs font-semibold text-gray-500 absolute top-[-8px] left-3 bg-[#EAF2FF] px-1 z-10">Hasta</label>
+            <div class="relative">
+              <input 
+                id="filter-to"
+                type="date" 
+                formControlName="hasta"
+                class="h-[56px] w-full px-4 py-2 border border-gray-300 rounded-md bg-white text-sm focus:ring-blue-500 focus:border-blue-500"
+              >
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-700">
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+              </div>
+            </div>
+          </div>
 
-          <!-- Botón de Limpiar Filtros -->
           <button
             type="button"
             (click)="clearFilters()"
@@ -100,11 +116,7 @@
           </button>
         </form>
       </div>
-      <!-- FIN CABECERA/FILTROS -->
-
-      <!-- Contenido (LISTADO DE ACTIVIDADES) -->
       <div class="px-6 py-4">
-        <!-- Sin actividades / sin mes -->
         <div
           *ngIf="!currentMonthGroup"
           class="py-10 text-center text-sm text-gray-500"
@@ -112,15 +124,12 @@
           No hay actividades que coincidan con los filtros.
         </div>
 
-        <!-- Con mes seleccionado (solo listado, sin título extra) -->
         <ng-container *ngIf="currentMonthGroup as month">
-          <!-- LISTADO CON ALTURA FIJA + SCROLL -->
           <div class="divide-y divide-gray-100 h-[540px] overflow-y-auto pr-2">
             <div
               *ngFor="let ug of month.users"
               class="py-5 flex flex-col md:flex-row md:items-start md:justify-between gap-4"
             >
-              <!-- Avatar + nombre -->
               <div class="flex flex-col items-center min-w-[120px]">
                 <div
                   class="h-12 w-12 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-sm font-semibold"
@@ -134,7 +143,6 @@
                 </p>
               </div>
 
-              <!-- Lista de actividades -->
               <div class="flex-1 w-full">
                 <ul class="space-y-2">
                   <li
