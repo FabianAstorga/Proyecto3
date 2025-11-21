@@ -57,18 +57,10 @@ let UsuariosService = class UsuariosService {
         this.usuarioRepository = usuarioRepository;
     }
     async create(createUsuarioDto) {
-        const existente = await this.usuarioRepository.findOne({
-            where: { correo: createUsuarioDto.correo },
-        });
-        if (existente) {
-            throw new common_1.ConflictException(`El correo ${createUsuarioDto.correo} ya está registrado.`);
-        }
-        if (createUsuarioDto.contrasena) {
-            const salt = await bcrypt.genSalt(10);
-            createUsuarioDto.contrasena = await bcrypt.hash(createUsuarioDto.contrasena, salt);
-        }
-        const nuevoUsuario = this.usuarioRepository.create(createUsuarioDto);
-        return this.usuarioRepository.save(nuevoUsuario);
+        const hash = await bcrypt.hash(createUsuarioDto.contrasena, 10);
+        createUsuarioDto.contrasena = hash;
+        const usuario = this.usuarioRepository.create(createUsuarioDto);
+        return this.usuarioRepository.save(usuario);
     }
     findAll() {
         return this.usuarioRepository.find();

@@ -12,6 +12,7 @@ import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import { Usuario } from '../../database/entities/usuario.entity';
 
+
 @Injectable()
 export class UsuariosService {
   constructor(
@@ -23,28 +24,17 @@ export class UsuariosService {
    * Crear usuario — Solo administrador (según tu controlador)
    */
   async create(createUsuarioDto: CreateUsuarioDto) {
-    const existente = await this.usuarioRepository.findOne({
-      where: { correo: createUsuarioDto.correo },
-    });
+    // 1) Hashear la contraseña que viene en el DTO
+    const hash = await bcrypt.hash(createUsuarioDto.contrasena, 10);
 
-    if (existente) {
-      throw new ConflictException(
-        `El correo ${createUsuarioDto.correo} ya está registrado.`,
-      );
-    }
+    // 2) Reemplazarla por el hash
+    createUsuarioDto.contrasena = hash;
 
-    // Encriptar contraseña
-    if (createUsuarioDto.contrasena) {
-      const salt = await bcrypt.genSalt(10);
-      createUsuarioDto.contrasena = await bcrypt.hash(
-        createUsuarioDto.contrasena,
-        salt,
-      );
-    }
-
-    const nuevoUsuario = this.usuarioRepository.create(createUsuarioDto);
-    return this.usuarioRepository.save(nuevoUsuario);
+    // 3) Crear y guardar la entidad
+    const usuario = this.usuarioRepository.create(createUsuarioDto);
+    return this.usuarioRepository.save(usuario);
   }
+
 
   /**
    * Obtener todos los usuarios — Solo administrador

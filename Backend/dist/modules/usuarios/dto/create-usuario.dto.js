@@ -38,7 +38,7 @@ __decorate([
 ], CreateUsuarioDto.prototype, "correo", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.MinLength)(8, { message: 'La contraseña debe tener al menos 8 caracteres' }),
     __metadata("design:type", String)
 ], CreateUsuarioDto.prototype, "contrasena", void 0);

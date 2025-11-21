@@ -35,11 +35,11 @@ __decorate([
     __metadata("design:type", Date)
 ], Horario.prototype, "fecha", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'timestamp' }),
+    (0, typeorm_1.Column)({ type: 'datetime' }),
     __metadata("design:type", Date)
 ], Horario.prototype, "horaInicio", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'timestamp' }),
+    (0, typeorm_1.Column)({ type: 'datetime', nullable: true }),
     __metadata("design:type", Date)
 ], Horario.prototype, "horaFin", void 0);
 __decorate([
