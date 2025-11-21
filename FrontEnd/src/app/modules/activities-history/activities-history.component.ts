@@ -49,7 +49,7 @@ interface UserGroup {
 }
 
 interface MonthGroup {
-  monthKey: string;   // '2025-10'
+  monthKey: string;  // '2025-10'
   monthLabel: string; // 'Octubre 2025'
   users: UserGroup[];
 }
@@ -66,7 +66,7 @@ interface MonthGroup {
     MatDatepickerModule,
     MatNativeDateModule,
     MatSelectModule,
-    MatOptionModule,
+    MatOptionModule, // NECESARIO para mat-option en el template
     LayoutComponent,
   ],
   templateUrl: './activities-history.component.html',
