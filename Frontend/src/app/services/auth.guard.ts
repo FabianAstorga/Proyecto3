@@ -8,7 +8,7 @@ import {
   RouterStateSnapshot,
   UrlTree,
 } from '@angular/router';
-import { AuthService } from '../services/auth.service';
+import { AuthService } from './auth.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthGuard implements CanActivate, CanActivateChild {
@@ -34,8 +34,8 @@ export class AuthGuard implements CanActivate, CanActivateChild {
   ): boolean | UrlTree {
     // 1) Debe estar logueado
     if (!this.authService.isLoggedIn()) {
-      // 👇 si tu login está en otra ruta, cámbialo aquí
-      return this.router.createUrlTree(['/login'], {
+      // ❗ Importante: redirigimos a '/', NO a '/login'
+      return this.router.createUrlTree(['/'], {
         queryParams: { returnUrl: state.url },
       });
     }
@@ -46,9 +46,9 @@ export class AuthGuard implements CanActivate, CanActivateChild {
       return true;
     }
 
-    // 3) Validar rol del usuario
-    const userRole = this.authService.getUserRole();
-    if (userRole && allowedRoles.includes(userRole)) {
+    // 3) Validar rol del usuario (del token)
+    const userRole = this.authService.getUserRole()?.toLowerCase();
+    if (userRole && allowedRoles.map((r) => r.toLowerCase()).includes(userRole)) {
       return true;
     }
 
@@ -57,3 +57,4 @@ export class AuthGuard implements CanActivate, CanActivateChild {
     return this.router.parseUrl(fallback);
   }
 }
+

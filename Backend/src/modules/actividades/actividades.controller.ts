@@ -6,18 +6,25 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
+import type { Request } from 'express';
 import { ActividadService } from './actividades.service';
 import { CreateActividadDto } from './dto/create-actividad.dto';
 import { UpdateActividadDto } from './dto/update-actividad.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
-@Controller('actividad')
+// 👇 OJO: el front usa /actividades
+@Controller('actividades')
 export class ActividadController {
   constructor(private readonly actividadService: ActividadService) {}
 
   @Post()
-  create(@Body() dto: CreateActividadDto) {
-    return this.actividadService.create(dto);
+  @UseGuards(JwtAuthGuard)
+  create(@Body() dto: CreateActividadDto, @Req() req: Request) {
+    const user = req.user as any; // viene del JwtStrategy (user.id, user.rol, etc.)
+    return this.actividadService.create(dto, user.id);
   }
 
   @Get()
@@ -27,16 +34,16 @@ export class ActividadController {
 
   @Get(':id')
   findOne(@Param('id') id: number) {
-    return this.actividadService.findOne(id);
+    return this.actividadService.findOne(Number(id));
   }
 
   @Patch(':id')
   update(@Param('id') id: number, @Body() dto: UpdateActividadDto) {
-    return this.actividadService.update(id, dto);
+    return this.actividadService.update(Number(id), dto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: number) {
-    return this.actividadService.remove(id);
+    return this.actividadService.remove(Number(id));
   }
 }

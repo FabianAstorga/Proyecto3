@@ -133,62 +133,34 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     const email = this.form.value.email.trim();
     const password = this.form.value.password.trim();
 
-    // Usamos DataService.login (lee users.json internamente)
-    this.dataService.login(email, password).subscribe((user) => {
-      if (!user) {
+    this.dataService.login(email, password).subscribe({
+      next: ({ user, token }) => {
+        // 1) guardo token + user
+        this.authService.login(token, user);
+
+        // 2) cierro modal
+        this.closeLogin();
+
+        // 3) si venía de una ruta protegida, regreso ahí
+        const returnUrl =
+          this.route.snapshot.queryParamMap.get('returnUrl') ?? '';
+
+        if (returnUrl.trim().length > 0) {
+          this.router.navigateByUrl(returnUrl);
+          return;
+        }
+
+        // 4) si no, voy al home según rol
+        const home = this.authService.getHomeRouteForRole();
+        this.router.navigateByUrl(home);
+      },
+      error: (err) => {
+        console.error('Error en login', err);
         alert('Correo o contraseña incorrectos');
         this.form.reset();
         this.form.markAsUntouched();
-        return;
-      }
-
-      // Generar token con estructura JWT para que jwtDecode funcione
-      const payload = {
-        id: user.id,
-        email: user.email,
-        role: user.role,
-        exp: Math.floor(Date.now() / 1000) + 60 * 60, // 1 hora
-      };
-
-      // header + payload en base64, sin firma (solo para demo)
-      const header = {
-        alg: 'none',
-        typ: 'JWT',
-      };
-      const token =
-        btoa(JSON.stringify(header)) +
-        '.' +
-        btoa(JSON.stringify(payload)) +
-        '.';
-
-      this.authService.login(token); // guarda en localStorage
-
-      this.closeLogin();
-
-      // Si venimos de un returnUrl (bloqueado por el guard), respetarlo
-      const returnUrl =
-        this.route.snapshot.queryParamMap.get('returnUrl') ?? '';
-
-      if (returnUrl.trim().length > 0) {
-        this.router.navigateByUrl(returnUrl);
-        return;
-      }
-
-      // Si no hay returnUrl, navegar según rol y nueva estructura de rutas
-      switch (user.role.toLowerCase()) {
-        case 'administrador':
-          this.router.navigate(['/admin', user.id, 'perfil']);
-          break;
-        case 'secretaria':
-          this.router.navigate(['/secretaria', user.id, 'perfil']);
-          break;
-        case 'funcionario':
-          this.router.navigate(['/funcionario', user.id, 'perfil']);
-          break;
-        default:
-          this.router.navigate(['/']);
-          break;
-      }
+      },
     });
   }
+
 }

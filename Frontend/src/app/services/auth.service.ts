@@ -2,37 +2,49 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
+import { User } from '../models/user.model';
 
 interface DecodedToken {
-  exp: number;
-  role: string;
-  id: number;
-  email: string;
+  sub: number;       // id del usuario en el backend
+  correo: string;
+  rol: string;       // 'funcionario' | 'secretaria' | 'administrador'
+  exp: number;       // timestamp en segundos
 }
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly TOKEN_KEY = 'authToken';
+  private readonly USER_KEY = 'authUser';
   private readonly LAST_SESSION_KEY = 'lastSession';
 
   constructor(private router: Router) {}
 
-  // Guarda el token (cuando el backend te lo entrega)
-  login(token: string): void {
+  // Guarda token + usuario
+  login(token: string, user: User): void {
     localStorage.setItem(this.TOKEN_KEY, token);
-    // registra fecha/hora de esta sesión
+    localStorage.setItem(this.USER_KEY, JSON.stringify(user));
     localStorage.setItem(this.LAST_SESSION_KEY, new Date().toISOString());
   }
 
   logout(): void {
     localStorage.removeItem(this.TOKEN_KEY);
-    // si quieres mantener la última sesión, NO borres LAST_SESSION_KEY
-    // localStorage.removeItem(this.LAST_SESSION_KEY);
-    this.router.navigate(['/login']);
+    localStorage.removeItem(this.USER_KEY);
+    // te mando SIEMPRE a la home ('/')
+    this.router.navigateByUrl('/');
   }
 
   getToken(): string | null {
     return localStorage.getItem(this.TOKEN_KEY);
+  }
+
+  private getUserFromStorage(): User | null {
+    const raw = localStorage.getItem(this.USER_KEY);
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw) as User;
+    } catch {
+      return null;
+    }
   }
 
   private getDecodedToken(): DecodedToken | null {
@@ -41,8 +53,8 @@ export class AuthService {
 
     try {
       return jwtDecode<DecodedToken>(token);
-    } catch (error) {
-      console.error('Error decodificando el token:', error);
+    } catch (err) {
+      console.error('Error decodificando token', err);
       return null;
     }
   }
@@ -50,55 +62,52 @@ export class AuthService {
   // -------- Helpers de sesión --------
 
   isLoggedIn(): boolean {
-    const decodedToken = this.getDecodedToken();
-    if (!decodedToken) return false;
-    return Date.now() < decodedToken.exp * 1000;
+    const t = this.getDecodedToken();
+    if (!t) return false;
+    return Date.now() < t.exp * 1000;
   }
 
   getUserRole(): string | null {
-    const decodedToken = this.getDecodedToken();
-    return decodedToken ? decodedToken.role : null;
+    const t = this.getDecodedToken();
+    if (t?.rol) return t.rol; // viene en minúscula del backend
+
+    const u = this.getUserFromStorage();
+    return u?.role ?? null;
   }
 
   getUserId(): number | null {
-    const decodedToken = this.getDecodedToken();
-    return decodedToken ? decodedToken.id : null;
+    const t = this.getDecodedToken();
+    if (t?.sub) return t.sub;
+
+    const u = this.getUserFromStorage();
+    return u?.id ?? null;
   }
 
   getUserEmail(): string | null {
-    const decodedToken = this.getDecodedToken();
-    return decodedToken ? decodedToken.email : null;
+    const t = this.getDecodedToken();
+    if (t?.correo) return t.correo;
+
+    const u = this.getUserFromStorage();
+    return u?.email ?? null;
   }
 
-  /** Última sesión guardada en este navegador (ISO string) */
   getLastSessionISO(): string | null {
     return localStorage.getItem(this.LAST_SESSION_KEY);
   }
 
   // -------- Ruta home según rol --------
-  /**
-   * Devuelve la ruta "home" según el rol del usuario.
-   * Si no hay usuario o rol, vuelve a '/'.
-   */
   getHomeRouteForRole(): string {
     const role = this.getUserRole();
     const id = this.getUserId();
 
-    if (!role || !id) {
-      return '/';
-    }
+    if (!role || !id) return '/';
 
-    switch (role) {
-      case 'Funcionario':
-        return `/funcionario/perfil/${id}`;
-      case 'Secretaria':
-        return `/secretaria/perfil/${id}`;
-      case 'Director':
-        return `/director/perfil/${id}`;
-      case 'Admin':
-        return '/admin/dashboard';
-      default:
-        return '/';
-    }
+    const r = role.toLowerCase();
+
+    if (r === 'funcionario') return `/funcionario/${id}/perfil`;
+    if (r === 'secretaria') return `/secretaria/${id}/perfil`;
+    if (r === 'administrador') return `/admin/${id}/perfil`;
+
+    return '/';
   }
 }

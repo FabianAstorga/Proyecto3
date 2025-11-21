@@ -7,6 +7,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { Informe } from './informe.entity';
+import { Usuario } from './usuario.entity';
 
 @Entity('actividad')
 export class Actividad {
@@ -32,6 +33,12 @@ export class Actividad {
 
   @Column({ type: 'boolean', default: false})
   esRepetitiva: boolean;
+
+  @ManyToOne(() => Usuario, (usuario) => usuario.actividades, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'usuario_id' }) // crea la columna usuario_id en la tabla
+  usuario: Usuario;
   // Relación: Actividad "pertenece a" Formulario
   @ManyToOne(() => Informe, (informe) => informe.actividades, {
     onDelete: 'CASCADE',

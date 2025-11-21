@@ -24,6 +24,7 @@ import { MatSelectModule } from '@angular/material/select';
 
 import { LayoutComponent } from '../../components/layout/layout.component';
 import { AuthService } from '../../services/auth.service';
+import { DataService, CreateActividadPayload } from '../../services/data.service';
 
 type WeekFlags = {
   mon: boolean;
@@ -79,6 +80,7 @@ export const ES_DATE_FORMATS = {
 export class ActivityNewComponent {
   private fb = inject(FormBuilder);
   private auth = inject(AuthService);
+  private dataService = inject(DataService);
 
   // 📌 Link para volver al perfil del funcionario logueado (por si lo necesitas luego)
   get perfilLink(): string {
@@ -365,13 +367,18 @@ export class ActivityNewComponent {
 
     const base = this.form.value;
 
+    // 1) Tipo final
     const tipoFinal =
-      base.tipo_actividad === 'Otro (especificar)' &&
-      base.tipo_actividad_otro
+      (base.tipo_actividad === 'Otro (especificar)' && base.tipo_actividad_otro
         ? base.tipo_actividad_otro
-        : base.tipo_actividad;
+        : base.tipo_actividad) ?? '';
 
-    const fechas = new Set<string>([this.toISO(base.fecha as Date)]);
+    // 2) Fechas: set + primera fecha (fecha principal)
+    const fechas = new Set<string>();
+    if (base.fecha instanceof Date) {
+      fechas.add(this.toISO(base.fecha));
+    }
+
     const multi = base.multi!;
     const mode = multi.mode as MultiMode | undefined;
 
@@ -406,18 +413,36 @@ export class ActivityNewComponent {
       }
     }
 
-    const payload = {
-      descripcionAct: base.descripcionAct,
-      tipo_actividad: tipoFinal,
-      estado: base.estado,
-      fechas: Array.from(fechas).sort(),
+    const fechasArray = Array.from(fechas).sort();
+    const fechaPrincipal = fechasArray[0] ?? this.toISO(base.fecha as Date);
+
+    // 3) Otras props “limpias”
+    const descripcion = base.descripcionAct ?? '';
+
+    // 👇 transformamos el string del form a boolean para el backend
+    const estadoBool = (base.estado ?? 'Pendiente') === 'Realizada';
+
+    const payload: CreateActividadPayload = {
+      titulo: tipoFinal,
+      descripcion,
+      fecha: fechaPrincipal,
+      tipo: tipoFinal,
+      estado: estadoBool,         // <- ahora sí es boolean
+      esRepetitiva: mode !== 'none',
     };
 
-    console.log(
-      'Payload actividad (fecha principal libre; multi dentro del mes):',
-      payload
-    );
+    console.log('Payload que se enviará al backend:', payload);
 
-    // this.dataService.crearActividad(payload).subscribe(...)
+    this.dataService.crearActividad(payload).subscribe({
+      next: () => {
+        alert('✔ Actividad registrada correctamente');
+        this.onReset();
+      },
+      error: (err) => {
+        console.error('Error al crear actividad:', err);
+        alert('❌ Ocurrió un error al registrar la actividad');
+      },
+    });
   }
+
 }

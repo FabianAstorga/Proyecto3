@@ -1,31 +1,52 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateActividadDto } from './dto/create-actividad.dto';
 import { UpdateActividadDto } from './dto/update-actividad.dto';
 import { Actividad } from 'src/database/entities/actividad.entity';
+import { Usuario } from 'src/database/entities/usuario.entity';
 
 @Injectable()
 export class ActividadService {
   constructor(
     @InjectRepository(Actividad)
     private readonly actividadRepository: Repository<Actividad>,
+
+    @InjectRepository(Usuario)
+    private readonly usuarioRepository: Repository<Usuario>,
   ) {}
 
-  async create(dto: CreateActividadDto) {
-    const actividad = this.actividadRepository.create(dto);
+  // 👇 ahora recibe también el id del usuario (desde el token)
+  async create(dto: CreateActividadDto, userId: number) {
+    const usuario = await this.usuarioRepository.findOne({
+      where: { id: userId },
+    });
+
+    if (!usuario) {
+      throw new NotFoundException('Usuario no encontrado para la actividad');
+    }
+
+    const actividad = this.actividadRepository.create({
+      ...dto,
+      usuario, // relación ManyToOne -> se guardará usuario_id
+    });
+
     return this.actividadRepository.save(actividad);
   }
 
   findAll() {
-    return this.actividadRepository.find({ relations: ['informe'] });
+    return this.actividadRepository.find({
+      relations: ['informe', 'usuario'],
+    });
   }
 
   findOne(id: number) {
     return this.actividadRepository.findOne({
-      //corregido?
-      where: { id_actividad: id }, // Correcto para buscar por una clave no llamada 'id'
-      relations: ['informe'],
+      where: { id_actividad: id },
+      relations: ['informe', 'usuario'],
     });
   }
 

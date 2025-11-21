@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -15,20 +15,18 @@ export class LayoutComponent implements OnInit {
   /** Ítems del menú lateral (se sobreescriben según rol) */
   @Input() navItems: NavItem[] = [];
 
-  /** A dónde apunta el botón de cerrar sesión (por si quieres usarlo en el futuro) */
+  /** A dónde apunta el botón de cerrar sesión */
   @Input() logoutLink = '/';
 
   /** --- lógica de sidebar con transición suave --- */
   isCollapsed = true; // ancho (w-14 / w-72)
-  showMenu = false; // aparición de contenido (fade/slide)
+  showMenu = false;   // aparición de contenido (fade/slide)
 
   private _showT?: any;
   private _hideT?: any;
 
-  constructor(
-    private authService: AuthService,
-    private router: Router
-  ) {}
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
   ngOnInit(): void {
     this.buildMenu();
@@ -49,63 +47,29 @@ export class LayoutComponent implements OnInit {
       // ================= FUNCIONARIO =================
       case 'funcionario':
         this.navItems = [
-          {
-            label: 'Inicio perfil',
-            link: `/funcionario/${id}/perfil`,
-          },
-          {
-            label: 'Ingresar registro',
-            link: `/funcionario/${id}/actividades/nueva`,
-          },
-          {
-            label: 'Mi historial',
-            link: `/funcionario/${id}/actividades/historial`,
-          },
-          {
-            label: 'Mi horario',
-            link: `/funcionario/${id}/horario`,
-          },
+          { label: 'Inicio perfil',      link: `/funcionario/${id}/perfil` },
+          { label: 'Ingresar registro',  link: `/funcionario/${id}/actividades/nueva` },
+          { label: 'Mi historial',       link: `/funcionario/${id}/actividades/historial` },
+          { label: 'Mi horario',         link: `/funcionario/${id}/horario` },
         ];
         break;
 
       // ================= SECRETARÍA =================
       case 'secretaria':
         this.navItems = [
-          {
-            label: 'Perfil secretaria',
-            link: `/secretaria/${id}/perfil`,
-          },
-          {
-            label: 'Historial funcionarios',
-            link: `/secretaria/${id}/actividades/historial`,
-          },
-          {
-            label: 'Mi horario',
-            link: `/secretaria/${id}/horario`,
-          },
-          {
-            label: 'Gestionar calendario',
-            link: `/secretaria/${id}/calendario`,
-          },
-          
+          { label: 'Perfil secretaria',      link: `/secretaria/${id}/perfil` },
+          { label: 'Historial funcionarios', link: `/secretaria/${id}/actividades/historial` },
+          { label: 'Mi horario',             link: `/secretaria/${id}/horario` },
+          { label: 'Gestionar calendario',   link: `/secretaria/${id}/calendario` },
         ];
         break;
 
       // ================= ADMINISTRADOR =================
       case 'administrador':
         this.navItems = [
-          {
-            label: 'Panel administrador',
-            link: `/admin/${id}/perfil`,
-          },
-          {
-            label: 'Gestionar calendario',
-            link: `/admin/${id}/calendario`,
-          },
-          {
-            label: 'Gestionar funcionarios',
-            link: `/admin/${id}/funcionarios`,
-          },
+          { label: 'Panel administrador',    link: `/admin/${id}/perfil` },
+          { label: 'Gestionar calendario',   link: `/admin/${id}/calendario` },
+          { label: 'Gestionar funcionarios', link: `/admin/${id}/funcionarios` },
         ];
         break;
 
@@ -130,6 +94,6 @@ export class LayoutComponent implements OnInit {
 
   // Cierre de sesión real
   onLogout() {
-    this.authService.logout(); // limpia token y navega según tu AuthService
+    this.authService.logout();
   }
 }

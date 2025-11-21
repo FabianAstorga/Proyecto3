@@ -11,6 +11,7 @@ import {
 import { EmpleadoCargo } from './empleado-cargo.entity';
 import { Informe } from './informe.entity';
 import { Horario } from './horario.entity';
+import { Actividad } from './actividad.entity';
 
 
 @Entity('usuario')
@@ -58,5 +59,9 @@ export class Usuario {
 
   @OneToMany(() => Horario, horario => horario.usuario)
   horarios: Horario[];
+
+  @OneToMany(() => Actividad, (actividad) => actividad.usuario)
+  actividades: Actividad[];
+
 
 }
