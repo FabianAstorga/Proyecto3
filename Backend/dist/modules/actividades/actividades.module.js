@@ -12,13 +12,15 @@ const actividades_service_1 = require("./actividades.service");
 const actividades_controller_1 = require("./actividades.controller");
 const typeorm_1 = require("@nestjs/typeorm");
 const actividad_entity_1 = require("../../database/entities/actividad.entity");
+const informes_module_1 = require("../informes/informes.module");
 let ActividadesModule = class ActividadesModule {
 };
 exports.ActividadesModule = ActividadesModule;
 exports.ActividadesModule = ActividadesModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([actividad_entity_1.Actividad])],
-        controllers: [actividades_controller_1.ActividadController],
+        imports: [typeorm_1.TypeOrmModule.forFeature([actividad_entity_1.Actividad]),
+            informes_module_1.InformesModule],
+        controllers: [actividades_controller_1.ActividadesController],
         providers: [actividades_service_1.ActividadService],
     })
 ], ActividadesModule);

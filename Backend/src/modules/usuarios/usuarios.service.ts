@@ -20,7 +20,7 @@ export class UsuariosService {
   ) {}
 
   /**
-   * Crear usuario — Solo administrador (según tu controlador)
+   * Crear usuario — Solo administrador 
    */
   async create(createUsuarioDto: CreateUsuarioDto) {
     const existente = await this.usuarioRepository.findOne({

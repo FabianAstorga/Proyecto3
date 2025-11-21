@@ -10,7 +10,6 @@ import { Informe } from './informe.entity';
 
 @Entity('actividad')
 export class Actividad {
-  //modifique id
   @PrimaryGeneratedColumn()
   id_actividad: number;
 
@@ -26,15 +25,23 @@ export class Actividad {
   @Column({ type: 'varchar', length: 100 })
   tipo: string;
 
-  // Para el checklist
-  @Column({ type: 'boolean', default: false })
-  estado: boolean;
+  @Column({ 
+    type: 'enum',
+    enum: ['Pendiente', 'En Progreso', 'Realizada', 'Cancelada'],
+    default: 'Pendiente'
+  })
+  estado: string;
 
-  @Column({ type: 'boolean', default: false})
+  @Column({ type: 'boolean', default: false })
   esRepetitiva: boolean;
-  // Relación: Actividad "pertenece a" Formulario
+
+  @Column({ type: 'int' })
+  informe_id: number;
+
+  // Relación: Actividad "pertenece a" Informe
   @ManyToOne(() => Informe, (informe) => informe.actividades, {
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'informe_id' })
   informe: Informe;
 }

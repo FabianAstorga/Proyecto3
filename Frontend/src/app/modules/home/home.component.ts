@@ -130,64 +130,44 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
       return;
     }
 
-    const email = this.form.value.email.trim();
-    const password = this.form.value.password.trim();
+    const credentials = {
+      correo: this.form.value.email.trim(),
+      contrasena: this.form.value.password.trim(),
+    };
 
     // Usamos DataService.login (lee users.json internamente)
-    this.dataService.login(email, password).subscribe((user) => {
-      if (!user) {
-        alert('Correo o contraseña incorrectos');
-        this.form.reset();
-        this.form.markAsUntouched();
-        return;
-      }
+    this.authService.loginUser(credentials).subscribe({
+      next: () => {
+        // <--- CAMBIO: El token JWT real ya fue guardado automáticamente en localStorage
+        // por el método loginUser() del AuthService (dentro del pipe tap)
+        
+        this.closeLogin();
 
-      // Generar token con estructura JWT para que jwtDecode funcione
-      const payload = {
-        id: user.id,
-        email: user.email,
-        role: user.role,
-        exp: Math.floor(Date.now() / 1000) + 60 * 60, // 1 hora
-      };
+        // Verificar si hay una URL de retorno (por ejemplo, si fue redirigido por el guard)
+        const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+        
+        if (returnUrl && returnUrl.trim().length > 0) {
+          this.router.navigateByUrl(returnUrl);
+          return;
+        }
 
-      // header + payload en base64, sin firma (solo para demo)
-      const header = {
-        alg: 'none',
-        typ: 'JWT',
-      };
-      const token =
-        btoa(JSON.stringify(header)) +
-        '.' +
-        btoa(JSON.stringify(payload)) +
-        '.';
-
-      this.authService.login(token); // guarda en localStorage
-
-      this.closeLogin();
-
-      // Si venimos de un returnUrl (bloqueado por el guard), respetarlo
-      const returnUrl =
-        this.route.snapshot.queryParamMap.get('returnUrl') ?? '';
-
-      if (returnUrl.trim().length > 0) {
-        this.router.navigateByUrl(returnUrl);
-        return;
-      }
-
-      // Si no hay returnUrl, navegar según rol y nueva estructura de rutas
-      switch (user.role.toLowerCase()) {
-        case 'administrador':
-          this.router.navigate(['/admin', user.id, 'perfil']);
-          break;
-        case 'secretaria':
-          this.router.navigate(['/secretaria', user.id, 'perfil']);
-          break;
-        case 'funcionario':
-          this.router.navigate(['/funcionario', user.id, 'perfil']);
-          break;
-        default:
-          this.router.navigate(['/']);
-          break;
+        // <--- CAMBIO: Usar la lógica centralizada del servicio para navegar según el rol
+        // El método getHomeRouteForRole() lee el token JWT real y devuelve la ruta correcta
+        const targetRoute = this.authService.getHomeRouteForRole();
+        this.router.navigate([targetRoute]);
+      },
+      error: (err) => {
+        // <--- CAMBIO: Manejo de errores HTTP reales
+        console.error('Login error:', err);
+        
+        if (err.status === 401 || err.status === 404) {
+          alert('Correo o contraseña incorrectos.');
+        } else {
+          alert('Ocurrió un error al intentar iniciar sesión. Intente más tarde.');
+        }
+        
+        // Limpiar solo la contraseña
+        this.form.get('password')?.reset();
       }
     });
   }

@@ -16,7 +16,7 @@ export const routes: Routes = [
     path: 'funcionario/:id',
     canActivate: [AuthGuard],
     canActivateChild: [AuthGuard],
-    data: { roles: ['Funcionario'] },
+    data: { roles: ['funcionario'] },
     children: [
       {
         path: 'perfil',
@@ -61,7 +61,7 @@ export const routes: Routes = [
     path: 'secretaria/:id',
     canActivate: [AuthGuard],
     canActivateChild: [AuthGuard],
-    data: { roles: ['Secretaria'] },
+    data: { roles: ['secretaria'] },
     children: [
       {
         path: 'perfil',
@@ -106,7 +106,7 @@ export const routes: Routes = [
     path: 'admin/:id',
     canActivate: [AuthGuard],
     canActivateChild: [AuthGuard],
-    data: { roles: ['Administrador'] },
+    data: { roles: ['administrador'] },
     children: [
       {
         path: 'perfil',

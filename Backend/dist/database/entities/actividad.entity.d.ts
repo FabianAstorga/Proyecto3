@@ -5,7 +5,8 @@ export declare class Actividad {
     descripcion: string;
     fecha: Date;
     tipo: string;
-    estado: boolean;
+    estado: string;
     esRepetitiva: boolean;
+    informe_id: number;
     informe: Informe;
 }

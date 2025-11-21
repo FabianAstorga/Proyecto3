@@ -4,6 +4,7 @@ import {
   IsDateString,
   IsBoolean,
   IsNumber,
+  IsEnum,
 } from 'class-validator';
 
 export class UpdateActividadDto {
@@ -24,9 +25,9 @@ export class UpdateActividadDto {
   @IsOptional()
   tipo?: string;
 
-  @IsBoolean()
   @IsOptional()
-  estado?: boolean;
+  @IsEnum(['Pendiente', 'En Progreso', 'Realizada', 'Cancelada'])
+  estado?: string;
 
   @IsBoolean()
   @IsOptional()

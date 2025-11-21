@@ -2,12 +2,14 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
+import { HttpClient } from '@angular/common/http';
+import { Observable, tap } from 'rxjs';
 
 interface DecodedToken {
   exp: number;
-  role: string;
-  id: number;
-  email: string;
+  sub: number;      
+  correo: string;   
+  rol: string;      
 }
 
 @Injectable({ providedIn: 'root' })
@@ -15,14 +17,27 @@ export class AuthService {
   private readonly TOKEN_KEY = 'authToken';
   private readonly LAST_SESSION_KEY = 'lastSession';
 
-  constructor(private router: Router) {}
+  private readonly API_URL = 'http://localhost:3000'; 
 
-  // Guarda el token (cuando el backend te lo entrega)
-  login(token: string): void {
+  constructor(private router: Router, private http: HttpClient) {}
+
+  // Guarda el token 
+  loginUser(credentials: { correo: string; contrasena: string }): Observable<any> {
+    return this.http.post<any>(`${this.API_URL}/auth/login`, credentials).pipe(
+      tap((response) => {
+        // Si el backend devuelve { access_token: '...' }
+        if (response && response.access_token) {
+          this.saveToken(response.access_token);
+        }
+      })
+    );
+  }
+
+  saveToken(token: string): void {
     localStorage.setItem(this.TOKEN_KEY, token);
-    // registra fecha/hora de esta sesión
     localStorage.setItem(this.LAST_SESSION_KEY, new Date().toISOString());
   }
+
 
   logout(): void {
     localStorage.removeItem(this.TOKEN_KEY);
@@ -57,17 +72,17 @@ export class AuthService {
 
   getUserRole(): string | null {
     const decodedToken = this.getDecodedToken();
-    return decodedToken ? decodedToken.role : null;
+    return decodedToken ? decodedToken.rol : null;
   }
 
   getUserId(): number | null {
     const decodedToken = this.getDecodedToken();
-    return decodedToken ? decodedToken.id : null;
+    return decodedToken ? decodedToken.sub : null;
   }
 
   getUserEmail(): string | null {
     const decodedToken = this.getDecodedToken();
-    return decodedToken ? decodedToken.email : null;
+    return decodedToken ? decodedToken.correo : null;
   }
 
   /** Última sesión guardada en este navegador (ISO string) */
@@ -88,15 +103,16 @@ export class AuthService {
       return '/';
     }
 
-    switch (role) {
-      case 'Funcionario':
-        return `/funcionario/perfil/${id}`;
-      case 'Secretaria':
-        return `/secretaria/perfil/${id}`;
-      case 'Director':
-        return `/director/perfil/${id}`;
-      case 'Admin':
-        return '/admin/dashboard';
+    switch (role.toLowerCase()) {
+      case 'admin':
+      case 'administrador':
+        return `/admin/${id}/perfil`;
+      case 'secretaria':
+        return `/secretaria/${id}/perfil`;
+      case 'funcionario':
+        return `/funcionario/${id}/perfil`;
+      case 'director':
+        return `/director/${id}/perfil`;
       default:
         return '/';
     }

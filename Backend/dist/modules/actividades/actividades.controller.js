@@ -12,70 +12,74 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ActividadController = void 0;
+exports.ActividadesController = void 0;
 const common_1 = require("@nestjs/common");
 const actividades_service_1 = require("./actividades.service");
 const create_actividad_dto_1 = require("./dto/create-actividad.dto");
 const update_actividad_dto_1 = require("./dto/update-actividad.dto");
-let ActividadController = class ActividadController {
+const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
+let ActividadesController = class ActividadesController {
     actividadService;
     constructor(actividadService) {
         this.actividadService = actividadService;
     }
-    create(dto) {
-        return this.actividadService.create(dto);
+    create(createActividadDto, req) {
+        const usuarioId = req.user.id;
+        return this.actividadService.create(createActividadDto, usuarioId);
     }
     findAll() {
         return this.actividadService.findAll();
     }
     findOne(id) {
-        return this.actividadService.findOne(id);
+        return this.actividadService.findOne(+id);
     }
-    update(id, dto) {
-        return this.actividadService.update(id, dto);
+    update(id, updateActividadDto) {
+        return this.actividadService.update(+id, updateActividadDto);
     }
     remove(id) {
-        return this.actividadService.remove(id);
+        return this.actividadService.remove(+id);
     }
 };
-exports.ActividadController = ActividadController;
+exports.ActividadesController = ActividadesController;
 __decorate([
     (0, common_1.Post)(),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_actividad_dto_1.CreateActividadDto]),
+    __metadata("design:paramtypes", [create_actividad_dto_1.CreateActividadDto, Object]),
     __metadata("design:returntype", void 0)
-], ActividadController.prototype, "create", null);
+], ActividadesController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
-], ActividadController.prototype, "findAll", null);
+], ActividadesController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
-], ActividadController.prototype, "findOne", null);
+], ActividadesController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Patch)(':id'),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, update_actividad_dto_1.UpdateActividadDto]),
+    __metadata("design:paramtypes", [String, update_actividad_dto_1.UpdateActividadDto]),
     __metadata("design:returntype", void 0)
-], ActividadController.prototype, "update", null);
+], ActividadesController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
-], ActividadController.prototype, "remove", null);
-exports.ActividadController = ActividadController = __decorate([
-    (0, common_1.Controller)('actividad'),
+], ActividadesController.prototype, "remove", null);
+exports.ActividadesController = ActividadesController = __decorate([
+    (0, common_1.Controller)('actividades'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __metadata("design:paramtypes", [actividades_service_1.ActividadService])
-], ActividadController);
+], ActividadesController);
 //# sourceMappingURL=actividades.controller.js.map

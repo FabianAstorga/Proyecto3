@@ -22,10 +22,10 @@ export class Horario {
   fecha: Date;
 
   // Asumiendo que necesitas la fecha y hora
-  @Column({ type: 'timestamp' })
+  @Column({ type: 'datetime' })
   horaInicio: Date; 
 
-  @Column({ type: 'timestamp' })
+  @Column({ type: 'datetime' })
   horaFin: Date;
 
   @Column({ type: 'boolean', default: true })

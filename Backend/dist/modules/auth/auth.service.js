@@ -95,7 +95,10 @@ let AuthService = class AuthService {
         };
         const token = this.jwtService.sign(payload);
         const { contrasena, ...usuarioSinContrasena } = user;
-        return '✔ Inicio de sesión exitoso.' + '\n' + '✔ Token de autenticación: ' + token;
+        return {
+            access_token: token,
+            user: usuarioSinContrasena,
+        };
     }
 };
 exports.AuthService = AuthService;

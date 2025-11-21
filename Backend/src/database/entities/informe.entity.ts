@@ -23,11 +23,19 @@ export class Informe {
   @Column({ type: 'date', nullable: true })
   fechaRevision: Date;
 
-  @Column({ default: 'pendiente' })
+  @Column({ 
+    type: 'enum',
+    enum: ['pendiente', 'enviado', 'revisado', 'aprobado', 'rechazado'],
+    default: 'pendiente'
+  })
   estado: string;
 
   @Column({ type: 'text', nullable: true })
   observaciones: string;
+
+  // olumna explícita para la clave foránea
+  @Column({ type: 'int' })
+  usuario_id: number;
 
   @ManyToOne(() => Usuario, (usuario) => usuario.informes, {
     onDelete: 'CASCADE',

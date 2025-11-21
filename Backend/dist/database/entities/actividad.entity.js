@@ -20,6 +20,7 @@ let Actividad = class Actividad {
     tipo;
     estado;
     esRepetitiva;
+    informe_id;
     informe;
 };
 exports.Actividad = Actividad;
@@ -44,17 +45,26 @@ __decorate([
     __metadata("design:type", String)
 ], Actividad.prototype, "tipo", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'boolean', default: false }),
-    __metadata("design:type", Boolean)
+    (0, typeorm_1.Column)({
+        type: 'enum',
+        enum: ['Pendiente', 'En Progreso', 'Realizada', 'Cancelada'],
+        default: 'Pendiente'
+    }),
+    __metadata("design:type", String)
 ], Actividad.prototype, "estado", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: 'boolean', default: false }),
     __metadata("design:type", Boolean)
 ], Actividad.prototype, "esRepetitiva", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ type: 'int' }),
+    __metadata("design:type", Number)
+], Actividad.prototype, "informe_id", void 0);
+__decorate([
     (0, typeorm_1.ManyToOne)(() => informe_entity_1.Informe, (informe) => informe.actividades, {
         onDelete: 'CASCADE',
     }),
+    (0, typeorm_1.JoinColumn)({ name: 'informe_id' }),
     __metadata("design:type", informe_entity_1.Informe)
 ], Actividad.prototype, "informe", void 0);
 exports.Actividad = Actividad = __decorate([

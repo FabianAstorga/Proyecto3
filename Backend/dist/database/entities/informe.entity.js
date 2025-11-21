@@ -20,6 +20,7 @@ let Informe = class Informe {
     fechaRevision;
     estado;
     observaciones;
+    usuario_id;
     usuario;
     actividades;
 };
@@ -41,13 +42,21 @@ __decorate([
     __metadata("design:type", Date)
 ], Informe.prototype, "fechaRevision", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ default: 'pendiente' }),
+    (0, typeorm_1.Column)({
+        type: 'enum',
+        enum: ['pendiente', 'enviado', 'revisado', 'aprobado', 'rechazado'],
+        default: 'pendiente'
+    }),
     __metadata("design:type", String)
 ], Informe.prototype, "estado", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: 'text', nullable: true }),
     __metadata("design:type", String)
 ], Informe.prototype, "observaciones", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'int' }),
+    __metadata("design:type", Number)
+], Informe.prototype, "usuario_id", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => usuario_entity_1.Usuario, (usuario) => usuario.informes, {
         onDelete: 'CASCADE',

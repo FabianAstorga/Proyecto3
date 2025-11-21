@@ -7,6 +7,7 @@ export declare class Informe {
     fechaRevision: Date;
     estado: string;
     observaciones: string;
+    usuario_id: number;
     usuario: Usuario;
     actividades: Actividad[];
 }
