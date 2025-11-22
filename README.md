@@ -28,11 +28,10 @@ DB_PORT=3306
 DB_USERNAME=panel
 DB_PASSWORD=
 DB_NAME=paneladmin
-JWT_SECRET=mi_secreto_super_seguro</p>
-## Project setup
+JWT_SECRET=mi_secreto_super_seguro
 ```
 
-## Description
+## Descripción
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
@@ -40,7 +39,7 @@ JWT_SECRET=mi_secreto_super_seguro</p>
 $ npm install
 ```
 
-## Compile and run the project
+## Compilación y ejecución del proyecto
 
 ```bash
 # development
@@ -51,6 +50,16 @@ $ npm run start:dev
 
 # production mode
 $ npm run start:prod
+```
+
+## Generar Migraciones
+
+```bash
+# build migration (example)
+npx typeorm-ts-node-commonjs migration:generate ./src/database/migrations/initial -d ./src/database/data-source.ts
+
+# execute migration (example)
+npx typeorm-ts-node-commonjs migration:run -d ./src/database/data-source.ts
 ```
 
 ## Run tests
@@ -96,13 +105,3 @@ Check out a few resources that may come in handy when working with NestJS:
 
 Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
 
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
->>>>>>> 605d8292 (feac: create auth and config migrations)
