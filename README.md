@@ -1,5 +1,6 @@
 # Proyecto3
-Repositorio de Proyecto 3, de ambos mini proyectos, su documentacion, codigo y demas cosas relacionadas
+Repositorio de Proyecto 3
+De sistema de registros de actividades curriculares con: la documentacion, codigo y demas cosas relacionadas.
 =======
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
