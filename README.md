@@ -1,6 +1,9 @@
 # Proyecto3
 Repositorio de Proyecto 3
-De sistema de registros de actividades curriculares con: la documentacion, codigo y demas cosas relacionadas.
+Es un sistema de registros de actividades curriculares para llevar un registro mensual de los funcionarios activos del departamento de mecanica, y este repositorio viene con: la documentacion, codigo, referencias, entre otros.
+
+# Proyecto 3 - Departamento de Mecanica
+Una aplicación web desarrollada para simular el funcionamiento de una empresa de logística tipo **DHL Express**, con funcionalidades como gestión de usuarios, paquetes, rutas de entrega optimizadas, seguimiento en tiempo real, notificaciones y más.
 =======
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
@@ -18,8 +21,26 @@ De sistema de registros de actividades curriculares con: la documentacion, codig
   <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
     <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
 </p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+
+## 🛠️ Tecnologías utilizadas
+
+### Frontend:
+- **Angular (v18)**
+- **Tailwind CSS** (para el diseño)
+- **RxJS** (para manejo de estado reactivo)
+- **JWT** (para autenticación)
+- **WebSocket** (para notificaciones en tiempo real)
+- **Swagger** (para documentación del API)
+
+### Backend:
+- **NestJS** (v11)
+- **TypeORM**
+- **MySQL**
+- **JWT** (para autenticación)
+- **Passport**
+- **WebSocket** (para notificaciones en tiempo real)
+- **Swagger** (documentación de API)
+
 ## Archivo .env (backend)
 
 ```bash
@@ -31,9 +52,15 @@ DB_NAME=paneladmin
 JWT_SECRET=mi_secreto_super_seguro
 ```
 
-## Descripción
+## Instalación
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+
+```bash
+git clone https://github.com/Cristian-HC/dhl-frontend.git](https://github.com/FabianAstorga/Proyecto3.git
+Carpeta -> Backend y Frontend
+cd Proyecto3/Carpeta
+```
 
 ```bash
 $ npm install
