@@ -1,7 +1,3 @@
-# Proyecto3
-Repositorio de Proyecto 3
-Es un sistema de registros de actividades curriculares para llevar un registro mensual de los funcionarios activos del departamento de mecanica, y este repositorio viene con: la documentacion, codigo, referencias, entre otros.
-
 # Proyecto 3 - Departamento de Mecanica
 Una aplicación web desarrollada para simular el funcionamiento de una empresa de logística tipo **DHL Express**, con funcionalidades como gestión de usuarios, paquetes, rutas de entrega optimizadas, seguimiento en tiempo real, notificaciones y más.
 =======
