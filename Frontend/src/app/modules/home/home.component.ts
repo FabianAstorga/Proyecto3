@@ -6,31 +6,36 @@ import {
   ElementRef,
   ViewChild,
   AfterViewInit,
-} from '@angular/core';
-import { CommonModule } from '@angular/common';
+} from "@angular/core";
+import { CommonModule } from "@angular/common";
 import {
   ReactiveFormsModule,
   FormBuilder,
   Validators,
   FormGroup,
-} from '@angular/forms';
-import { Router, RouterLink, ActivatedRoute } from '@angular/router';
-import { FooterComponent } from '../../components/footer/footer.component';
-import { AuthService } from '../../services/auth.service';
-import { DataService } from '../../services/data.service';
+} from "@angular/forms";
+import { Router, RouterLink, ActivatedRoute } from "@angular/router";
+import { FooterComponent } from "../../components/footer/footer.component";
+import { AuthService } from "../../services/auth.service";
+import { DataService } from "../../services/data.service";
 
 @Component({
   standalone: true,
-  selector: 'app-home',
+  selector: "app-home",
   imports: [CommonModule, ReactiveFormsModule, RouterLink, FooterComponent],
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss'],
+  templateUrl: "./home.component.html",
+  styleUrls: ["./home.component.scss"],
 })
 export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
-  @ViewChild('hotbar', { static: true }) hotbarRef!: ElementRef<HTMLElement>;
+  @ViewChild("hotbar", { static: true }) hotbarRef!: ElementRef<HTMLElement>;
   hotbarH = 0;
 
-  images: string[] = ['/mecanica3.jpg', '/mecanica2.jpg', '/mecanica.jpg'];
+  images: string[] = [
+    "assets/img/mecanica3.jpg",
+    "assets/img/mecanica2.jpg",
+    "assets/img/mecanica.jpg",
+  ];
+
   currentIndex = 0;
   currentBg = this.images[0];
   intervalMs = 5000;
@@ -40,10 +45,14 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   showPassword = false;
   form!: FormGroup;
 
+  // Alertas
+  alertMessage: string | null = null;
+  alertType: "success" | "error" = "error";
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private route: ActivatedRoute, // para leer returnUrl
+    private route: ActivatedRoute,
     private authService: AuthService,
     private dataService: DataService
   ) {}
@@ -54,16 +63,16 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
       const img = new Image();
       img.src = src;
     });
+
     this.timerId = setInterval(() => this.nextBackground(), this.intervalMs);
 
     // Formulario login
     this.form = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required]],
+      email: ["", [Validators.required, Validators.email]],
+      password: ["", [Validators.required]],
       remember: [false],
     });
 
-    // Asegurar formulario limpio al inicio
     this.form.reset();
   }
 
@@ -71,7 +80,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     this.measureHotbar();
   }
 
-  @HostListener('window:resize')
+  @HostListener("window:resize")
   onResize() {
     this.measureHotbar();
   }
@@ -96,8 +105,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     this.currentBg = this.images[i];
   }
 
-  // --- Lógica de Modal ---
-
+  // --- Modal login ---
   openLogin(): void {
     this.loginOpen = true;
     this.form.reset();
@@ -110,12 +118,10 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
 
   toggleLogin(): void {
     this.loginOpen = !this.loginOpen;
-    if (this.loginOpen) {
-      this.form.reset();
-    }
+    if (this.loginOpen) this.form.reset();
   }
 
-  @HostListener('document:keydown.escape')
+  @HostListener("document:keydown.escape")
   onEsc() {
     if (this.loginOpen) this.closeLogin();
   }
@@ -124,43 +130,71 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     return this.form.controls;
   }
 
+  showAlert(
+    message: string,
+    duration = 3000,
+    type: "success" | "error" = "error"
+  ) {
+    this.alertMessage = message;
+    this.alertType = type;
+    setTimeout(() => {
+      this.alertMessage = null;
+    }, duration);
+  }
+
   submit(): void {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
+    const email = this.form.value.email?.trim();
+    const password = this.form.value.password?.trim();
+
+    // Validaciones independientes
+    if (!email && !password) {
+      this.showAlert("❌ Debes ingresar correo y contraseña", 3000, "error");
+      return;
+    }
+    if (!email) {
+      this.showAlert("❌ Debes ingresar tu correo", 3000, "error");
+      return;
+    }
+    if (!password) {
+      this.showAlert("❌ Debes ingresar tu contraseña", 3000, "error");
       return;
     }
 
-    const email = this.form.value.email.trim();
-    const password = this.form.value.password.trim();
-
+    // Llamada login
     this.dataService.login(email, password).subscribe({
-      next: ({ user, token }) => {
-        // 1) guardo token + user
-        this.authService.login(token, user);
+      next: (res: any) => {
+        const user = res.user ?? res.usuario;
+        const token = res.token;
 
-        // 2) cierro modal
-        this.closeLogin();
-
-        // 3) si venía de una ruta protegida, regreso ahí
-        const returnUrl =
-          this.route.snapshot.queryParamMap.get('returnUrl') ?? '';
-
-        if (returnUrl.trim().length > 0) {
-          this.router.navigateByUrl(returnUrl);
+        if (!user || !token) {
+          this.showAlert("❌ Correo o contraseña incorrectos", 4000, "error");
           return;
         }
 
-        // 4) si no, voy al home según rol
-        const home = this.authService.getHomeRouteForRole();
-        this.router.navigateByUrl(home);
+        // Guardar token y usuario
+        this.authService.login(token, user);
+
+        // Cerrar modal
+        this.closeLogin();
+
+        // Mostrar alerta de éxito en verde
+        this.showAlert("✅ Sesión iniciada correctamente", 1500, "success");
+
+        // Delay antes de redirigir
+        setTimeout(() => {
+          const returnUrl =
+            this.route.snapshot.queryParamMap.get("returnUrl") ?? "";
+          if (returnUrl.trim()) {
+            this.router.navigateByUrl(returnUrl);
+            return;
+          }
+          this.router.navigateByUrl(this.authService.getHomeRouteForRole());
+        }, 1500); // 1.5 segundos
       },
       error: (err) => {
-        console.error('Error en login', err);
-        alert('Correo o contraseña incorrectos');
-        this.form.reset();
-        this.form.markAsUntouched();
+        console.error("Error en login", err);
+        this.showAlert("❌ Correo o contraseña incorrectos", 4000, "error");
       },
     });
   }
-
 }

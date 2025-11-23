@@ -46,9 +46,7 @@
 
             <!-- Eventos del día -->
             <div class="flex-1">
-              <ng-container
-                *ngIf="eventsByDay[d.key]?.length; else noEvents"
-              >
+              <ng-container *ngIf="eventsByDay[d.key]?.length; else noEvents">
                 <div class="flex flex-wrap gap-3 md:gap-4">
                   <div
                     *ngFor="let ev of eventsByDay[d.key]"
@@ -154,13 +152,8 @@
               name="blockIndex"
               required
             >
-              <option [ngValue]="null" disabled>
-                Selecciona un bloque…
-              </option>
-              <option
-                *ngFor="let i of modal.availableBlocks"
-                [ngValue]="i"
-              >
+              <option [ngValue]="null" disabled>Selecciona un bloque…</option>
+              <option *ngFor="let i of modal.availableBlocks" [ngValue]="i">
                 {{ blocks[i].label }} {{ blocks[i].code }}
               </option>
             </select>

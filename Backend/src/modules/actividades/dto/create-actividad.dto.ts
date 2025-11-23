@@ -5,7 +5,7 @@ import {
   IsBoolean,
   IsOptional,
   IsNumber,
-} from 'class-validator';
+} from "class-validator";
 
 export class CreateActividadDto {
   @IsString()
@@ -28,5 +28,4 @@ export class CreateActividadDto {
   esRepetitiva?: boolean;
 
   // es el id_informe creo
-
 }

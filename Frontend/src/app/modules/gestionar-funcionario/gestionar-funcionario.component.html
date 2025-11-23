@@ -1,31 +1,58 @@
 <app-layout [title]="'Administración'" [logoutLink]="'/login'">
-  <section class="app-page space-y-8">
-    <!-- Título -->
-    <div>
-      <h1 class="app-section-title">Gestionar funcionarios</h1>
+  <section class="app-page space-y-8 p-6 bg-gray-50 min-h-screen">
+    <!-- ================= Alerta flotante ================= -->
+    <div
+      *ngIf="alertMessage"
+      class="fixed inset-0 flex items-center justify-center z-50 pointer-events-none"
+    >
+      <div
+        class="backdrop-blur-md px-6 py-4 rounded-lg shadow-lg text-white max-w-xs w-full text-center pointer-events-auto animate-fadeIn"
+        [ngClass]="{
+          'bg-green-500/80': alertType === 'success',
+          'bg-red-500/80': alertType === 'danger',
+          'bg-yellow-400/80 text-black': alertType === 'warning'
+        }"
+      >
+        <span class="font-semibold">{{ alertType | titlecase }}! </span>
+        {{ alertMessage }}
+      </div>
     </div>
 
-    <!-- Formulario -->
-    <div class="app-card">
-      <div class="app-card-header">
-        <h2 class="app-card-title">Datos del funcionario</h2>
+    <!-- ================= Título Principal ================= -->
+    <div>
+      <h1 class="text-5xl text-center font-extrabold text-gray-800">
+        Gestionar funcionarios
+      </h1>
+      <p class="text-gray-600 mt-1 text-2xl tracking-wide">
+        Cree, edite o elimine usuarios del sistema.
+      </p>
+    </div>
+
+    <!-- ================= Formulario de Usuario ================= -->
+    <div class="app-card bg-white shadow-md rounded-lg overflow-hidden">
+      <div
+        class="app-card-header bg-yellow-400/20 px-6 py-3 border-b border-gray-200"
+      >
+        <h2 class="text-lg font-semibold text-gray-800">
+          Datos del funcionario
+        </h2>
       </div>
 
-      <div class="app-card-body">
+      <div class="app-card-body p-6">
         <form
-          class="grid grid-cols-1 md:grid-cols-2 gap-5"
+          class="grid grid-cols-1 md:grid-cols-2 gap-6"
           [formGroup]="form"
           (ngSubmit)="modo === 'crear' ? crear() : actualizar()"
         >
           <!-- Nombre -->
           <div>
-            <label for="nombre" class="block text-sm font-medium text-gray-700">
-              Nombre
-            </label>
+            <label for="nombre" class="block text-sm font-medium text-gray-700"
+              >Nombre</label
+            >
             <input
               id="nombre"
               placeholder="Ingrese el nombre"
-              class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
+              class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none shadow-sm"
               formControlName="nombre"
             />
             <p
@@ -36,19 +63,21 @@
             </p>
           </div>
 
-          <!-- Apellidos -->
+          <!-- Apellido -->
           <div>
-            <label for="apellidos" class="block text-sm font-medium text-gray-700">
-              Apellidos
-            </label>
+            <label
+              for="apellido"
+              class="block text-sm font-medium text-gray-700"
+              >Apellido</label
+            >
             <input
-              id="apellidos"
-              placeholder="Ingrese los apellidos"
-              class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
-              formControlName="apellidos"
+              id="apellido"
+              placeholder="Ingrese el apellido"
+              class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none shadow-sm"
+              formControlName="apellido"
             />
             <p
-              *ngIf="f['apellidos'].touched && f['apellidos'].invalid"
+              *ngIf="f['apellido'].touched && f['apellido'].invalid"
               class="text-xs text-red-600 mt-1"
             >
               Obligatorio.
@@ -57,14 +86,14 @@
 
           <!-- Correo -->
           <div>
-            <label for="correo" class="block text-sm font-medium text-gray-700">
-              Correo
-            </label>
+            <label for="correo" class="block text-sm font-medium text-gray-700"
+              >Correo</label
+            >
             <input
               id="correo"
               type="email"
               placeholder="ejemplo@uta.cl"
-              class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
+              class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none shadow-sm"
               formControlName="correo"
             />
             <p
@@ -77,89 +106,120 @@
 
           <!-- Teléfono -->
           <div>
-            <label for="telefono" class="block text-sm font-medium text-gray-700">
-              Teléfono
-            </label>
+            <label
+              for="telefono"
+              class="block text-sm font-medium text-gray-700"
+              >Teléfono</label
+            >
             <input
               id="telefono"
               placeholder="Ej: +56 9 1234 5678"
-              class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
+              class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none shadow-sm"
               formControlName="telefono"
             />
           </div>
 
-          <!-- Anexo -->
+          <!-- Contraseña -->
           <div>
-            <label for="anexo" class="block text-sm font-medium text-gray-700">
-              Anexo
-            </label>
-            <input
-              id="anexo"
-              placeholder="Ej: 1234"
-              class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
-              formControlName="anexo"
-            />
-          </div>
-
-          <!-- URL Horario -->
-          <div>
-            <label for="url_horario" class="block text-sm font-medium text-gray-700">
-              URL Horario
-            </label>
-            <input
-              id="url_horario"
-              placeholder="https://..."
-              class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
-              formControlName="url_horario"
-            />
-          </div>
-
-          <!-- Foto URL -->
-          <div>
-            <label for="foto_url" class="block text-sm font-medium text-gray-700">
-              Foto (URL)
-            </label>
-            <input
-              id="foto_url"
-              placeholder="https://imagen-perfil.jpg"
-              class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
-              formControlName="foto_url"
-            />
-          </div>
-
-          <!-- RUT -->
-          <div>
-            <label for="rut" class="block text-sm font-medium text-gray-700">
-              RUT
-            </label>
-            <input
-              id="rut"
-              placeholder="Ej: 12.345.678-9"
-              class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
-              formControlName="rut"
-            />
-          </div>
-
-          <!-- Estado -->
-          <div>
-            <label for="estado" class="block text-sm font-medium text-gray-700">
-              Estado
-            </label>
-            <select
-              id="estado"
-              class="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none bg-white"
-              formControlName="estado"
+            <label
+              for="contrasena"
+              class="block text-sm font-medium text-gray-700"
+              >Contraseña</label
             >
-              <option *ngFor="let e of estados" [value]="e">{{ e }}</option>
-            </select>
+            <input
+              id="contrasena"
+              type="password"
+              placeholder="Ingrese la contraseña"
+              class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none shadow-sm"
+              formControlName="contrasena"
+            />
+            <p
+              *ngIf="
+                f['contrasena'].touched &&
+                f['contrasena'].invalid &&
+                f['contrasena'].value
+              "
+              class="text-xs text-red-600 mt-1"
+            >
+              La contraseña debe tener al menos 8 caracteres si la cambia.
+            </p>
           </div>
 
-          <!-- Botones -->
-          <div class="md:col-span-2 flex flex-wrap gap-3 pt-4">
-            <button type="submit" class="btn-primary">
-              {{ modo === 'crear' ? 'Crear' : 'Actualizar' }}
+          <!-- Rol -->
+          <div>
+            <label for="rol" class="block text-sm font-medium text-gray-700"
+              >Rol</label
+            >
+            <select
+              id="rol"
+              class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none shadow-sm"
+              formControlName="rol"
+            >
+              <option value="">Seleccione un rol</option>
+              <option *ngFor="let r of roles" [value]="r">
+                {{ r | titlecase }}
+              </option>
+            </select>
+            <p
+              *ngIf="f['rol'].touched && f['rol'].invalid"
+              class="text-xs text-red-600 mt-1"
+            >
+              Obligatorio.
+            </p>
+          </div>
+
+          <!-- Foto Drag & Drop -->
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-700"
+              >Foto del funcionario</label
+            >
+            <div
+              class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer mt-1 hover:border-yellow-400 hover:bg-yellow-50 transition"
+              (dragover)="onDragOver($event)"
+              (dragleave)="onDragLeave($event)"
+              (drop)="onDrop($event)"
+              [ngClass]="{ 'border-yellow-400 bg-yellow-50': isDragging }"
+              (click)="fileInput.click()"
+            >
+              <p *ngIf="!form.value.foto_url">
+                Arrastra tu foto aquí o haz clic para seleccionarla
+              </p>
+              <img
+                *ngIf="form.value.foto_url"
+                [src]="form.value.foto_url"
+                class="h-32 w-32 rounded-full mx-auto mt-2 shadow-md"
+                alt="Foto seleccionada"
+              />
+              <input
+                type="file"
+                accept="image/*"
+                class="hidden"
+                #fileInput
+                (change)="onFileSelected($event)"
+              />
+            </div>
+            <button
+              type="button"
+              class="mt-2 btn-secondary"
+              (click)="fileInput.click()"
+            >
+              Seleccionar archivo
             </button>
-            <button type="button" (click)="resetForm()" class="btn-secondary">
+          </div>
+
+          <!-- Botones Crear/Actualizar y Limpiar -->
+          <div class="md:col-span-2 flex flex-wrap gap-3 pt-4">
+            <button
+              type="submit"
+              class="btn-primary shadow hover:shadow-lg transition"
+            >
+              {{ modo === "crear" ? "Crear" : "Actualizar" }}
+            </button>
+            <button
+              type="button"
+              (click)="resetForm()"
+              class="btn-secondary shadow hover:shadow-lg transition"
+            >
               Limpiar
             </button>
           </div>
@@ -167,55 +227,57 @@
       </div>
     </div>
 
-    <!-- Tabla -->
-    <div class="app-card">
-      <div class="app-card-header">
-        <h2 class="app-card-title">Cambios recientes</h2>
+    <!-- ================= Tabla de Usuarios ================= -->
+    <div class="app-card bg-white shadow-md rounded-lg overflow-hidden">
+      <div
+        class="app-card-header bg-yellow-400/20 px-6 py-3 border-b border-gray-200"
+      >
+        <h2 class="text-lg font-semibold text-gray-800">
+          Usuarios del Sistema
+        </h2>
       </div>
-
-      <div class="app-card-body">
-        <div class="overflow-x-auto">
-          <table class="min-w-full text-sm">
-            <thead>
-              <tr class="text-[#0D1440] border-b border-gray-200">
-                <th class="px-4 py-2 text-left">Nombre</th>
-                <th class="px-4 py-2 text-left">Correo</th>
-                <th class="px-4 py-2 text-center">Estado</th>
-                <th class="px-4 py-2 text-center">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let u of usuarios()" class="border-t border-gray-100">
-                <td class="px-4 py-2">{{ u.nombre }} {{ u.apellidos }}</td>
-                <td class="px-4 py-2">{{ u.correo }}</td>
-                <td class="px-4 py-2 text-center">
-                  <span [ngClass]="u.estado === 'Activo' ? 'pill-success' : 'pill-muted'">
-                    {{ u.estado }}
-                  </span>
-                </td>
-                <td class="px-4 py-2 text-center">
-                  <div class="flex gap-2 justify-center">
-                    <button class="btn-secondary px-3 py-1.5 text-xs" (click)="editar(u)">
-                      Editar
-                    </button>
-                    <button
-                      class="px-3 py-1.5 rounded-md bg-red-50 text-red-700 border border-red-200 text-xs hover:bg-red-100"
-                      (click)="eliminar(u.id)"
-                    >
-                      Eliminar
-                    </button>
-                  </div>
-                </td>
-              </tr>
-
-              <tr *ngIf="usuarios().length === 0">
-                <td colspan="4" class="px-4 py-6 text-center text-gray-500">
-                  Sin registros
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+      <div class="app-card-body p-6 overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr class="text-gray-600 uppercase text-xs">
+              <th class="px-4 py-2 text-left">Nombre</th>
+              <th class="px-4 py-2 text-left">Correo</th>
+              <th class="px-4 py-2 text-left">Rol</th>
+              <th class="px-4 py-2 text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-100">
+            <tr
+              *ngFor="let u of usuarios()"
+              class="hover:bg-gray-50 transition"
+            >
+              <td class="px-4 py-2">{{ u.nombre }} {{ u.apellido }}</td>
+              <td class="px-4 py-2">{{ u.correo }}</td>
+              <td class="px-4 py-2">{{ u.rol | titlecase }}</td>
+              <td class="px-4 py-2 text-center">
+                <div class="flex gap-2 justify-center">
+                  <button
+                    class="btn-secondary px-3 py-1.5 text-xs hover:bg-gray-200 transition"
+                    (click)="editar(u)"
+                  >
+                    Editar
+                  </button>
+                  <button
+                    class="px-3 py-1.5 rounded-md bg-red-50 text-red-700 border border-red-200 text-xs hover:bg-red-100 transition"
+                    (click)="eliminar(u.id)"
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="usuarios().length === 0">
+              <td colspan="4" class="px-4 py-6 text-center text-gray-400">
+                Sin registros
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </section>

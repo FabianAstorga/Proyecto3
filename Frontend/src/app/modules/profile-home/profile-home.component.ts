@@ -1,19 +1,19 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { ActivatedRoute } from "@angular/router";
 
-import { LayoutComponent } from '../../components/layout/layout.component';
-import { User } from '../../models/user.model';
-import { Activity } from '../../models/activity.model';
-import { Cargo } from '../../models/charge.model';
-import { DataService } from '../../services/data.service';
-import { AuthService } from '../../services/auth.service';
+import { LayoutComponent } from "../../components/layout/layout.component";
+import { User } from "../../models/user.model";
+import { Activity } from "../../models/activity.model";
+import { Cargo } from "../../models/charge.model";
+import { DataService } from "../../services/data.service";
+import { AuthService } from "../../services/auth.service";
 
 @Component({
   standalone: true,
-  selector: 'app-profile-home',
+  selector: "app-profile-home",
   imports: [CommonModule, LayoutComponent],
-  templateUrl: './profile-home.component.html',
+  templateUrl: "./profile-home.component.html",
 })
 export class ProfileHomeComponent implements OnInit {
   user: User | undefined;
@@ -23,8 +23,8 @@ export class ProfileHomeComponent implements OnInit {
   cargoDescripcion: string[] = [];
 
   // Dinámicos
-  notificationLabel = '';
-  lastSession = '';
+  notificationLabel = "";
+  lastSession = "";
 
   showDetails = false;
 
@@ -44,31 +44,31 @@ export class ProfileHomeComponent implements OnInit {
       const d = new Date(lastIso);
       this.lastSession = this.formatDateTime(d); // dd/mm/aaaa HH:MM
     } else {
-      this.lastSession = 'Sin registro de sesión';
+      this.lastSession = "Sin registro de sesión";
     }
 
     // 3) Carga de usuario + datos
-    const idParam = this.route.snapshot.paramMap.get('id');
+    const idParam = this.route.snapshot.paramMap.get("id");
     const id = idParam ? Number(idParam) : NaN;
 
     if (!Number.isFinite(id)) {
-      console.error('ID de usuario inválido en la ruta');
+      console.error("ID de usuario inválido en la ruta");
       return;
     }
 
-    this.dataService.getUserById(id).subscribe({
-      next: user => {
+    this.dataService.getUser(id).subscribe({
+      next: (user) => {
         this.user = user;
         if (!this.user) {
-          console.error('Usuario no encontrado para id =', id);
+          console.error("Usuario no encontrado para id =", id);
           return;
         }
 
         this.loadActivities();
         this.loadCargos();
       },
-      error: err => {
-        console.error('Error cargando usuario por id:', err);
+      error: (err) => {
+        console.error("Error cargando usuario por id:", err);
       },
     });
   }
@@ -115,16 +115,16 @@ export class ProfileHomeComponent implements OnInit {
     const y = d.getFullYear();
     const m = d.getMonth() + 1;
     const day = d.getDate();
-    const dd = String(day).padStart(2, '0');
-    const mm = String(m).padStart(2, '0');
+    const dd = String(day).padStart(2, "0");
+    const mm = String(m).padStart(2, "0");
     return `${dd}/${mm}/${y}`;
   }
 
   /** Formatea Date a dd/mm/aaaa HH:MM */
   private formatDateTime(d: Date): string {
     const datePart = this.formatDate(d);
-    const hh = String(d.getHours()).padStart(2, '0');
-    const mi = String(d.getMinutes()).padStart(2, '0');
+    const hh = String(d.getHours()).padStart(2, "0");
+    const mi = String(d.getMinutes()).padStart(2, "0");
     return `${datePart} ${hh}:${mi}`;
   }
 
@@ -132,7 +132,7 @@ export class ProfileHomeComponent implements OnInit {
     if (!this.user) return;
 
     this.dataService.getActivitiesByUser(this.user.id).subscribe({
-      next: activities => {
+      next: (activities) => {
         // total KPIs
         this.activitiesCount = activities.length;
 
@@ -141,8 +141,8 @@ export class ProfileHomeComponent implements OnInit {
           .sort((a, b) => (a.fecha < b.fecha ? 1 : a.fecha > b.fecha ? -1 : 0))
           .slice(0, 10);
       },
-      error: err => {
-        console.error('Error cargando actividades desde DataService:', err);
+      error: (err) => {
+        console.error("Error cargando actividades desde DataService:", err);
       },
     });
   }
@@ -150,23 +150,24 @@ export class ProfileHomeComponent implements OnInit {
   private loadCargos(): void {
     if (!this.user) return;
 
-    this.dataService.getCargoByRole(this.user.role as any).subscribe({
-      next: (cargo: Cargo | undefined) => {
-        this.cargoDescripcion = cargo?.descripcion ?? [];
+    this.dataService.getCargosByUsuario(this.user.id).subscribe({
+      next: (cargos: Cargo[]) => {
+        this.cargoDescripcion = cargos.map((c) => c.descripcion ?? "");
       },
-      error: err => {
-        console.error('Error cargando cargos desde DataService:', err);
+      error: (err) => {
+        console.error("Error cargando los cargos del usuario:", err);
+        this.cargoDescripcion = [];
       },
     });
   }
 
   // Utilidad para mostrar fecha en dd/mm/aaaa (para las actividades)
   formatDMY(iso: string): string {
-    if (!iso) return '';
-    const [y, m, d] = iso.split('-').map(Number);
+    if (!iso) return "";
+    const [y, m, d] = iso.split("-").map(Number);
     if (!y || !m || !d) return iso;
-    const dd = String(d).padStart(2, '0');
-    const mm = String(m).padStart(2, '0');
+    const dd = String(d).padStart(2, "0");
+    const mm = String(m).padStart(2, "0");
     return `${dd}/${mm}/${y}`;
   }
 
@@ -179,6 +180,6 @@ export class ProfileHomeComponent implements OnInit {
   }
 
   onAvatarError(e: Event): void {
-    (e.target as HTMLImageElement).src = '/avatar.jpg';
+    (e.target as HTMLImageElement).src = "/avatar-de-usuario.png";
   }
 }

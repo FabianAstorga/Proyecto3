@@ -1,21 +1,21 @@
 // src/app/services/auth.service.ts
-import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
-import { jwtDecode } from 'jwt-decode';
-import { User } from '../models/user.model';
+import { Injectable } from "@angular/core";
+import { jwtDecode } from "jwt-decode";
+import { User } from "../models/user.model";
+import { Router } from "@angular/router";
 
 interface DecodedToken {
-  sub: number;       // id del usuario en el backend
+  sub: number; // id del usuario en el backend
   correo: string;
-  rol: string;       // 'funcionario' | 'secretaria' | 'administrador'
-  exp: number;       // timestamp en segundos
+  rol: string; // 'funcionario' | 'secretaria' | 'administrador'
+  exp: number; // timestamp en segundos
 }
 
-@Injectable({ providedIn: 'root' })
+@Injectable({ providedIn: "root" })
 export class AuthService {
-  private readonly TOKEN_KEY = 'authToken';
-  private readonly USER_KEY = 'authUser';
-  private readonly LAST_SESSION_KEY = 'lastSession';
+  private readonly TOKEN_KEY = "authToken";
+  private readonly USER_KEY = "authUser";
+  private readonly LAST_SESSION_KEY = "lastSession";
 
   constructor(private router: Router) {}
 
@@ -30,14 +30,14 @@ export class AuthService {
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.USER_KEY);
     // te mando SIEMPRE a la home ('/')
-    this.router.navigateByUrl('/');
+    this.router.navigateByUrl("/");
   }
 
   getToken(): string | null {
     return localStorage.getItem(this.TOKEN_KEY);
   }
 
-  private getUserFromStorage(): User | null {
+  public getUserFromStorage(): User | null {
     const raw = localStorage.getItem(this.USER_KEY);
     if (!raw) return null;
     try {
@@ -54,7 +54,7 @@ export class AuthService {
     try {
       return jwtDecode<DecodedToken>(token);
     } catch (err) {
-      console.error('Error decodificando token', err);
+      console.error("Error decodificando token", err);
       return null;
     }
   }
@@ -100,14 +100,14 @@ export class AuthService {
     const role = this.getUserRole();
     const id = this.getUserId();
 
-    if (!role || !id) return '/';
+    if (!role || !id) return "/";
 
     const r = role.toLowerCase();
 
-    if (r === 'funcionario') return `/funcionario/${id}/perfil`;
-    if (r === 'secretaria') return `/secretaria/${id}/perfil`;
-    if (r === 'administrador') return `/admin/${id}/perfil`;
+    if (r === "funcionario") return `/funcionario/${id}/perfil`;
+    if (r === "secretaria") return `/secretaria/${id}/perfil`;
+    if (r === "administrador") return `/admin/${id}/perfil`;
 
-    return '/';
+    return "/";
   }
 }

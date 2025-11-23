@@ -1,4 +1,5 @@
 export interface Cargo {
-  role: string;
-  descripcion: string[];
+  id_cargo: number;
+  ocupacion: string;
+  descripcion?: string;
 }

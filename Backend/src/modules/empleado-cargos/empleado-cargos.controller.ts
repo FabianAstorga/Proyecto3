@@ -6,37 +6,41 @@ import {
   Param,
   Delete,
   Put,
-} from '@nestjs/common';
-import { CreateEmpleadoCargoDto } from './dto/create-empleado-cargo.dto';
-import { UpdateEmpleadoCargoDto } from './dto/update-empleado-cargo.dto';
-import { EmpleadoCargoService } from './empleado-cargos.service';
+  ParseIntPipe,
+} from "@nestjs/common";
+import { CreateEmpleadoCargoDto } from "./dto/create-empleado-cargo.dto";
+import { UpdateEmpleadoCargoDto } from "./dto/update-empleado-cargo.dto";
+import { EmpleadoCargoService } from "./empleado-cargos.service";
 
-@Controller('empleado-cargo')
+@Controller("employee-charge")
 export class EmpleadoCargoController {
   constructor(private readonly service: EmpleadoCargoService) {}
 
-  @Post()
+  @Post("create")
   create(@Body() dto: CreateEmpleadoCargoDto) {
     return this.service.create(dto);
   }
 
-  @Get()
+  @Get("get")
   findAll() {
     return this.service.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
+  @Get("get/:id")
+  findOne(@Param("id", ParseIntPipe) id: number) {
     return this.service.findOne(+id);
   }
 
-  @Put(':id')
-  update(@Param('id') id: string, @Body() dto: UpdateEmpleadoCargoDto) {
+  @Put("update/:id")
+  update(
+    @Param("id", ParseIntPipe) id: number,
+    @Body() dto: UpdateEmpleadoCargoDto
+  ) {
     return this.service.update(+id, dto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
+  @Delete("delete/:id")
+  remove(@Param("id", ParseIntPipe) id: number) {
     return this.service.remove(+id);
   }
 }

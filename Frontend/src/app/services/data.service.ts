@@ -1,69 +1,32 @@
 // src/app/services/data.service.ts
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
+import { Injectable } from "@angular/core";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { Observable, map } from "rxjs";
 
-import { User } from '../models/user.model';
-import { Activity } from '../models/activity.model';
-import { Cargo } from '../models/charge.model';
-import { AuthService } from './auth.service';
+import { User } from "../models/user.model";
+import { Activity } from "../models/activity.model";
+import { Cargo } from "../models/charge.model";
+import { AuthService } from "./auth.service";
+import { CreateActividadPayload } from "./backend/activity-backend.model";
+import { LoginResponse } from "./backend/logindata-backend.model";
+import { BackendUser } from "./backend/user-backend.model";
+import { BackendActividad } from "./backend/activity-backend2.model";
+import { EmpleadoCargo } from "./backend/charge-backend.model";
 
-export type UserRole = User['role'];
+export type UserRole = User["role"];
 
-// ====== Interfaces que representan lo que manda el BACKEND ======
-
-interface BackendUser {
-  id: number;
-  nombre: string;
-  apellido: string;
-  correo: string;
-  rol: string;        // 'funcionario' | 'secretaria' | 'administrador'
-  telefono: string;
-  foto_url?: string | null;
-}
-
-interface LoginResponse {
-  message: string;
-  user: BackendUser;
-  access_token: string;
-}
-
-interface BackendActividad {
-  id_actividad: number;
-  titulo: string;
-  descripcion: string;
-  fecha: string;       // 'YYYY-MM-DD'
-  tipo: string;
-  estado: boolean;     // true / false
-  esRepetitiva: boolean;
-  usuario: BackendUser | null; // puede venir null si no hay usuario
-  informe: any | null;
-}
-
-// payload ejemplo para crear actividad
-export interface CreateActividadPayload {
-  titulo: string;
-  descripcion: string;
-  fecha: string;      // 'YYYY-MM-DD'
-  tipo: string;
-  estado: boolean;    // o number, según tu DTO
-  esRepetitiva: boolean;
-}
-
-// ================================================================
-@Injectable({ providedIn: 'root' })
+@Injectable({ providedIn: "root" })
 export class DataService {
-  private readonly apiUrl = 'http://localhost:3000';
+  private readonly apiUrl = "http://localhost:3000";
 
-  private readonly usuariosEndpoint = `${this.apiUrl}/users/getAll`;
+  //Estandarizado, solo se llama a la ruta maestra (controlador)
+  private readonly usuariosEndpoint = `${this.apiUrl}/users`;
+  private readonly empleadoCargoEndpoint = `${this.apiUrl}/employee-charge`;
   private readonly actividadesEndpoint = `${this.apiUrl}/actividades`;
-  private readonly cargosEndpoint = `${this.apiUrl}/cargos`;
+  private readonly cargosEndpoint = `${this.apiUrl}/charges`;
   private readonly loginEndpoint = `${this.apiUrl}/auth/login`;
 
-  constructor(
-    private http: HttpClient,
-    private authService: AuthService
-  ) {}
+  constructor(private http: HttpClient, private authService: AuthService) {}
 
   // ------- helpers auth -------
   private getAuthOptions() {
@@ -86,27 +49,27 @@ export class DataService {
       // pasa de 'funcionario' -> 'Funcionario', etc.
       role: u.rol.charAt(0).toUpperCase() + u.rol.slice(1),
       password: undefined,
-      photoUrl: u.foto_url ?? '/usuario(1).png',
+      photoUrl: u.foto_url ?? "/usuario(1).png",
     };
   }
 
   // ------- mapeo actividad backend -> front -------
   private mapBackendActividad(a: BackendActividad): Activity {
     // 1) estado boolean -> string para el front
-    const estado: Activity['estado'] =
-      a.estado === true ? 'Aprobada' : 'Pendiente'; // ajusta si quieres otro texto
+    const estado: Activity["estado"] =
+      a.estado === true ? "Aprobada" : "Pendiente"; // ajusta si quieres otro texto
 
     // 2) nombre del usuario
     const userId = a.usuario ? a.usuario.id : null;
     const userName = a.usuario
       ? `${a.usuario.nombre} ${a.usuario.apellido}`
-      : 'Usuario sin asignar';
+      : "Usuario sin asignar";
 
     return {
       // estos campos deben existir en tu Activity model
       id: a.id_actividad,
       titulo: a.titulo,
-      detalle: a.descripcion ?? '',
+      detalle: a.descripcion ?? "",
       fecha: a.fecha,
       tipo: a.tipo,
       horas: 0, // si aún no manejan horas reales, deja 0
@@ -116,17 +79,61 @@ export class DataService {
     };
   }
 
-  // ================= USUARIOS =================
+  // ================= USUARIO - CRUD =================
 
   getUsers(): Observable<User[]> {
     return this.http
-      .get<BackendUser[]>(this.usuariosEndpoint, this.getAuthOptions())
+      .get<BackendUser[]>(`${this.usuariosEndpoint}/get`, this.getAuthOptions())
       .pipe(map((list) => list.map((u) => this.mapBackendUser(u))));
   }
 
-  getUserById(id: number): Observable<User | undefined> {
-    return this.getUsers().pipe(
-      map((users) => users.find((u) => u.id === id))
+  getUser(id: number): Observable<User> {
+    return this.http
+      .get<BackendUser>(
+        `${this.usuariosEndpoint}/get/${id}`,
+        this.getAuthOptions()
+      )
+      .pipe(map((u) => this.mapBackendUser(u)));
+  }
+
+  createUser(payload: any): Observable<any> {
+    return this.http.post(
+      `${this.usuariosEndpoint}/create`,
+      payload,
+      this.getAuthOptions()
+    );
+  }
+
+  updateUser(id: number, payload: any): Observable<any> {
+    return this.http.patch(
+      `${this.usuariosEndpoint}/update/${id}`,
+      payload,
+      this.getAuthOptions()
+    );
+  }
+
+  deleteUser(id: number): Observable<any> {
+    return this.http.delete(
+      `${this.usuariosEndpoint}/delete/${id}`,
+      this.getAuthOptions()
+    );
+  }
+
+  getMyProfile(): Observable<User> {
+    return this.http
+      .get<BackendUser>(
+        `${this.usuariosEndpoint}/getProfile`,
+        this.getAuthOptions()
+      )
+      .pipe(map((u) => this.mapBackendUser(u)));
+  }
+
+  // Actualizar mi propio perfil
+  updateMyProfile(payload: any): Observable<any> {
+    return this.http.patch(
+      `${this.usuariosEndpoint}/updateProfile`,
+      payload,
+      this.getAuthOptions()
     );
   }
 
@@ -157,8 +164,6 @@ export class DataService {
       .pipe(map((list) => list.map((a) => this.mapBackendActividad(a))));
   }
 
-
-
   getActivitiesByUser(userId: number): Observable<Activity[]> {
     return this.http
       .get<BackendActividad[]>(
@@ -176,18 +181,107 @@ export class DataService {
     );
   }
 
-  // ================= CARGOS =================
-
-  getCargos(): Observable<Cargo[]> {
-    return this.http.get<Cargo[]>(
-      this.cargosEndpoint,
+  // ================= CARGOS - CRUD =================
+  createCargo(payload: any): Observable<any> {
+    // POST /charges/create
+    return this.http.post(
+      `${this.cargosEndpoint}/create`,
+      payload,
       this.getAuthOptions()
     );
   }
 
-  getCargoByRole(role: UserRole): Observable<Cargo | undefined> {
-    return this.getCargos().pipe(
-      map((cargos) => cargos.find((c) => c.role === role))
+  updateCargo(id: number, payload: any): Observable<any> {
+    // PATCH /charges/update/:id
+    return this.http.patch(
+      `${this.cargosEndpoint}/update/${id}`,
+      payload,
+      this.getAuthOptions()
+    );
+  }
+
+  deleteCargo(id: number): Observable<any> {
+    // DELETE /charges/delete/:id
+    return this.http.delete(
+      `${this.cargosEndpoint}/delete/${id}`,
+      this.getAuthOptions()
+    );
+  }
+
+  getCargo(id: number): Observable<Cargo> {
+    // GET /charges/get/:id
+    return this.http.get<Cargo>(
+      `${this.cargosEndpoint}/get/${id}`,
+      this.getAuthOptions()
+    );
+  }
+
+  getCargos(): Observable<Cargo[]> {
+    // GET /charges/get
+    return this.http.get<Cargo[]>(
+      `${this.cargosEndpoint}/get`,
+      this.getAuthOptions()
+    );
+  }
+
+  // ================= EMPLEADO-CARGO - CRUD =================
+
+  // Crear asignación (asignar cargo a usuario) -> POST /employee-charge/create
+  createEmpleadoCargo(payload: {
+    usuarioId: number;
+    cargoId: number;
+  }): Observable<EmpleadoCargo> {
+    return this.http.post<EmpleadoCargo>(
+      `${this.empleadoCargoEndpoint}/create`,
+      payload,
+      this.getAuthOptions()
+    );
+  }
+
+  // Obtener todas las asignaciones -> GET /employee-charge/get
+  getEmpleadoCargos(): Observable<EmpleadoCargo[]> {
+    return this.http.get<EmpleadoCargo[]>(
+      `${this.empleadoCargoEndpoint}/get`,
+      this.getAuthOptions()
+    );
+  }
+
+  // Obtener asignación por ID -> GET /employee-charge/get/:id
+  getEmpleadoCargo(id: number): Observable<EmpleadoCargo> {
+    return this.http.get<EmpleadoCargo>(
+      `${this.empleadoCargoEndpoint}/get/${id}`,
+      this.getAuthOptions()
+    );
+  }
+
+  // Actualizar asignación (cambiar el cargo de un usuario) -> PUT /employee-charge/update/:id
+  updateEmpleadoCargo(
+    id: number,
+    payload: { usuarioId?: number; cargoId?: number }
+  ): Observable<EmpleadoCargo> {
+    return this.http.put<EmpleadoCargo>(
+      `${this.empleadoCargoEndpoint}/update/${id}`,
+      payload,
+      this.getAuthOptions()
+    );
+  }
+
+  // Eliminar asignación -> DELETE /employee-charge/delete/:id
+  deleteEmpleadoCargo(id: number): Observable<any> {
+    return this.http.delete(
+      `${this.empleadoCargoEndpoint}/delete/${id}`,
+      this.getAuthOptions()
+    );
+  }
+
+  // Obtener todos los cargos de un usuario específico
+  getCargosByUsuario(usuarioId: number): Observable<Cargo[]> {
+    return this.getEmpleadoCargos().pipe(
+      map((list) =>
+        list.filter((ec) => ec.usuario.id === usuarioId).map((ec) => ec.cargo)
+      )
     );
   }
 }
+
+export type { CreateActividadPayload };

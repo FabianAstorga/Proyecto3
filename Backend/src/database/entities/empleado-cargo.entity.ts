@@ -1,32 +1,20 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToOne,
-  JoinColumn,
-} from 'typeorm';
-import { Cargo } from './cargo.entity';
-import { Usuario } from './usuario.entity';
+import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from "typeorm";
+import { Usuario } from "./usuario.entity";
+import { Cargo } from "./cargo.entity";
 
-@Entity('empleado_cargo')
+@Entity("empleado_cargo")
 export class EmpleadoCargo {
   @PrimaryGeneratedColumn()
-  id: number; // Clave primaria simple para la relación
+  id: number;
 
-  @Column({ type: 'date' })
-  fecha_inicio: Date;
-
-  @Column({ type: 'date', nullable: true })
-  fecha_fin: Date;
-
-  // --- Relaciones ---
-  @ManyToOne(() => Usuario, (usuario) => usuario.cargos, {
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn({ name: 'usuario_id' })
+  @ManyToOne(() => Usuario, (usuario) => usuario.cargos, { eager: true })
+  @JoinColumn({ name: "id_usuario" })
   usuario: Usuario;
 
-  @ManyToOne(() => Cargo, (cargo) => cargo.empleados, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'cargo_id' })
+  @ManyToOne(() => Cargo, (cargo) => cargo.empleados, { eager: true })
+  @JoinColumn({ name: "id_cargo" })
   cargo: Cargo;
+
+  // Aquí puedes agregar campos adicionales si quieres, por ejemplo:
+  // fecha_inicio, fecha_fin, activo, etc.
 }

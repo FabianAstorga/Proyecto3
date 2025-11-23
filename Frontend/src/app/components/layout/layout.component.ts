@@ -1,85 +1,111 @@
-import { Component, Input, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
+import { Component, Input, OnInit, inject } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { Router, RouterLink } from "@angular/router";
+import { User } from "../../models/user.model";
+import { AuthService } from "../../services/auth.service";
 
 export type NavItem = { label: string; link: string };
 
 @Component({
   standalone: true,
-  selector: 'app-layout',
+  selector: "app-layout",
   imports: [CommonModule, RouterLink],
-  templateUrl: './layout.component.html',
+  templateUrl: "./layout.component.html",
 })
 export class LayoutComponent implements OnInit {
-  /** Ítems del menú lateral (se sobreescriben según rol) */
+  // Inputs desde el padre
+  @Input() logoutLink = "/";
+  @Input() user: User | undefined;
   @Input() navItems: NavItem[] = [];
 
-  /** A dónde apunta el botón de cerrar sesión */
-  @Input() logoutLink = '/';
+  isCollapsed = true;
+  showMenu = false;
 
-  /** --- lógica de sidebar con transición suave --- */
-  isCollapsed = true; // ancho (w-14 / w-72)
-  showMenu = false;   // aparición de contenido (fade/slide)
-
-  private _showT?: any;
-  private _hideT?: any;
+  private _showT?: ReturnType<typeof setTimeout>;
+  private _hideT?: ReturnType<typeof setTimeout>;
 
   private authService = inject(AuthService);
   private router = inject(Router);
 
   ngOnInit(): void {
-    this.buildMenu();
+    this.loadUser();
   }
 
-  /** Construye el menú lateral según rol + id del usuario logueado */
-  private buildMenu(): void {
-    const role = this.authService.getUserRole()?.toLowerCase();
-    const id = this.authService.getUserId();
-
-    if (!role || !id) {
-      // Sin sesión válida: menú vacío
-      this.navItems = [];
-      return;
+  /** Carga el usuario logueado desde AuthService si no viene del padre */
+  private loadUser(): void {
+    if (!this.user) {
+      const storedUser = this.authService.getUserFromStorage();
+      if (!storedUser || !this.authService.isLoggedIn()) {
+        this.router.navigate(["/login"]);
+        return;
+      }
+      this.user = storedUser;
     }
 
+    // Solo construye menú si no viene desde el padre
+    if (!this.navItems || this.navItems.length === 0) {
+      this.buildMenu();
+    }
+  }
+
+  /** Construye el menú lateral según rol */
+  private buildMenu(): void {
+    if (!this.user) return;
+
+    const role = this.user.role.toLowerCase();
+    const id = this.user.id;
+
     switch (role) {
-      // ================= FUNCIONARIO =================
-      case 'funcionario':
+      case "funcionario":
         this.navItems = [
-          { label: 'Inicio perfil',      link: `/funcionario/${id}/perfil` },
-          { label: 'Ingresar registro',  link: `/funcionario/${id}/actividades/nueva` },
-          { label: 'Mi historial',       link: `/funcionario/${id}/actividades/historial` },
-          { label: 'Mi horario',         link: `/funcionario/${id}/horario` },
+          { label: "Inicio perfil", link: `/funcionario/${id}/perfil` },
+          {
+            label: "Ingresar registro",
+            link: `/funcionario/${id}/actividades/nueva`,
+          },
+          {
+            label: "Mi historial",
+            link: `/funcionario/${id}/actividades/historial`,
+          },
+          { label: "Mi horario", link: `/funcionario/${id}/horario` },
         ];
         break;
 
-      // ================= SECRETARÍA =================
-      case 'secretaria':
+      case "secretaria":
         this.navItems = [
-          { label: 'Perfil secretaria',      link: `/secretaria/${id}/perfil` },
-          { label: 'Historial funcionarios', link: `/secretaria/${id}/actividades/historial` },
-          { label: 'Mi horario',             link: `/secretaria/${id}/horario` },
-          { label: 'Gestionar calendario',   link: `/secretaria/${id}/calendario` },
+          { label: "Perfil secretaria", link: `/secretaria/${id}/perfil` },
+          {
+            label: "Historial funcionarios",
+            link: `/secretaria/${id}/actividades/historial`,
+          },
+          { label: "Mi horario", link: `/secretaria/${id}/horario` },
+          {
+            label: "Gestionar calendario",
+            link: `/secretaria/${id}/calendario`,
+          },
         ];
         break;
 
-      // ================= ADMINISTRADOR =================
-      case 'administrador':
+      case "administrador":
         this.navItems = [
-          { label: 'Panel administrador',    link: `/admin/${id}/perfil` },
-          { label: 'Gestionar calendario',   link: `/admin/${id}/calendario` },
-          { label: 'Gestionar funcionarios', link: `/admin/${id}/funcionarios` },
+          { label: "Panel de Control", link: `/admin/${id}/perfil` },
+          { label: "Gestionar Calendario", link: `/admin/${id}/calendario` },
+          {
+            label: "Gestionar Funcionarios",
+            link: `/admin/${id}/funcionarios`,
+          },
+          { label: "Gestionar Cargos", link: `/admin/${id}/cargos` },
+          { label: "Asignar Cargos", link: `/admin/${id}/asignar` },
         ];
         break;
 
-      // Rol inesperado → sin menú
       default:
         this.navItems = [];
         break;
     }
   }
 
+  // Sidebar hover
   onEnterSidebar() {
     this.isCollapsed = false;
     clearTimeout(this._hideT);
@@ -92,8 +118,13 @@ export class LayoutComponent implements OnInit {
     this._hideT = setTimeout(() => (this.isCollapsed = true), 180);
   }
 
-  // Cierre de sesión real
+  onAvatarError(e: Event) {
+    (e.target as HTMLImageElement).src = "/avatar-de-usuario.png";
+  }
+
+  // Logout
   onLogout() {
     this.authService.logout();
+    this.router.navigate([this.logoutLink]); // redirige al login o link pasado
   }
 }

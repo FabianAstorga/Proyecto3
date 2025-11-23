@@ -4,20 +4,19 @@ import {
   ConflictException,
   NotFoundException,
   ForbiddenException,
-} from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import * as bcrypt from 'bcryptjs';
-import { CreateUsuarioDto } from './dto/create-usuario.dto';
-import { UpdateUsuarioDto } from './dto/update-usuario.dto';
-import { Usuario } from '../../database/entities/usuario.entity';
-
+} from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import * as bcrypt from "bcryptjs";
+import { CreateUsuarioDto } from "./dto/create-usuario.dto";
+import { UpdateUsuarioDto } from "./dto/update-usuario.dto";
+import { Usuario } from "../../database/entities/usuario.entity";
 
 @Injectable()
 export class UsuariosService {
   constructor(
     @InjectRepository(Usuario)
-    private readonly usuarioRepository: Repository<Usuario>,
+    private readonly usuarioRepository: Repository<Usuario>
   ) {}
 
   /**
@@ -34,7 +33,6 @@ export class UsuariosService {
     const usuario = this.usuarioRepository.create(createUsuarioDto);
     return this.usuarioRepository.save(usuario);
   }
-
 
   /**
    * Obtener todos los usuarios — Solo administrador
@@ -91,7 +89,7 @@ export class UsuariosService {
       const salt = await bcrypt.genSalt(10);
       updateUsuarioDto.contrasena = await bcrypt.hash(
         updateUsuarioDto.contrasena,
-        salt,
+        salt
       );
     }
 
@@ -144,13 +142,13 @@ export class UsuariosService {
     return this.usuarioRepository.findOne({
       where: { correo },
       select: [
-        'id',
-        'correo',
-        'contrasena',
-        'estado',
-        'nombre',
-        'apellido',
-        'rol',
+        "id",
+        "correo",
+        "contrasena",
+        "estado",
+        "nombre",
+        "apellido",
+        "rol",
       ],
     });
   }

@@ -5,43 +5,48 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
-} from 'typeorm';
-import { Informe } from './informe.entity';
-import { Usuario } from './usuario.entity';
+} from "typeorm";
+import { Informe } from "./informe.entity";
+import { Usuario } from "./usuario.entity";
 
-@Entity('actividad')
+@Entity("actividad")
 export class Actividad {
   //modifique id
   @PrimaryGeneratedColumn()
   id_actividad: number;
 
-  @Column({ type: 'varchar', length: 50 })
+  @Column({ type: "varchar", length: 50 })
   titulo: string;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ type: "varchar", length: 255 })
   descripcion: string;
 
-  @Column({ type: 'date' })
+  @Column({ type: "date" })
   fecha: Date;
 
-  @Column({ type: 'varchar', length: 100 })
+  @Column({ type: "varchar", length: 100 })
   tipo: string;
 
   // Para el checklist
-  @Column({ type: 'boolean', default: false })
-  estado: boolean;
+  @Column({
+    type: "enum",
+    enum: ["Pendiente", "En Progreso", "Realizada", "Cancelada"],
+    default: "Pendiente",
+  })
+  estado: string;
 
-  @Column({ type: 'boolean', default: false})
+  @Column({ type: "boolean", default: false })
   esRepetitiva: boolean;
 
   @ManyToOne(() => Usuario, (usuario) => usuario.actividades, {
-    onDelete: 'CASCADE',
+    onDelete: "CASCADE",
   })
-  @JoinColumn({ name: 'usuario_id' }) // crea la columna usuario_id en la tabla
+  @JoinColumn({ name: "usuario_id" }) // crea la columna usuario_id en la tabla
   usuario: Usuario;
+
   // Relación: Actividad "pertenece a" Formulario
   @ManyToOne(() => Informe, (informe) => informe.actividades, {
-    onDelete: 'CASCADE',
+    onDelete: "CASCADE",
   })
   informe: Informe;
 }

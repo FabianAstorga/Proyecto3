@@ -1,20 +1,17 @@
-import { IsDateString, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
+import {
+  IsDateString,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+} from "class-validator";
 
+// create-empleado-cargo.dto.ts
 export class CreateEmpleadoCargoDto {
-  @IsDateString()
-  @IsNotEmpty()
-  fecha_inicio: Date;
-
-  @IsDateString()
-  @IsOptional()
-  fecha_fin?: Date;
-
-  // Claves foráneas
   @IsNumber()
   @IsNotEmpty()
-  usuarioId: number;
+  id_usuario: number;
 
   @IsNumber()
   @IsNotEmpty()
-  cargoId: number;
+  id_cargo: number;
 }

@@ -1,0 +1,1 @@
+{"version":3,"file":"create-empleado-cargo.dto.js","sourceRoot":"","sources":["../../../../src/modules/empleado-cargos/dto/create-empleado-cargo.dto.ts"],"names":[],"mappings":";;;;;;;;;;;;AAAA,qDAKyB;AAGzB,MAAa,sBAAsB;IAGjC,UAAU,CAAS;IAInB,QAAQ,CAAS;CAClB;AARD,wDAQC;AALC;IAFC,IAAA,0BAAQ,GAAE;IACV,IAAA,4BAAU,GAAE;;0DACM;AAInB;IAFC,IAAA,0BAAQ,GAAE;IACV,IAAA,4BAAU,GAAE;;wDACI"}
