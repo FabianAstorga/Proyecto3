@@ -1,5 +1,5 @@
 # Proyecto 3 - Departamento de Mecanica
-Una aplicación web desarrollada para simular el funcionamiento de una empresa de logística tipo **DHL Express**, con funcionalidades como gestión de usuarios, paquetes, rutas de entrega optimizadas, seguimiento en tiempo real, notificaciones y más.
+Una aplicación web desarrollada para ...
 =======
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
