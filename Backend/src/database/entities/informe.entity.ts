@@ -5,11 +5,11 @@ import {
   ManyToOne,
   OneToMany,
   JoinColumn,
-} from "typeorm";
-import { Usuario } from "./usuario.entity";
-import { Actividad } from "./actividad.entity";
+} from 'typeorm';
+import { Usuario } from './usuario.entity';
+import { Actividad } from './actividad.entity';
 
-@Entity("informe")
+@Entity('informe')
 export class Informe {
   @PrimaryGeneratedColumn()
   id_informe: number;
@@ -17,20 +17,22 @@ export class Informe {
   @Column({ length: 20 })
   periodo: string;
 
-  @Column({
-    type: "enum",
-    enum: ["pendiente", "enviado", "revisado", "aprobado", "rechazado"],
-    default: "pendiente",
-  })
+  @Column({ type: 'date', nullable: true })
+  fechaEnvio: Date;
+
+  @Column({ type: 'date', nullable: true })
+  fechaRevision: Date;
+
+  @Column({ default: 'pendiente' })
   estado: string;
 
-  @Column({ type: "text", nullable: true })
+  @Column({ type: 'text', nullable: true })
   observaciones: string;
 
   @ManyToOne(() => Usuario, (usuario) => usuario.informes, {
-    onDelete: "CASCADE",
+    onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: "usuario_id" })
+  @JoinColumn({ name: 'usuario_id' })
   usuario: Usuario;
 
   @OneToMany(() => Actividad, (actividad) => actividad.informe)

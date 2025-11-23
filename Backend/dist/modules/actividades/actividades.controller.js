@@ -16,6 +16,7 @@ exports.ActividadController = void 0;
 const common_1 = require("@nestjs/common");
 const actividades_service_1 = require("./actividades.service");
 const create_actividad_dto_1 = require("./dto/create-actividad.dto");
+const update_actividad_dto_1 = require("./dto/update-actividad.dto");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 let ActividadController = class ActividadController {
     actividadService;
@@ -29,8 +30,14 @@ let ActividadController = class ActividadController {
     findAll() {
         return this.actividadService.findAll();
     }
+    findByUser(userId) {
+        return this.actividadService.findByUser(Number(userId));
+    }
     findOne(id) {
         return this.actividadService.findOne(Number(id));
+    }
+    update(id, dto) {
+        return this.actividadService.update(Number(id), dto);
     }
     remove(id) {
         return this.actividadService.remove(Number(id));
@@ -53,21 +60,37 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], ActividadController.prototype, "findAll", null);
 __decorate([
-    (0, common_1.Get)(":id"),
-    __param(0, (0, common_1.Param)("id")),
+    (0, common_1.Get)('usuario/:userId'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    __param(0, (0, common_1.Param)('userId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], ActividadController.prototype, "findByUser", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
 ], ActividadController.prototype, "findOne", null);
 __decorate([
-    (0, common_1.Delete)(":id"),
-    __param(0, (0, common_1.Param)("id")),
+    (0, common_1.Patch)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, update_actividad_dto_1.UpdateActividadDto]),
+    __metadata("design:returntype", void 0)
+], ActividadController.prototype, "update", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
 ], ActividadController.prototype, "remove", null);
 exports.ActividadController = ActividadController = __decorate([
-    (0, common_1.Controller)("actividades"),
+    (0, common_1.Controller)('actividades'),
     __metadata("design:paramtypes", [actividades_service_1.ActividadService])
 ], ActividadController);
 //# sourceMappingURL=actividades.controller.js.map

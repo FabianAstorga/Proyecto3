@@ -3,6 +3,6 @@ export declare class UpdateActividadDto {
     descripcion?: string;
     fecha?: string;
     tipo?: string;
-    estado?: boolean;
+    estado?: string;
     esRepetitiva?: boolean;
 }

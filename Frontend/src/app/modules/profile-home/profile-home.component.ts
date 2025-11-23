@@ -47,28 +47,48 @@ export class ProfileHomeComponent implements OnInit {
       this.lastSession = "Sin registro de sesión";
     }
 
+    const token = this.authService.getToken();
+    if (!token) {
+      return;
+    }
+    
+
+
     // 3) Carga de usuario + datos
     const idParam = this.route.snapshot.paramMap.get("id");
-    const id = idParam ? Number(idParam) : NaN;
+    let userId: number;
 
-    if (!Number.isFinite(id)) {
+    if (idParam) {
+      // Si hay ID en la ruta, usarlo
+      userId = Number(idParam);
+    } else {
+      // Si no hay ID en la ruta, usar el del usuario logueado
+      const loggedUserId = this.authService.getUserId();
+      if (!loggedUserId) {
+        console.error("No hay usuario logueado");
+        return;
+      }
+      userId = loggedUserId;
+    }
+
+    if (!Number.isFinite(userId)) {
       console.error("ID de usuario inválido en la ruta");
       return;
     }
 
-    this.dataService.getUser(id).subscribe({
+    this.dataService.getUser(userId).subscribe({
       next: (user) => {
         this.user = user;
         if (!this.user) {
-          console.error("Usuario no encontrado para id =", id);
           return;
         }
 
-        this.loadActivities();
-        this.loadCargos();
+        // Cargar actividades y cargos en paralelo
+        this.loadActivities(userId);
+        this.loadCargos(userId);
       },
       error: (err) => {
-        console.error("Error cargando usuario por id:", err);
+        console.error("Error cargando usuario:", err);
       },
     });
   }
@@ -128,34 +148,29 @@ export class ProfileHomeComponent implements OnInit {
     return `${datePart} ${hh}:${mi}`;
   }
 
-  private loadActivities(): void {
-    if (!this.user) return;
-
-    this.dataService.getActivitiesByUser(this.user.id).subscribe({
+  private loadActivities(userId: number): void {
+    this.dataService.getActivitiesByUser(userId).subscribe({
       next: (activities) => {
-        // total KPIs
         this.activitiesCount = activities.length;
-
-        // últimas 10 actividades ordenadas por fecha descendente
         this.recent = [...activities]
           .sort((a, b) => (a.fecha < b.fecha ? 1 : a.fecha > b.fecha ? -1 : 0))
           .slice(0, 10);
       },
       error: (err) => {
-        console.error("Error cargando actividades desde DataService:", err);
+        console.error("Error cargando actividades:", err);
+        this.activitiesCount = 0;
+        this.recent = [];
       },
     });
   }
 
-  private loadCargos(): void {
-    if (!this.user) return;
-
-    this.dataService.getCargosByUsuario(this.user.id).subscribe({
+  private loadCargos(userId: number): void {
+    this.dataService.getCargosByUsuario(userId).subscribe({
       next: (cargos: Cargo[]) => {
         this.cargoDescripcion = cargos.map((c) => c.descripcion ?? "");
       },
       error: (err) => {
-        console.error("Error cargando los cargos del usuario:", err);
+        console.error("Error cargando cargos:", err);
         this.cargoDescripcion = [];
       },
     });

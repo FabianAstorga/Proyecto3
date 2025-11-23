@@ -1,2 +1,2 @@
-export declare class ActividadesModule {
+export declare class ActividadModule {
 }

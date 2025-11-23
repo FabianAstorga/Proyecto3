@@ -28,6 +28,7 @@ import {
   CreateActividadPayload,
   DataService,
 } from "../../services/data.service";
+import { ModoCreacion } from "../../services/backend/activity-backend.model";
 
 type WeekFlags = {
   mon: boolean;
@@ -85,7 +86,7 @@ export class ActivityNewComponent {
   private auth = inject(AuthService);
   private dataService = inject(DataService);
 
-  // 📌 Link para volver al perfil del funcionario logueado (por si lo necesitas luego)
+  // 📌 Link para volver al perfil del funcionario logueado
   get perfilLink(): string {
     const id = this.auth.getUserId();
     return id != null ? `/funcionario/perfil/${id}` : "/funcionario/perfil";
@@ -119,7 +120,7 @@ export class ActivityNewComponent {
   readonly monthStartISO = this.toISO(this.firstDay);
   readonly monthEndISO = this.toISO(this.lastDay);
 
-  // Feriados 2025 (Chile) -> se siguen bloqueando en MULTI-DÍA
+  // Feriados 2025 (Chile) 
   private readonly feriadosISO = new Set<string>([
     "2025-01-01",
     "2025-04-18",
@@ -227,7 +228,7 @@ export class ActivityNewComponent {
     );
   };
 
-  /** Estilo visual en calendario (si quieres aplicarlo en el datepicker) */
+  /** Estilo visual en calendario */
   dateClass = (d: Date): string => {
     return this.feriadosISO.has(this.toISO(d))
       ? "holiday-cell"
@@ -314,6 +315,20 @@ export class ActivityNewComponent {
     ];
     return map.filter(([k]) => (w as any)[k]).map(([, num]) => num);
   }
+  // Mapeo de días para el backend
+  private getDiasSemanaNombres(): string[] {
+    const w = this.weekly.get("weekdays")!.value as WeekFlags;
+    const map: [keyof WeekFlags, string][] = [
+      ["sun", "Domingo"],
+      ["mon", "Lunes"],
+      ["tue", "Martes"],
+      ["wed", "Miércoles"],
+      ["thu", "Jueves"],
+      ["fri", "Viernes"],
+      ["sat", "Sábado"],
+    ];
+    return map.filter(([k]) => (w as any)[k]).map(([, nombre]) => nombre);
+  }
 
   // ==== Acciones UI MULTI-DÍA ====
   addSpecificDate(value: Date = new Date()) {
@@ -324,7 +339,7 @@ export class ActivityNewComponent {
     this.specificDates.removeAt(i);
   }
 
-  // ==== Reset limpio (por si lo usas desde otro lado) ====
+  // ==== Reset limpio ====
   onReset(): void {
     this.form.reset({
       descripcionAct: "",
@@ -366,69 +381,59 @@ export class ActivityNewComponent {
 
     const base = this.form.value;
 
-    // 1) Tipo final
+    // Tipo final
     const tipoFinal =
       (base.tipo_actividad === "Otro (especificar)" && base.tipo_actividad_otro
         ? base.tipo_actividad_otro
         : base.tipo_actividad) ?? "";
 
-    // 2) Fechas: set + primera fecha (fecha principal)
-    const fechas = new Set<string>();
-    if (base.fecha instanceof Date) {
-      fechas.add(this.toISO(base.fecha));
-    }
-
     const multi = base.multi!;
     const mode = multi.mode as MultiMode | undefined;
 
-    if (mode && mode !== "none") {
-      if (mode === "specific") {
-        for (const c of this.specificDates.controls) {
-          const v = (c as AbstractControl).value as Date;
-          const iso = this.toISO(v);
-          if (
-            iso >= this.monthStartISO &&
-            iso <= this.monthEndISO &&
-            !this.feriadosISO.has(iso)
-          ) {
-            fechas.add(iso);
-          }
-        }
-      } else if (mode === "weekly") {
-        const s = multi.weekly!.start as Date;
-        const e = multi.weekly!.end as Date;
-        const wdays = this.selectedWeekdays();
-        for (const d of this.daysBetween(s, e)) {
-          const iso = this.toISO(d);
-          if (
-            wdays.includes(d.getDay()) &&
-            iso >= this.monthStartISO &&
-            iso <= this.monthEndISO &&
-            !this.feriadosISO.has(iso)
-          ) {
-            fechas.add(iso);
-          }
-        }
-      }
+    let payload: CreateActividadPayload;
+
+    // Construir payload según el modo
+    if (!mode || mode === "none") {
+      // MODO SIMPLE
+      payload = {
+        modo: 'simple' as ModoCreacion,
+        titulo: tipoFinal,
+        descripcion: base.descripcionAct ?? "",
+        tipo: tipoFinal,
+        estado: base.estado ?? "Pendiente",
+        fecha: this.toISO(base.fecha as Date),
+      };
+    } else if (mode === "specific") {
+      // MODO FECHAS ESPECÍFICAS
+      const fechasEspecificas = this.specificDates.controls.map(c => ({
+    fecha: this.toISO(c.value as Date)
+  }));
+
+      payload = {
+        modo: 'fechas_especificas' as ModoCreacion,
+        titulo: tipoFinal,
+        descripcion: base.descripcionAct ?? "",
+        tipo: tipoFinal,
+        estado: base.estado ?? "Pendiente",
+        fechas_especificas: fechasEspecificas,
+      };
+    } else {
+      // MODO REPETICIÓN SEMANAL
+      const s = multi.weekly!.start as Date;
+      const e = multi.weekly!.end as Date;
+      const diasSemana = this.getDiasSemanaNombres();
+
+      payload = {
+        modo: 'repeticion_semanal' as ModoCreacion,
+        titulo: tipoFinal,
+        descripcion: base.descripcionAct ?? "",
+        tipo: tipoFinal,
+        estado: base.estado ?? "Pendiente",
+        fecha_desde: this.toISO(s),
+        fecha_hasta: this.toISO(e),
+        dias_semana: diasSemana,
+      };
     }
-
-    const fechasArray = Array.from(fechas).sort();
-    const fechaPrincipal = fechasArray[0] ?? this.toISO(base.fecha as Date);
-
-    // 3) Otras props “limpias”
-    const descripcion = base.descripcionAct ?? "";
-
-    // 👇 transformamos el string del form a boolean para el backend
-    const estadoBool = (base.estado ?? "Pendiente") === "Realizada";
-
-    const payload: CreateActividadPayload = {
-      titulo: tipoFinal,
-      descripcion,
-      fecha: fechaPrincipal,
-      tipo: tipoFinal,
-      estado: estadoBool, // <- ahora sí es boolean
-      esRepetitiva: mode !== "none",
-    };
 
     console.log("Payload que se enviará al backend:", payload);
 

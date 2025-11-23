@@ -3,7 +3,7 @@ import {
   IsString,
   IsDateString,
   IsBoolean,
-  IsNumber,
+  IsIn,
 } from 'class-validator';
 
 export class UpdateActividadDto {
@@ -24,9 +24,10 @@ export class UpdateActividadDto {
   @IsOptional()
   tipo?: string;
 
-  @IsBoolean()
+  @IsString()
   @IsOptional()
-  estado?: boolean;
+  @IsIn(['Pendiente', 'En Progreso', 'Realizada', 'Cancelada'])
+  estado?: string;
 
   @IsBoolean()
   @IsOptional()

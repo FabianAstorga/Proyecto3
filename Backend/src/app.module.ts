@@ -4,20 +4,22 @@ import { AppService } from "./app.service";
 import { DatabaseModule } from "./database/database.module";
 import { ConfigModule } from "./config/config.module";
 import { AuthModule } from "./modules/auth/auth.module";
-import { ActividadesModule } from "./modules/actividades/actividades.module";
+import { ActividadModule } from "./modules/actividades/actividades.module";
 import { EmpleadoCargosModule } from "./modules/empleado-cargos/empleado-cargos.module";
 import { CargosModule } from "./modules/cargos/cargos.module";
 import { UsuariosModule } from "./modules/usuarios/usuarios.module";
+import { InformesModule } from './modules/informes/informes.module';
 
 @Module({
   imports: [
     DatabaseModule,
     ConfigModule,
     AuthModule,
-    ActividadesModule,
+    ActividadModule,
     EmpleadoCargosModule,
     CargosModule,
     UsuariosModule,
+    InformesModule,
     // InformesModule
   ],
   controllers: [AppController],

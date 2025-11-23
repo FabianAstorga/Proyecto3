@@ -6,8 +6,8 @@ export interface BackendActividad {
   descripcion: string;
   fecha: string; // 'YYYY-MM-DD'
   tipo: string;
-  estado: boolean; // true / false
+  estado: string; // 'Pendiente' | 'En Progreso' | 'Realizada' | 'Cancelada'
   esRepetitiva: boolean;
-  usuario: BackendUser | null; // puede venir null si no hay usuario
+  usuario: BackendUser | null;
   informe: any | null;
 }

@@ -17,6 +17,7 @@ const actividades_module_1 = require("./modules/actividades/actividades.module")
 const empleado_cargos_module_1 = require("./modules/empleado-cargos/empleado-cargos.module");
 const cargos_module_1 = require("./modules/cargos/cargos.module");
 const usuarios_module_1 = require("./modules/usuarios/usuarios.module");
+const informes_module_1 = require("./modules/informes/informes.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -26,10 +27,11 @@ exports.AppModule = AppModule = __decorate([
             database_module_1.DatabaseModule,
             config_module_1.ConfigModule,
             auth_module_1.AuthModule,
-            actividades_module_1.ActividadesModule,
+            actividades_module_1.ActividadModule,
             empleado_cargos_module_1.EmpleadoCargosModule,
             cargos_module_1.CargosModule,
             usuarios_module_1.UsuariosModule,
+            informes_module_1.InformesModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

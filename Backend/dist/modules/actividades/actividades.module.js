@@ -6,21 +6,26 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ActividadesModule = void 0;
+exports.ActividadModule = void 0;
 const common_1 = require("@nestjs/common");
+const typeorm_1 = require("@nestjs/typeorm");
 const actividades_service_1 = require("./actividades.service");
 const actividades_controller_1 = require("./actividades.controller");
-const typeorm_1 = require("@nestjs/typeorm");
 const actividad_entity_1 = require("../../database/entities/actividad.entity");
 const usuario_entity_1 = require("../../database/entities/usuario.entity");
-let ActividadesModule = class ActividadesModule {
+const informes_module_1 = require("../informes/informes.module");
+let ActividadModule = class ActividadModule {
 };
-exports.ActividadesModule = ActividadesModule;
-exports.ActividadesModule = ActividadesModule = __decorate([
+exports.ActividadModule = ActividadModule;
+exports.ActividadModule = ActividadModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([actividad_entity_1.Actividad, usuario_entity_1.Usuario])],
+        imports: [
+            typeorm_1.TypeOrmModule.forFeature([actividad_entity_1.Actividad, usuario_entity_1.Usuario]),
+            informes_module_1.InformesModule,
+        ],
         controllers: [actividades_controller_1.ActividadController],
         providers: [actividades_service_1.ActividadService],
+        exports: [actividades_service_1.ActividadService],
     })
-], ActividadesModule);
+], ActividadModule);
 //# sourceMappingURL=actividades.module.js.map

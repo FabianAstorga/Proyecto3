@@ -4,10 +4,29 @@ import {
   IsDateString,
   IsBoolean,
   IsOptional,
-  IsNumber,
-} from "class-validator";
+  IsEnum,
+  IsArray,
+  ValidateNested,
+  IsIn,
+} from 'class-validator';
+import { Type } from 'class-transformer';
+
+export enum ModoCreacion {
+  SIMPLE = 'simple',
+  FECHAS_ESPECIFICAS = 'fechas_especificas',
+  REPETICION_SEMANAL = 'repeticion_semanal',
+}
+
+class FechaEspecificaDto {
+  @IsDateString()
+  fecha: string;
+}
 
 export class CreateActividadDto {
+  @IsEnum(ModoCreacion)
+  @IsNotEmpty()
+  modo: ModoCreacion;
+
   @IsString()
   @IsNotEmpty()
   titulo: string;
@@ -16,16 +35,42 @@ export class CreateActividadDto {
   @IsNotEmpty()
   descripcion: string;
 
-  @IsDateString()
-  fecha: string;
-
   @IsString()
   @IsNotEmpty()
   tipo: string;
+
+  @IsString()
+  @IsOptional()
+  @IsIn(['Pendiente', 'En Progreso', 'Realizada', 'Cancelada'])
+  estado?: string;
 
   @IsBoolean()
   @IsOptional()
   esRepetitiva?: boolean;
 
-  // es el id_informe creo
+  // --- Modo SIMPLE ---
+  @IsDateString()
+  @IsOptional()
+  fecha?: string;
+
+  // --- Modo FECHAS_ESPECIFICAS ---
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => FechaEspecificaDto)
+  @IsOptional()
+  fechas_especificas?: FechaEspecificaDto[];
+
+  // --- Modo REPETICION_SEMANAL ---
+  @IsDateString()
+  @IsOptional()
+  fecha_desde?: string;
+
+  @IsDateString()
+  @IsOptional()
+  fecha_hasta?: string;
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  dias_semana?: string[];
 }

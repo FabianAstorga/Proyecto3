@@ -39,6 +39,7 @@ __decorate([
     __metadata("design:type", String)
 ], RegisterDto.prototype, "apellido", void 0);
 __decorate([
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsPhoneNumber)(),
     __metadata("design:type", String)
 ], RegisterDto.prototype, "telefono", void 0);

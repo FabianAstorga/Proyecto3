@@ -7,7 +7,7 @@ import { User } from "../models/user.model";
 import { Activity } from "../models/activity.model";
 import { Cargo } from "../models/charge.model";
 import { AuthService } from "./auth.service";
-import { CreateActividadPayload } from "./backend/activity-backend.model";
+import { CreateActividadPayload, ModoCreacion } from "./backend/activity-backend.model";
 import { LoginResponse } from "./backend/logindata-backend.model";
 import { BackendUser } from "./backend/user-backend.model";
 import { BackendActividad } from "./backend/activity-backend2.model";
@@ -25,6 +25,7 @@ export class DataService {
   private readonly actividadesEndpoint = `${this.apiUrl}/actividades`;
   private readonly cargosEndpoint = `${this.apiUrl}/charges`;
   private readonly loginEndpoint = `${this.apiUrl}/auth/login`;
+    private readonly informesEndpoint = `${this.apiUrl}/informes`;
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
@@ -55,29 +56,33 @@ export class DataService {
 
   // ------- mapeo actividad backend -> front -------
   private mapBackendActividad(a: BackendActividad): Activity {
-    // 1) estado boolean -> string para el front
-    const estado: Activity["estado"] =
-      a.estado === true ? "Aprobada" : "Pendiente"; // ajusta si quieres otro texto
+  // El backend ahora devuelve estado como string directamente
+  const estadoMap: Record<string, Activity['estado']> = {
+    'Pendiente': 'Pendiente',
+    'En Progreso': 'Pendiente', // o ajusta según tu modelo front
+    'Realizada': 'Aprobada',
+    'Cancelada': 'Rechazada'
+  };
+  
+  const estado = estadoMap[a.estado] || 'Pendiente';
 
-    // 2) nombre del usuario
-    const userId = a.usuario ? a.usuario.id : null;
-    const userName = a.usuario
-      ? `${a.usuario.nombre} ${a.usuario.apellido}`
-      : "Usuario sin asignar";
+  const userId = a.usuario ? a.usuario.id : null;
+  const userName = a.usuario
+    ? `${a.usuario.nombre} ${a.usuario.apellido}`
+    : "Usuario sin asignar";
 
-    return {
-      // estos campos deben existir en tu Activity model
-      id: a.id_actividad,
-      titulo: a.titulo,
-      detalle: a.descripcion ?? "",
-      fecha: a.fecha,
-      tipo: a.tipo,
-      horas: 0, // si aún no manejan horas reales, deja 0
-      estado,
-      userId,
-      userName,
-    };
-  }
+  return {
+    id: a.id_actividad,
+    titulo: a.titulo,
+    detalle: a.descripcion ?? "",
+    fecha: a.fecha,
+    tipo: a.tipo,
+    horas: 0,
+    estado,
+    userId,
+    userName,
+  };
+}
 
   // ================= USUARIO - CRUD =================
 
@@ -177,6 +182,48 @@ export class DataService {
     return this.http.post(
       this.actividadesEndpoint,
       payload,
+      this.getAuthOptions()
+    );
+  }
+
+  updateActividad(id: number, payload: Partial<CreateActividadPayload>): Observable<any> {
+    return this.http.patch(
+      `${this.actividadesEndpoint}/${id}`,
+      payload,
+      this.getAuthOptions()
+    );
+  }
+
+  deleteActividad(id: number): Observable<any> {
+    return this.http.delete(
+      `${this.actividadesEndpoint}/${id}`,
+      this.getAuthOptions()
+    );
+  }
+
+  // ================= INFORMES =================
+  
+  // Obtener mis informes
+  getMisInformes(): Observable<any[]> {
+    return this.http.get<any[]>(
+      `${this.informesEndpoint}/mis-informes`,
+      this.getAuthOptions()
+    );
+  }
+
+  // Obtener un informe específico con sus actividades
+  getInforme(id: number): Observable<any> {
+    return this.http.get<any>(
+      `${this.informesEndpoint}/${id}`,
+      this.getAuthOptions()
+    );
+  }
+
+  // Marcar informe como enviado
+  enviarInforme(id: number): Observable<any> {
+    return this.http.patch(
+      `${this.informesEndpoint}/${id}/enviar`,
+      {},
       this.getAuthOptions()
     );
   }
@@ -284,4 +331,4 @@ export class DataService {
   }
 }
 
-export type { CreateActividadPayload };
+export type { CreateActividadPayload, ModoCreacion };

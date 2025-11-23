@@ -41,9 +41,10 @@ __decorate([
     __metadata("design:type", String)
 ], UpdateActividadDto.prototype, "tipo", void 0);
 __decorate([
-    (0, class_validator_1.IsBoolean)(),
+    (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", Boolean)
+    (0, class_validator_1.IsIn)(['Pendiente', 'En Progreso', 'Realizada', 'Cancelada']),
+    __metadata("design:type", String)
 ], UpdateActividadDto.prototype, "estado", void 0);
 __decorate([
     (0, class_validator_1.IsBoolean)(),

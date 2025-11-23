@@ -21,6 +21,7 @@ export class RegisterDto {
   @IsNotEmpty()
   apellido!: string;
 
+  @IsOptional()
   @IsPhoneNumber()
   telefono!: string;
 
