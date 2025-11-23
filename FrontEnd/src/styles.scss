@@ -1,0 +1,174 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+  @apply text-slate-900;
+  background: linear-gradient(
+  0deg,
+  #fff8da 0%,
+  #d8e0ff 100%
+);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    sans-serif;
+}
+}
+
+@layer components {
+  /* ===== CONTENEDORES DE PÁGINA ===== */
+  .page-container {
+    @apply max-w-7xl mx-auto px-4 md:px-8 py-6 md:py-10 space-y-8;
+  }
+
+  .page-container-narrow {
+    @apply max-w-3xl mx-auto px-4 md:px-8 py-6 md:py-10 space-y-8;
+  }
+
+  /* Título grande de sección */
+  .page-title {
+    @apply text-3xl font-bold text-[#0D1440];
+  }
+
+  /* ===== TARJETAS ===== */
+  .card-base {
+    @apply bg-white rounded-2xl border border-gray-200 shadow-sm;
+  }
+
+  .card-soft {
+    @apply bg-white rounded-2xl border border-gray-100 shadow p-6;
+  }
+
+  .card-header {
+    @apply px-6 py-4 border-b border-gray-200
+           flex flex-col md:flex-row md:items-center md:justify-between gap-2;
+  }
+
+  .card-header-colored {
+    @apply px-6 py-3 bg-yellow-400 border-b border-yellow-400
+           flex items-center justify-between gap-3;
+  }
+
+  .card-title {
+    @apply text-lg md:text-xl font-bold text-[#0D1440];
+  }
+
+  .card-subtitle {
+    @apply text-xs text-gray-500;
+  }
+
+  .card-body {
+    @apply px-6 py-5;
+  }
+
+  /* ===== BANDAS ===== */
+  .band-header-blue {
+    @apply px-6 py-4 bg-[#EAF2FF] text-[#0D1440] font-semibold border-b border-blue-200;
+  }
+
+  .band-header-yellow {
+    @apply px-6 py-4 bg-[#FACC15] text-[#0D1440] font-bold;
+  }
+
+  /* ===== BOTONES ===== */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md
+           bg-yellow-400 text-[#0D1440] font-semibold
+           hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-300
+           transition-colors;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md
+           border border-gray-300 text-gray-700 text-sm font-medium
+           hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200
+           transition-colors;
+  }
+
+  .btn-ghost-primary {
+    @apply inline-flex items-center justify-center gap-2 px-3 py-2 rounded-md
+           border border-[#0D1440] text-[#0D1440] text-sm font-semibold
+           hover:bg-[#0D1440] hover:text-white
+           transition-colors;
+  }
+
+  /* ===== PILLS / ESTADOS ===== */
+  .pill-status {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold
+           border transition-colors;
+  }
+
+  .pill-status-aprobada {
+    @apply pill-status bg-emerald-50 text-emerald-700 border-emerald-200;
+  }
+
+  .pill-status-pendiente {
+    @apply pill-status bg-amber-50 text-amber-700 border-amber-200;
+  }
+
+  .pill-status-rechazada {
+    @apply pill-status bg-red-50 text-red-700 border-red-200;
+  }
+
+  .pill-estado-activo {
+    @apply pill-status bg-green-50 text-green-700 border-green-200;
+  }
+
+  .pill-estado-inactivo {
+    @apply pill-status bg-gray-100 text-gray-700 border-gray-300;
+  }
+
+  /* ===== TABLAS / LISTAS ===== */
+  .table-row-hover {
+    @apply transition-colors duration-150 ease-out hover:bg-blue-50/60;
+  }
+
+  .list-row-hover {
+    @apply transition transform duration-150 ease-out
+           hover:-translate-y-[1px] hover:shadow-sm;
+  }
+
+  /* ===== TARJETAS KPI ===== */
+  .kpi-card {
+    @apply bg-white rounded-2xl border border-gray-100 shadow p-6 text-center;
+  }
+
+  .kpi-card-soft-yellow {
+    @apply rounded-2xl border border-yellow-200 bg-yellow-50 shadow p-6 text-center;
+  }
+
+  .kpi-card-soft-blue {
+    @apply rounded-2xl border border-blue-200 bg-blue-50 shadow p-6 text-center;
+  }
+
+  /* ===== MODAL ===== */
+  .modal-backdrop {
+    @apply fixed inset-0 bg-black/40 flex items-center justify-center z-[100];
+  }
+
+  .modal-panel {
+    @apply bg-white rounded-2xl shadow-2xl border border-gray-200 w-[90%] max-w-xl
+           transform transition duration-150 ease-out;
+  }
+
+  /* ===== FLECHAS DE NAVEGACIÓN (HISTORIAL) ===== */
+  .nav-arrow {
+    @apply absolute top-1/2 -translate-y-1/2 flex items-center justify-center
+           h-12 w-12 rounded-full bg-white shadow border border-gray-200
+           text-gray-700 text-xl cursor-pointer transition
+           hover:bg-blue-600 hover:text-white hover:border-blue-600;
+  }
+
+  .nav-arrow-left {
+    @apply -left-10 md:-left-10;
+  }
+
+  .nav-arrow-right {
+    @apply -right-10 md:-right-10;
+  }
+
+  .nav-arrow-disabled {
+    @apply opacity-40 cursor-default
+           hover:bg-white hover:text-gray-700 hover:border-gray-200;
+  }
+}

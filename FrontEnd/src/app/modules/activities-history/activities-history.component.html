@@ -1,0 +1,172 @@
+<app-layout [logoutLink]="'/login'">
+  <section class="page-container relative">
+    <!-- Flecha izquierda -->
+    <button
+      type="button"
+      class="nav-arrow nav-arrow-left"
+      (click)="goPrevMonth()"
+      [ngClass]="{ 'nav-arrow-disabled': !hasPrevMonth }"
+      aria-label="Mes anterior"
+      [disabled]="!hasPrevMonth"
+    >
+      ‹
+    </button>
+
+    <!-- Flecha derecha -->
+    <button
+      type="button"
+      class="nav-arrow nav-arrow-right"
+      (click)="goNextMonth()"
+      [ngClass]="{ 'nav-arrow-disabled': !hasNextMonth }"
+      aria-label="Mes siguiente"
+      [disabled]="!hasNextMonth"
+    >
+      ›
+    </button>
+
+    <div class="card-base mb-6 overflow-hidden border-blue-400">
+      <!-- CABECERA PRINCIPAL + FILTROS -->
+      <div class="px-6 pt-5 pb-3 border-b border-[#0D1440] bg-[#EAF2FF]">
+        
+        <!-- Título y Botón de PDF (Fila superior) -->
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+          <ng-container *ngIf="currentMonthGroup as month; else tituloGenerico">
+            <h1 class="text-2xl md:text-3xl font-bold text-[#0D1440]">
+              Historial {{ month.monthLabel }}
+            </h1>
+
+            <button
+              type="button"
+              (click)="downloadMonthPdf(month)"
+              class="inline-flex items-center px-3 py-2 rounded-md bg-blue-600 text-white text-xs md:text-sm font-semibold hover:bg-blue-700"
+            >
+              Descargar PDF
+            </button>
+          </ng-container>
+
+          <ng-template #tituloGenerico>
+            <h1 class="text-2xl md:text-3xl font-bold text-[#0D1440]">
+              Historial de actividades
+            </h1>
+          </ng-template>
+        </div>
+
+        <!-- SECCIÓN DE FILTROS (Fila inferior) -->
+        <form [formGroup]="filters" class="flex flex-wrap items-end gap-4 pb-2">
+          
+          <!-- Filtro por Usuario / Actividad (ANCHO AMPLIADO) -->
+          <mat-form-field 
+            appearance="outline" 
+            class="w-full sm:w-[280px] bg-white relative z-10"
+          >
+            <mat-label>Buscar Usuario / Actividad</mat-label>
+            <input matInput type="text" formControlName="q" placeholder="Ej: Juan Pérez">
+          </mat-form-field>
+          
+          <!-- Filtro por Estado -->
+          <mat-form-field appearance="outline" class="w-full sm:w-[150px] bg-white relative z-10">
+            <mat-label>Estado</mat-label>
+            <mat-select formControlName="estado">
+              <mat-option value="">Todos</mat-option>
+              <mat-option value="Aprobada">Aprobada</mat-option>
+              <mat-option value="Pendiente">Pendiente</mat-option>
+              <mat-option value="Rechazada">Rechazada</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Filtro por Fecha 'Desde' -->
+          <mat-form-field appearance="outline" class="w-full sm:w-[150px] bg-white relative z-10">
+            <mat-label>Desde</mat-label>
+            <input matInput [matDatepicker]="pickerDesde" formControlName="desde">
+            <mat-datepicker-toggle matSuffix [for]="pickerDesde"></mat-datepicker-toggle>
+            <mat-datepicker #pickerDesde></mat-datepicker>
+          </mat-form-field>
+
+          <!-- Filtro por Fecha 'Hasta' -->
+          <mat-form-field appearance="outline" class="w-full sm:w-[150px] bg-white relative z-10">
+            <mat-label>Hasta</mat-label>
+            <input matInput [matDatepicker]="pickerHasta" formControlName="hasta">
+            <mat-datepicker-toggle matSuffix [for]="pickerHasta"></mat-datepicker-toggle>
+            <mat-datepicker #pickerHasta></mat-datepicker>
+          </mat-form-field>
+
+          <!-- Botón de Limpiar Filtros -->
+          <button
+            type="button"
+            (click)="clearFilters()"
+            class="inline-flex items-center justify-center h-[56px] rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50 focus:outline-none"
+          >
+            Limpiar
+          </button>
+        </form>
+      </div>
+      <!-- FIN CABECERA/FILTROS -->
+
+      <!-- Contenido (LISTADO DE ACTIVIDADES) -->
+      <div class="px-6 py-4">
+        <!-- Sin actividades / sin mes -->
+        <div
+          *ngIf="!currentMonthGroup"
+          class="py-10 text-center text-sm text-gray-500"
+        >
+          No hay actividades que coincidan con los filtros.
+        </div>
+
+        <!-- Con mes seleccionado (solo listado, sin título extra) -->
+        <ng-container *ngIf="currentMonthGroup as month">
+          <!-- LISTADO CON ALTURA FIJA + SCROLL -->
+          <div class="divide-y divide-gray-100 h-[540px] overflow-y-auto pr-2">
+            <div
+              *ngFor="let ug of month.users"
+              class="py-5 flex flex-col md:flex-row md:items-start md:justify-between gap-4"
+            >
+              <!-- Avatar + nombre -->
+              <div class="flex flex-col items-center min-w-[120px]">
+                <div
+                  class="h-12 w-12 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-sm font-semibold"
+                >
+                  {{ ug.userName[0] || 'U' }}
+                </div>
+                <p
+                  class="mt-2 text-sm font-medium text-gray-900 text-center leading-tight"
+                >
+                  {{ ug.userName }}
+                </p>
+              </div>
+
+              <!-- Lista de actividades -->
+              <div class="flex-1 w-full">
+                <ul class="space-y-2">
+                  <li
+                    *ngFor="let a of ug.activities"
+                    class="py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3 list-row-hover rounded-lg"
+                  >
+                    <div class="text-base text-gray-800 leading-snug">
+                      <span class="font-semibold">
+                        {{ formatDMY(a.fecha) }}
+                      </span>
+                      · {{ a.titulo }} · {{ a.horas }} h
+                      <span
+                        class="text-sm text-gray-500"
+                        *ngIf="a.detalle"
+                      >
+                        — {{ a.detalle }}
+                      </span>
+                    </div>
+
+                    <span
+                      class="pill-status text-sm px-3 py-1.5 self-start md:self-auto"
+                      [ngClass]="statusPillClass(a.estado)"
+                    >
+                      {{ a.estado }}
+                    </span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </section>
+</app-layout>
