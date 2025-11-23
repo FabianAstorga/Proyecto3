@@ -4,9 +4,13 @@ import { ActividadController } from './actividades.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Actividad } from '../../database/entities/actividad.entity';
 import { Usuario } from 'src/database/entities/usuario.entity';
+import { InformesModule } from '../informes/informes.module'; 
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Actividad, Usuario])],
+  imports: [
+    TypeOrmModule.forFeature([Actividad, Usuario]),
+    InformesModule, 
+  ],
   controllers: [ActividadController],
   providers: [ActividadService],
 })

@@ -15,7 +15,6 @@ import { CreateActividadDto } from './dto/create-actividad.dto';
 import { UpdateActividadDto } from './dto/update-actividad.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
-// 👇 OJO: el front usa /actividades
 @Controller('actividades')
 export class ActividadController {
   constructor(private readonly actividadService: ActividadService) {}
@@ -30,6 +29,12 @@ export class ActividadController {
   @Get()
   findAll() {
     return this.actividadService.findAll();
+  }
+  
+  @Get('usuario/:userId')
+  @UseGuards(JwtAuthGuard)
+  findByUser(@Param('userId') userId: string) {
+    return this.actividadService.findByUser(Number(userId));
   }
 
   @Get(':id')

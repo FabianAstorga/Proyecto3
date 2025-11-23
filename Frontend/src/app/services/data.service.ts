@@ -40,14 +40,23 @@ interface BackendActividad {
   informe: any | null;
 }
 
-// payload ejemplo para crear actividad
 export interface CreateActividadPayload {
+  modo: 'simple' | 'fechas_especificas' | 'repeticion_semanal';
   titulo: string;
   descripcion: string;
-  fecha: string;      // 'YYYY-MM-DD'
   tipo: string;
-  estado: boolean;    // o number, según tu DTO
-  esRepetitiva: boolean;
+  estado?: boolean;
+  
+  // Modo SIMPLE
+  fecha?: string;
+  
+  // Modo FECHAS_ESPECIFICAS
+  fechas_especificas?: { fecha: string }[];
+  
+  // Modo REPETICION_SEMANAL
+  fecha_desde?: string;
+  fecha_hasta?: string;
+  dias_semana?: string[];
 }
 
 // ================================================================
@@ -169,6 +178,7 @@ export class DataService {
   }
 
   crearActividad(payload: CreateActividadPayload): Observable<any> {
+    console.log('📤 Enviando al backend:', payload);
     return this.http.post(
       this.actividadesEndpoint,
       payload,
