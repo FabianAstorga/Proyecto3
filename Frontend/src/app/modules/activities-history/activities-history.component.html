@@ -1,169 +1,162 @@
 <app-layout [logoutLink]="'/login'">
-  <section class="page-container relative">
-    <button
-      type="button"
-      class="nav-arrow nav-arrow-left"
-      (click)="goPrevMonth()"
-      [ngClass]="{ 'nav-arrow-disabled': !hasPrevMonth }"
-      aria-label="Mes anterior"
-      [disabled]="!hasPrevMonth"
+  <section
+    class="relative min-h-[calc(100vh-32px)] px-4 py-6 md:px-8 md:py-8
+           bg-slate-50 dark:bg-transparent"
+  >
+    <!-- CARD PRINCIPAL ANCHA -->
+    <div
+      class="mx-[15px] w-[calc(100%-30px)] overflow-hidden
+             rounded-3xl border border-slate-200 bg-white text-slate-900
+             shadow-[0_24px_60px_rgba(15,23,42,0.08)]
+             dark:border-slate-800 dark:bg-slate-950/80 dark:text-slate-100
+             dark:shadow-[0_24px_60px_rgba(15,23,42,0.8)] dark:backdrop-blur-sm"
     >
-      ‹
-    </button>
+      <!-- HEADER -->
+      <header
+        class="px-6 md:px-10 py-6 border-b border-slate-200 bg-white
+               dark:border-slate-800 dark:bg-gradient-to-r dark:from-slate-950 dark:via-slate-900 dark:to-slate-950"
+      >
+        <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <h1 class="text-3xl font-semibold leading-tight">
+            Historial —
+            <span class="text-indigo-600 dark:text-indigo-300">
+              {{ currentMonthLabel }}
+            </span>
+          </h1>
 
-    <button
-      type="button"
-      class="nav-arrow nav-arrow-right"
-      (click)="goNextMonth()"
-      [ngClass]="{ 'nav-arrow-disabled': !hasNextMonth }"
-      aria-label="Mes siguiente"
-      [disabled]="!hasNextMonth"
-    >
-      ›
-    </button>
-
-    <div class="card-base mb-6 overflow-hidden border-blue-400">
-      <div class="px-6 pt-5 pb-3 border-b border-[#0D1440] bg-[#EAF2FF]">
-        
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
-          <ng-container *ngIf="currentMonthGroup as month; else tituloGenerico">
-            <h1 class="text-2xl md:text-3xl font-bold text-[#0D1440]">
-              Historial {{ month.monthLabel }}
-            </h1>
-
-            <button
-              type="button"
-              (click)="downloadMonthPdf(month)"
-              class="inline-flex items-center px-3 py-2 rounded-md bg-blue-600 text-white text-xs md:text-sm font-semibold hover:bg-blue-700"
-            >
-              Descargar PDF
-            </button>
-          </ng-container>
-
-          <ng-template #tituloGenerico>
-            <h1 class="text-2xl md:text-3xl font-bold text-[#0D1440]">
-              Historial de actividades
-            </h1>
-          </ng-template>
+          <button
+            type="button"
+            (click)="downloadMonthPdf(currentMonthGroup)"
+            class="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-2
+                   text-sm font-semibold text-white shadow-md shadow-indigo-500/30
+                   transition hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          >
+            Descargar PDF
+          </button>
         </div>
 
-        <form [formGroup]="filters" class="flex flex-wrap items-end gap-4 pb-2">
-          
-          <div class="relative flex flex-col w-full sm:w-[280px]">
-            <label for="search-user" class="text-xs font-semibold text-gray-500 absolute top-[-8px] left-3 bg-[#EAF2FF] px-1 z-10">Buscar Usuario / Actividad</label>
-            <input 
-              id="search-user"
-              type="text" 
-              formControlName="q" 
-              placeholder="Ej: Juan Pérez"
-              class="h-[56px] px-4 py-2 border border-gray-300 rounded-md bg-white text-sm focus:ring-blue-500 focus:border-blue-500"
+        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+          Revisa las actividades registradas por usuario y mes.
+        </p>
+
+        <!-- FILTROS -->
+        <form [formGroup]="filters" class="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+          <!-- Buscar -->
+          <div class="col-span-1 md:col-span-2">
+            <label class="text-xs text-slate-600 dark:text-slate-300 mb-1 block"
+              >Buscar Usuario / Actividad</label
             >
+            <input
+              type="text"
+              formControlName="q"
+              placeholder="Ej: Juan Pérez, Taller…"
+              class="h-[48px] w-full rounded-xl border border-slate-300 bg-white
+                     px-3 py-2 text-sm text-slate-900 placeholder-slate-400
+                     focus:outline-none focus:ring-2 focus:ring-indigo-500
+                     dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder-slate-500"
+            />
           </div>
-          
-          <div class="relative flex flex-col w-full sm:w-[150px]">
-            <label for="filter-status" class="text-xs font-semibold text-gray-500 absolute top-[-8px] left-3 bg-[#EAF2FF] px-1 z-10">Estado</label>
-            <select 
-              id="filter-status"
+
+          <!-- Mes -->
+          <div>
+            <label class="text-xs text-slate-600 dark:text-slate-300 mb-1 block">Mes</label>
+            <select
+              formControlName="mes"
+              class="h-[48px] w-full rounded-xl border border-slate-300 bg-white
+                     px-3 py-2 text-sm text-slate-900
+                     focus:outline-none focus:ring-2 focus:ring-indigo-500
+                     dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100"
+            >
+              <option value="">Todos</option>
+              <option *ngFor="let m of meses" [value]="m.value">{{ m.label }}</option>
+            </select>
+          </div>
+
+          <!-- Estado -->
+          <div>
+            <label class="text-xs text-slate-600 dark:text-slate-300 mb-1 block">Estado</label>
+            <select
               formControlName="estado"
-              class="h-[56px] px-4 py-2 border border-gray-300 rounded-md bg-white text-sm focus:ring-blue-500 focus:border-blue-500 appearance-none pr-8"
+              class="h-[48px] w-full rounded-xl border border-slate-300 bg-white
+                     px-3 py-2 text-sm text-slate-900
+                     focus:outline-none focus:ring-2 focus:ring-indigo-500
+                     dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100"
             >
               <option value="">Todos</option>
               <option value="Aprobada">Aprobada</option>
               <option value="Pendiente">Pendiente</option>
               <option value="Rechazada">Rechazada</option>
             </select>
-            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-              <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-            </div>
           </div>
 
-          <div class="relative flex flex-col w-full sm:w-[150px]">
-            <label for="filter-from" class="text-xs font-semibold text-gray-500 absolute top-[-8px] left-3 bg-[#EAF2FF] px-1 z-10">Desde</label>
-            <div class="relative">
-              <input 
-                id="filter-from"
-                type="date" 
-                formControlName="desde"
-                class="h-[56px] w-full px-4 py-2 border border-gray-300 rounded-md bg-white text-sm focus:ring-blue-500 focus:border-blue-500"
-              >
-              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-700">
-                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-              </div>
-            </div>
+          <!-- Botón limpiar -->
+          <div class="md:col-span-4 flex justify-end mt-2">
+            <button
+              type="button"
+              (click)="clearFilters()"
+              class="rounded-xl border border-slate-300 bg-white px-4 py-2
+                     text-sm font-semibold text-slate-700 hover:bg-slate-50
+                     dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
+            >
+              Limpiar filtros
+            </button>
           </div>
-
-          <div class="relative flex flex-col w-full sm:w-[150px]">
-            <label for="filter-to" class="text-xs font-semibold text-gray-500 absolute top-[-8px] left-3 bg-[#EAF2FF] px-1 z-10">Hasta</label>
-            <div class="relative">
-              <input 
-                id="filter-to"
-                type="date" 
-                formControlName="hasta"
-                class="h-[56px] w-full px-4 py-2 border border-gray-300 rounded-md bg-white text-sm focus:ring-blue-500 focus:border-blue-500"
-              >
-              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-700">
-                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-              </div>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            (click)="clearFilters()"
-            class="inline-flex items-center justify-center h-[56px] rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50 focus:outline-none"
-          >
-            Limpiar
-          </button>
         </form>
-      </div>
-      <div class="px-6 py-4">
+      </header>
+
+      <!-- LISTA -->
+      <div class="px-6 md:px-10 py-6">
         <div
           *ngIf="!currentMonthGroup"
-          class="py-10 text-center text-sm text-gray-500"
+          class="py-10 text-center text-sm text-slate-500 dark:text-slate-400"
         >
           No hay actividades que coincidan con los filtros.
         </div>
 
         <ng-container *ngIf="currentMonthGroup as month">
-          <div class="divide-y divide-gray-100 h-[540px] overflow-y-auto pr-2">
+          <div class="divide-y divide-slate-200 dark:divide-slate-800 h-[560px] overflow-y-auto pr-2">
             <div
               *ngFor="let ug of month.users"
               class="py-5 flex flex-col md:flex-row md:items-start md:justify-between gap-4"
             >
+              <!-- AVATAR -->
               <div class="flex flex-col items-center min-w-[120px]">
                 <div
-                  class="h-12 w-12 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-sm font-semibold"
+                  class="h-12 w-12 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center
+                         text-sm font-semibold
+                         dark:bg-indigo-600/20 dark:text-indigo-300"
                 >
                   {{ ug.userName[0] || 'U' }}
                 </div>
                 <p
-                  class="mt-2 text-sm font-medium text-gray-900 text-center leading-tight"
+                  class="mt-2 text-sm font-medium text-slate-800 dark:text-slate-200 text-center leading-tight"
                 >
                   {{ ug.userName }}
                 </p>
               </div>
 
+              <!-- ACTIVIDADES -->
               <div class="flex-1 w-full">
                 <ul class="space-y-2">
                   <li
                     *ngFor="let a of ug.activities"
-                    class="py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3 list-row-hover rounded-lg"
+                    class="rounded-xl bg-slate-50 px-5 py-4 shadow-sm border border-slate-200
+                           flex flex-col md:flex-row md:items-center md:justify-between gap-3
+                           dark:bg-slate-900/40 dark:border-slate-800"
                   >
-                    <div class="text-base text-gray-800 leading-snug">
-                      <span class="font-semibold">
+                    <div class="text-sm text-slate-700 dark:text-slate-300 leading-snug">
+                      <span class="font-semibold text-slate-900 dark:text-slate-100">
                         {{ formatDMY(a.fecha) }}
                       </span>
-                      · {{ a.titulo }} · {{ a.horas }} h
-                      <span
-                        class="text-sm text-gray-500"
-                        *ngIf="a.detalle"
-                      >
+                      — {{ a.titulo }} · {{ a.horas }} h
+                      <span class="text-xs text-slate-500 dark:text-slate-400" *ngIf="a.detalle">
                         — {{ a.detalle }}
                       </span>
                     </div>
 
+                    <!-- ESTADO -->
                     <span
-                      class="pill-status text-sm px-3 py-1.5 self-start md:self-auto"
+                      class="px-3 py-1.5 text-xs rounded-full font-semibold"
                       [ngClass]="statusPillClass(a.estado)"
                     >
                       {{ a.estado }}

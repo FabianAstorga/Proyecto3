@@ -1,38 +1,59 @@
 <app-layout [logoutLink]="'/login'">
-  <section class="page-container">
-    <!-- CARD ÚNICA -->
-    <div class="card-base overflow-hidden border-yellow-400">
-      <!-- FRANJA SUPERIOR -->
-      <div
-        class="px-6 py-5 border-b border-yellow-200 bg-yellow-50 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+  <!-- Fondo tipo dashboard, igual que el profile -->
+  <section
+    class="min-h-[calc(100vh-32px)] px-4 py-6 md:px-8 md:py-8
+           bg-slate-50
+           dark:bg-gradient-to-b dark:from-slate-950 dark:via-slate-950 dark:to-slate-900"
+  >
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div
+      class="h-full w-full overflow-hidden rounded-3xl
+             border border-slate-200 bg-white text-slate-900
+             shadow-[0_24px_60px_rgba(15,23,42,0.08)]
+             dark:border-slate-800 dark:bg-slate-950/80 dark:text-slate-100
+             dark:shadow-[0_24px_60px_rgba(15,23,42,0.8)] dark:backdrop-blur-sm"
+    >
+      <!-- HEADER -->
+      <header
+        class="flex flex-col gap-4 border-b border-slate-200 px-6 py-4
+               lg:flex-row lg:items-center lg:justify-between lg:px-10
+               bg-white
+               dark:border-slate-800 dark:bg-slate-950/80"
       >
         <div>
-          <h1 class="text-2xl md:text-3xl font-bold text-[#0D1440]">
+          <h1 class="text-3xl font-semibold leading-tight">
             Registrar nueva actividad
           </h1>
+          <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            Completa la información de la actividad que deseas registrar.
+          </p>
         </div>
 
-        <!-- Botón principal: guardar actividad -->
+        <!-- Botón principal -->
         <button
           type="button"
           (click)="submit()"
-          class="inline-flex items-center gap-2 px-5 py-2.5 rounded-md border border-gray-800 text-gray-900 font-semibold text-sm md:text-base hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300"
+          class="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-500/30 transition hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-900"
         >
           Guardar actividad
         </button>
-      </div>
+      </header>
 
-      <!-- CONTENIDO DE LA CARD: FORMULARIO -->
-      <div class="px-6 py-6 md:px-8 md:py-8">
-        <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-6">
-          <!-- FILA SUPERIOR: FECHA + TIPO + ESTADO + MODO FECHAS -->
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <!-- CONTENIDO -->
+      <div class="px-6 py-6 md:px-10 md:py-8">
+        <form
+          [formGroup]="form"
+          (ngSubmit)="submit()"
+          class="space-y-10"
+        >
+          <!-- FILA DE FILTROS PRINCIPALES -->
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
             <!-- FECHA PRINCIPAL -->
-            <div class="md:max-w-xs">
-              <label class="block text-sm font-medium text-gray-700 mb-1">
+            <div>
+              <label class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">
                 Fecha principal *
               </label>
-              <mat-form-field appearance="outline" class="w-full">
+              <mat-form-field appearance="outline" class="w-full dark-field">
                 <input
                   matInput
                   [matDatepicker]="dpMain"
@@ -49,11 +70,11 @@
             </div>
 
             <!-- TIPO DE ACTIVIDAD (+ OTRO) -->
-            <div class="md:max-w-xs">
-              <label class="block text-sm font-medium text-gray-700 mb-1">
+            <div>
+              <label class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">
                 Tipo de actividad *
               </label>
-              <mat-form-field appearance="outline" class="w-full">
+              <mat-form-field appearance="outline" class="w-full dark-field">
                 <mat-select formControlName="tipo_actividad">
                   <mat-option *ngFor="let t of tiposActividad" [value]="t">
                     {{ t }}
@@ -61,25 +82,29 @@
                 </mat-select>
               </mat-form-field>
 
-              <div *ngIf="form.get('tipo_actividad')?.value === 'Otro (especificar)'">
-                <label class="block text-sm font-medium text-gray-700 mb-1">
+              <div
+                *ngIf="form.get('tipo_actividad')?.value === 'Otro (especificar)'"
+                class="mt-2"
+              >
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">
                   Especificar tipo *
                 </label>
                 <input
                   type="text"
                   formControlName="tipo_actividad_otro"
-                  class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                  class="w-full rounded-md border border-slate-300 bg-white text-slate-900 px-3 py-2 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+                         dark:border-[#1E2638] dark:bg-[#121A2E] dark:text-slate-100 dark:placeholder-slate-400"
                   placeholder="Ej.: Actividad de vinculación…"
                 />
               </div>
             </div>
 
             <!-- ESTADO -->
-            <div class="md:max-w-xs">
-              <label class="block text-sm font-medium text-gray-700 mb-1">
+            <div>
+              <label class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">
                 Estado *
               </label>
-              <mat-form-field appearance="outline" class="w-full">
+              <mat-form-field appearance="outline" class="w-full dark-field">
                 <mat-select formControlName="estado">
                   <mat-option *ngFor="let e of estados" [value]="e">
                     {{ e }}
@@ -89,11 +114,11 @@
             </div>
 
             <!-- MODO FECHAS (SELECT) -->
-            <div formGroupName="multi" class="md:max-w-xs">
-              <label class="block text-sm font-medium text-gray-700 mb-1">
+            <div formGroupName="multi">
+              <label class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">
                 Modo de fechas
               </label>
-              <mat-form-field appearance="outline" class="w-full">
+              <mat-form-field appearance="outline" class="w-full dark-field">
                 <mat-select formControlName="mode">
                   <mat-option value="none">Sin repetir</mat-option>
                   <mat-option value="specific">Fechas específicas</mat-option>
@@ -103,26 +128,30 @@
             </div>
           </div>
 
-          <!-- CONFIGURACIÓN MULTI-DÍA (SOLO SI mode !== 'none') -->
+          <!-- CONFIGURACIÓN MULTI-DÍA -->
           <div
             formGroupName="multi"
             class="space-y-4"
             *ngIf="multi.get('mode')?.value !== 'none'"
           >
             <div
-              class="border border-gray-200 rounded-xl p-4 space-y-4 bg-gray-50"
+              class="border border-slate-200 rounded-2xl p-4 space-y-4 bg-slate-50
+                     dark:border-slate-800 dark:bg-slate-900/60"
             >
-              <!-- MODO: FECHAS ESPECÍFICAS -->
-              <div *ngIf="multi.get('mode')?.value === 'specific'" class="space-y-3">
-                <div class="flex items-center justify-between">
-                  <span class="text-xs text-gray-600">
-                    Se crearán copias en fechas específicas dentro del mes actual (no
-                    feriados).
+              <!-- MODE: FECHAS ESPECÍFICAS -->
+              <div
+                *ngIf="multi.get('mode')?.value === 'specific'"
+                class="space-y-3"
+              >
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-xs text-slate-600 dark:text-slate-300">
+                    Se crearán copias en fechas específicas dentro del mes
+                    actual (no feriados).
                   </span>
                   <button
                     type="button"
                     (click)="addSpecificDate()"
-                    class="px-3 py-1.5 text-xs rounded-md bg-yellow-400 text-[#0D1440] font-semibold hover:bg-yellow-300"
+                    class="px-3 py-1.5 text-xs rounded-md bg-indigo-600 text-white font-semibold hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-900"
                   >
                     Agregar fecha
                   </button>
@@ -131,9 +160,9 @@
                 <div formArrayName="specificDates" class="space-y-3">
                   <div
                     *ngFor="let c of specificDates.controls; let i = index"
-                    class="flex items-center gap-2"
+                    class="flex flex-col md:flex-row md:items-center gap-2"
                   >
-                    <mat-form-field appearance="outline" class="flex-1">
+                    <mat-form-field appearance="outline" class="flex-1 dark-field">
                       <input
                         matInput
                         [matDatepicker]="dpSpec"
@@ -151,14 +180,15 @@
                     <button
                       type="button"
                       (click)="removeSpecificDate(i)"
-                      class="px-2 py-1 text-xs rounded-md bg-red-50 text-red-700 border border-red-200 hover:bg-red-100"
+                      class="px-2.5 py-1.5 text-xs rounded-md border border-red-200 bg-red-50 text-red-600 hover:bg-red-100
+                             dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-300 dark:hover:bg-red-500/20"
                     >
                       Eliminar
                     </button>
 
                     <span
-                      class="text-[11px] text-red-600"
                       *ngIf="c.invalid && c.touched"
+                      class="text-[11px] text-red-500 dark:text-red-400"
                     >
                       Fecha fuera del mes o no válida.
                     </span>
@@ -166,27 +196,33 @@
 
                   <p
                     *ngIf="specificDates.length === 0"
-                    class="text-xs text-gray-500"
+                    class="text-xs text-slate-500 dark:text-slate-400"
                   >
-                    No hay fechas adicionales; se usará solo la fecha principal.
+                    No hay fechas adicionales; se usará solo la fecha
+                    principal.
                   </p>
                 </div>
               </div>
 
-              <!-- MODO: SEMANAL -->
-              <div *ngIf="multi.get('mode')?.value === 'weekly'" class="space-y-3">
+              <!-- MODE: SEMANAL -->
+              <div
+                *ngIf="multi.get('mode')?.value === 'weekly'"
+                class="space-y-3"
+              >
                 <div formGroupName="weekly" class="space-y-3">
-                  <p class="text-xs text-gray-600">
-                    Se repetirán las fechas seleccionadas por semana dentro del mes
-                    actual (no feriados).
+                  <p class="text-xs text-slate-600 dark:text-slate-300">
+                    Se repetirán las fechas seleccionadas por semana dentro
+                    del mes actual (no feriados).
                   </p>
 
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label class="block text-sm font-medium text-gray-700 mb-1">
+                      <label
+                        class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1"
+                      >
                         Desde *
                       </label>
-                      <mat-form-field appearance="outline" class="w-full">
+                      <mat-form-field appearance="outline" class="w-full dark-field">
                         <input
                           matInput
                           [matDatepicker]="dpFrom"
@@ -203,10 +239,12 @@
                     </div>
 
                     <div>
-                      <label class="block text-sm font-medium text-gray-700 mb-1">
+                      <label
+                        class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1"
+                      >
                         Hasta *
                       </label>
-                      <mat-form-field appearance="outline" class="w-full">
+                      <mat-form-field appearance="outline" class="w-full dark-field">
                         <input
                           matInput
                           [matDatepicker]="dpTo"
@@ -223,78 +261,154 @@
                     </div>
                   </div>
 
-                  <!-- DÍAS DE LA SEMANA -->
-                  <div formGroupName="weekdays" class="flex flex-wrap gap-3 text-xs">
-                    <span class="w-full text-gray-600 mb-1">
+                  <div
+                    formGroupName="weekdays"
+                    class="flex flex-wrap gap-3 text-xs"
+                  >
+                    <span class="w-full text-slate-600 dark:text-slate-300 mb-1">
                       Selecciona los días de la semana:
                     </span>
 
-                    <label class="inline-flex items-center gap-1">
+                    <label class="inline-flex items-center gap-1 text-slate-700 dark:text-slate-200">
                       <input type="checkbox" formControlName="mon" />
                       <span>Lunes</span>
                     </label>
-                    <label class="inline-flex items-center gap-1">
+                    <label class="inline-flex items-center gap-1 text-slate-700 dark:text-slate-200">
                       <input type="checkbox" formControlName="tue" />
                       <span>Martes</span>
                     </label>
-                    <label class="inline-flex items-center gap-1">
+                    <label class="inline-flex items-center gap-1 text-slate-700 dark:text-slate-200">
                       <input type="checkbox" formControlName="wed" />
                       <span>Miércoles</span>
                     </label>
-                    <label class="inline-flex items-center gap-1">
+                    <label class="inline-flex items-center gap-1 text-slate-700 dark:text-slate-200">
                       <input type="checkbox" formControlName="thu" />
                       <span>Jueves</span>
                     </label>
-                    <label class="inline-flex items-center gap-1">
+                    <label class="inline-flex items-center gap-1 text-slate-700 dark:text-slate-200">
                       <input type="checkbox" formControlName="fri" />
                       <span>Viernes</span>
                     </label>
-                    <label class="inline-flex items-center gap-1">
+                    <label class="inline-flex items-center gap-1 text-slate-700 dark:text-slate-200">
                       <input type="checkbox" formControlName="sat" />
                       <span>Sábado</span>
                     </label>
-                    <label class="inline-flex items-center gap-1">
+                    <label class="inline-flex items-center gap-1 text-slate-700 dark:text-slate-200">
                       <input type="checkbox" formControlName="sun" />
                       <span>Domingo</span>
                     </label>
                   </div>
 
-                  <p class="text-xs text-gray-500">
-                    Solo se considerarán fechas dentro del mes actual y que no sean
-                    feriados.
+                  <p class="text-xs text-slate-500 dark:text-slate-400">
+                    Solo se considerarán fechas dentro del mes actual y que no
+                    sean feriados.
                   </p>
                 </div>
               </div>
 
               <p
                 *ngIf="multi.invalid && multi.touched"
-                class="text-xs text-red-600"
+                class="text-xs text-red-500 dark:text-red-400"
               >
-                Revisa las fechas del bloque multi-día (rango válido y dentro del mes).
+                Revisa las fechas del bloque multi-día (rango válido y dentro
+                del mes).
               </p>
             </div>
           </div>
 
-          <!-- DESCRIPCIÓN -->
+          <!-- DESCRIPCIÓN — ABAJO A TODO EL ANCHO -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-2">
               Descripción de la actividad *
             </label>
             <textarea
               formControlName="descripcionAct"
-              rows="7"
-              class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 min-h-[420px]"
+              rows="10"
+              class="w-full rounded-2xl border border-slate-300 bg-white text-slate-900 px-4 py-3 text-base placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[260px]
+                     dark:border-[#1E2638] dark:bg-[#121A2E] dark:text-slate-100 dark:placeholder-slate-400"
               placeholder="Ej.: Participación en taller de actualización docente…"
             ></textarea>
+
             <p
               *ngIf="f.descripcionAct.touched && f.descripcionAct.invalid"
-              class="text-xs text-red-600 mt-1"
+              class="text-sm text-red-500 dark:text-red-400 mt-1"
             >
               La descripción es obligatoria (máx. 500 caracteres).
             </p>
+
+            <div class="pt-2">
+              <p class="text-sm text-slate-500 dark:text-slate-400">
+                Consejo: sé específico en la descripción (objetivo, actividad
+                realizada, resultados). Esto ayuda a una mejor evaluación de tu
+                registro.
+              </p>
+            </div>
           </div>
         </form>
       </div>
     </div>
   </section>
+
+  <!-- Estilos específicos para los campos de Angular Material -->
+  <style>
+    /* Forma general del campo */
+    .dark-field .mat-mdc-text-field-wrapper {
+      border-radius: 12px !important;
+    }
+
+    /* --- MODO OSCURO: sólo se aplica cuando algún ancestro tiene .dark (html, body, etc.) --- */
+    :host-context(.dark) .dark-field .mat-mdc-text-field-wrapper {
+      background-color: #121A2E !important;
+    }
+
+    :host-context(.dark) .dark-field .mat-mdc-form-field-flex {
+      color: #E5E7EB !important;
+    }
+
+    :host-context(.dark) .dark-field .mat-mdc-form-field-outline {
+      color: #1F2942 !important;
+    }
+
+    :host-context(.dark) .dark-field .mat-mdc-form-field-outline-thick {
+      color: #3B82F6 !important; /* borde al enfocar */
+    }
+
+    :host-context(.dark) .dark-field input.mat-mdc-input-element {
+      color: #E5E7EB !important;
+    }
+
+    :host-context(.dark) .dark-field .mat-mdc-select-trigger,
+    :host-context(.dark) .dark-field .mat-mdc-select-value-text,
+    :host-context(.dark) .dark-field .mat-mdc-select-placeholder {
+      color: #E5E7EB !important;
+      opacity: 1 !important;
+    }
+
+    :host-context(.dark) .dark-field .mat-mdc-select-arrow {
+      color: #9CA3AF !important;
+    }
+
+    :host-context(.dark) .dark-field .mat-mdc-form-field-infix {
+      padding: 10px 0 !important;
+    }
+
+    /* Panel del mat-select en modo oscuro */
+    :host-context(.dark) ::ng-deep .mat-mdc-select-panel {
+      background-color: #020617 !important;
+      color: #E5E7EB !important;
+    }
+
+    :host-context(.dark) ::ng-deep .mat-mdc-option {
+      color: #E5E7EB !important;
+    }
+
+    :host-context(.dark) ::ng-deep .mat-mdc-option.mdc-list-item--selected {
+      background-color: #1D283A !important;
+      color: #E5E7EB !important;
+    }
+
+    :host-context(.dark) ::ng-deep .mat-mdc-option:hover {
+      background-color: #111827 !important;
+    }
+  </style>
 </app-layout>

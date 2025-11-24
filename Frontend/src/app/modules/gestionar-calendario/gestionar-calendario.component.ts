@@ -167,7 +167,7 @@ export class GestionarCalendarioComponent {
 
     const title = model.title.trim();
     if (!title || model.blockIndex === null) {
-      return; // podrías agregar validación visual si quieres
+      return;
     }
 
     const ev: ScheduleEvent = {

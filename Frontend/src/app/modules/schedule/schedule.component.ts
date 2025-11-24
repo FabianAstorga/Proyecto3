@@ -51,17 +51,17 @@ export class ScheduleComponent implements OnInit {
   // 7 slots (todos menos almuerzo) por día
   schedule: Record<DayKey, Cell[]> = {
     lun: [
-      { title: 'Cálculo I', room: 'A-201' },
       null,
       null,
-      { title: 'Física', room: 'Lab 3' },
+      null,
+      null,
       null,
       null,
       null,
     ],
     mar: [
       null,
-      { title: 'Programación', room: 'B-105' },
+      null,
       null,
       null,
       null,
@@ -71,7 +71,7 @@ export class ScheduleComponent implements OnInit {
     mie: [
       null,
       null,
-      { title: 'CAD', room: 'Lab CAD' },
+      null,
       null,
       null,
       null,
@@ -81,7 +81,7 @@ export class ScheduleComponent implements OnInit {
       null,
       null,
       null,
-      { title: 'Materiales', room: 'C-301' },
+      null,
       null,
       null,
       null,
@@ -91,7 +91,7 @@ export class ScheduleComponent implements OnInit {
       null,
       null,
       null,
-      { title: 'Electrónica', room: 'D-102' },
+      null,
       null,
       null,
     ],

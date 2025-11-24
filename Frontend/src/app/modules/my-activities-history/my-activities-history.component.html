@@ -1,90 +1,139 @@
 <app-layout [logoutLink]="'/login'">
-  <section class="page-container relative">
-    <!-- Flecha izquierda -->
-    <button
-      type="button"
-      class="nav-arrow nav-arrow-left"
-      (click)="goPrevMonth()"
-      [ngClass]="{ 'nav-arrow-disabled': !hasPrevMonth }"
-      aria-label="Mes anterior"
-      [disabled]="!hasPrevMonth"
-    >
-      ‹
-    </button>
-
-    <!-- Flecha derecha -->
-    <button
-      type="button"
-      class="nav-arrow nav-arrow-right"
-      (click)="goNextMonth()"
-      [ngClass]="{ 'nav-arrow-disabled': !hasNextMonth }"
-      aria-label="Mes siguiente"
-      [disabled]="!hasNextMonth"
-    >
-      ›
-    </button>
-
-    <div class="card-base mb-6 overflow-hidden border-blue-400">
-      <!-- Cabecera -->
-      <div
-        class="px-6 py-5 border-b border-[#0D1440] bg-[#EAF2FF] flex flex-col md:flex-row md:items-center md:justify-between gap-3"
+  <!-- Fondo tipo dashboard -->
+  <section
+    class="min-h-[calc(100vh-32px)] px-4 py-6 md:px-8 md:py-8
+           bg-slate-50
+           dark:bg-gradient-to-b dark:from-slate-950 dark:via-slate-950 dark:to-slate-900"
+  >
+    <div class="relative max-w-6xl mx-auto">
+      <!-- Flecha izquierda -->
+      <button
+        type="button"
+        (click)="goPrevMonth()"
+        [ngClass]="{ 'nav-arrow-disabled': !hasPrevMonth }"
+        aria-label="Mes anterior"
+        [disabled]="!hasPrevMonth"
+        class="
+          nav-arrow nav-arrow-left
+          absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full
+          z-20 flex h-12 w-12 items-center justify-center
+          rounded-full border border-slate-300 bg-white text-slate-700 text-3xl font-light
+          shadow-xl transition
+          hover:bg-slate-50 hover:border-slate-400 hover:text-slate-900 hover:scale-110
+          disabled:opacity-40 disabled:cursor-not-allowed
+          dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-200
+          dark:hover:bg-slate-800 dark:hover:border-slate-500 dark:hover:text-white
+        "
       >
-        <h1 class="text-2xl md:text-3xl font-bold text-[#0D1440]">
-          Historial
-          <span *ngIf="currentMonthGroup as month">
-            — {{ month.monthLabel }}
-          </span>
-        </h1>
+        ‹
+      </button>
 
-        <button
-          *ngIf="currentMonthGroup"
-          type="button"
-          (click)="downloadMonthPdf(currentMonthGroup!)"
-          class="inline-flex items-center px-3 py-2 rounded-md bg-blue-600 text-white text-xs md:text-sm font-semibold hover:bg-blue-700"
-        >
-          Descargar PDF
-        </button>
-      </div>
+      <!-- Flecha derecha -->
+      <button
+        type="button"
+        (click)="goNextMonth()"
+        [ngClass]="{ 'nav-arrow-disabled': !hasNextMonth }"
+        aria-label="Mes siguiente"
+        [disabled]="!hasNextMonth"
+        class="
+          nav-arrow nav-arrow-right
+          absolute right-0 top-1/2 -translate-y-1/2 translate-x-full
+          z-20 flex h-12 w-12 items-center justify-center
+          rounded-full border border-slate-300 bg-white text-slate-700 text-3xl font-light
+          shadow-xl transition
+          hover:bg-slate-50 hover:border-slate-400 hover:text-slate-900 hover:scale-110
+          disabled:opacity-40 disabled:cursor-not-allowed
+          dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-200
+          dark:hover:bg-slate-800 dark:hover:border-slate-500 dark:hover:text-white
+        "
+      >
+        ›
+      </button>
 
-      <!-- Contenido -->
-      <div class="px-6 py-4">
-        <!-- Sin actividades / sin mes -->
+      <!-- CARD PRINCIPAL -->
+      <div
+        class="h-full w-full overflow-hidden rounded-3xl
+               border border-slate-200 bg-white text-slate-900
+               shadow-[0_24px_60px_rgba(15,23,42,0.08)]
+               dark:border-slate-800 dark:bg-slate-950/80 dark:text-slate-100
+               dark:shadow-[0_24px_60px_rgba(15,23,42,0.8)] dark:backdrop-blur-sm"
+      >
+        <!-- Cabecera -->
         <div
-          *ngIf="!currentMonthGroup"
-          class="py-10 text-center text-sm text-gray-500"
+          class="px-6 py-4 md:px-10 md:py-5 border-b border-slate-200 flex flex-col gap-3 md:flex-row md:items-center md:justify-between
+                 bg-white
+                 dark:border-slate-800 dark:bg-gradient-to-r dark:from-slate-950 dark:via-slate-900 dark:to-slate-950"
         >
-          No tienes actividades registradas que coincidan con los filtros.
+          <div>
+            <h1 class="text-2xl md:text-3xl font-semibold leading-tight">
+              Historial
+              <span *ngIf="currentMonthGroup as month" class="text-indigo-600 dark:text-indigo-300">
+                — {{ month.monthLabel }}
+              </span>
+            </h1>
+            <p class="mt-1 text-xs md:text-sm text-slate-500 dark:text-slate-400">
+              Revisa tus actividades registradas, mes a mes.
+            </p>
+          </div>
+
+          <button
+            *ngIf="currentMonthGroup"
+            type="button"
+            (click)="downloadMonthPdf(currentMonthGroup!)"
+            class="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-2 text-xs md:text-sm font-semibold text-white shadow-md shadow-indigo-500/30 transition hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-900"
+          >
+            Descargar PDF
+          </button>
         </div>
 
-        <!-- Con mes seleccionado -->
-        <ng-container *ngIf="currentMonthGroup as month">
-          <div class="divide-y divide-gray-100 h-[540px] overflow-y-auto pr-2">
+        <!-- Contenido -->
+        <div class="px-6 py-5 md:px-10 md:py-6">
+          <!-- Sin actividades / sin mes -->
+          <div
+            *ngIf="!currentMonthGroup"
+            class="py-10 text-center text-sm text-slate-500"
+          >
+            No tienes actividades registradas que coincidan con los filtros.
+          </div>
+
+          <!-- Con mes seleccionado -->
+          <ng-container *ngIf="currentMonthGroup as month">
             <div
-              *ngFor="let a of month.activities"
-              class="py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3 list-row-hover rounded-lg"
+              class="h-[540px] overflow-y-auto pr-1 md:pr-2 space-y-3"
             >
-              <div class="text-base text-gray-800 leading-snug">
-                <span class="font-semibold">
-                  {{ formatDMY(a.fecha) }}
-                </span>
-                · {{ a.titulo }} · {{ a.horas }} h
+              <div
+                *ngFor="let a of month.activities"
+                class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between
+                       rounded-2xl border border-slate-100 bg-white px-4 py-3 text-sm md:text-base text-slate-900 hover:bg-slate-50 transition
+                       dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:bg-slate-900"
+              >
+                <!-- Izquierda: fecha + título + detalle -->
+                <div class="flex-1 min-w-0">
+                  <p class="font-semibold text-slate-900 dark:text-slate-50">
+                    {{ formatDMY(a.fecha) }}
+                    <span class="font-normal text-slate-600 dark:text-slate-300">
+                      · {{ a.titulo }} · {{ a.horas }} h
+                    </span>
+                  </p>
+                  <p
+                    class="mt-0.5 text-xs md:text-sm text-slate-500 dark:text-slate-400 truncate"
+                    *ngIf="a.detalle"
+                  >
+                    {{ a.detalle }}
+                  </p>
+                </div>
+
+                <!-- Derecha: estado -->
                 <span
-                  class="text-sm text-gray-500"
-                  *ngIf="a.detalle"
+                  class="mt-1 inline-flex items-center justify-center rounded-full px-3 py-1.5 text-xs md:text-sm font-medium self-start md:self-auto"
+                  [ngClass]="statusPillClass(a.estado)"
                 >
-                  — {{ a.detalle }}
+                  {{ a.estado }}
                 </span>
               </div>
-
-              <span
-                class="pill-status text-sm px-3 py-1.5 self-start md:self-auto"
-                [ngClass]="statusPillClass(a.estado)"
-              >
-                {{ a.estado }}
-              </span>
             </div>
-          </div>
-        </ng-container>
+          </ng-container>
+        </div>
       </div>
     </div>
   </section>

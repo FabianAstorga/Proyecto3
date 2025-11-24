@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { LayoutComponent } from '../../components/layout/layout.component';
 import { User } from '../../models/user.model';
@@ -12,7 +12,7 @@ import { AuthService } from '../../services/auth.service';
 @Component({
   standalone: true,
   selector: 'app-profile-home',
-  imports: [CommonModule, LayoutComponent],
+  imports: [CommonModule, LayoutComponent, RouterLink],
   templateUrl: './profile-home.component.html',
 })
 export class ProfileHomeComponent implements OnInit {
@@ -22,9 +22,20 @@ export class ProfileHomeComponent implements OnInit {
   activitiesCount = 0;
   cargoDescripcion: string[] = [];
 
+  // KPIs adicionales
+  monthActivitiesCount = 0;
+  pendingCount = 0;
+  approvedCount = 0;
+  monthHours = 0;
+
+  // Resúmenes
+  lastActivity: Activity | undefined;
+  mostFrequentTitle = '';
+
   // Dinámicos
   notificationLabel = '';
   lastSession = '';
+  daysSinceLastActivity: number | null = null;
 
   showDetails = false;
 
@@ -137,14 +148,82 @@ export class ProfileHomeComponent implements OnInit {
         this.activitiesCount = activities.length;
 
         // últimas 10 actividades ordenadas por fecha descendente
-        this.recent = [...activities]
-          .sort((a, b) => (a.fecha < b.fecha ? 1 : a.fecha > b.fecha ? -1 : 0))
-          .slice(0, 10);
+        const sorted = [...activities].sort((a, b) =>
+          a.fecha < b.fecha ? 1 : a.fecha > b.fecha ? -1 : 0
+        );
+        this.recent = sorted.slice(0, 10);
+        this.lastActivity = sorted[0];
+
+        // métricas adicionales
+        this.computeActivityMetrics(activities);
       },
       error: err => {
         console.error('Error cargando actividades desde DataService:', err);
       },
     });
+  }
+
+  private computeActivityMetrics(activities: Activity[]): void {
+    const today = new Date();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+
+    let monthCount = 0;
+    let pending = 0;
+    let approved = 0;
+    let monthHours = 0;
+    const titleCount: Record<string, number> = {};
+
+    for (const a of activities) {
+      // pendientes / aprobadas (no usamos rechazadas en KPIs)
+      if (a.estado === 'Pendiente') pending++;
+      if (a.estado === 'Aprobada') approved++;
+
+      if (a.fecha) {
+        const [yStr, mStr, dStr] = a.fecha.split('-');
+        const y = Number(yStr);
+        const m = Number(mStr) - 1;
+        const d = Number(dStr);
+
+        if (!isNaN(y) && !isNaN(m) && !isNaN(d)) {
+          if (y === currentYear && m === currentMonth) {
+            monthCount++;
+            const horasNum = Number(a.horas) || 0;
+            monthHours += horasNum;
+
+            if (a.titulo) {
+              titleCount[a.titulo] = (titleCount[a.titulo] ?? 0) + 1;
+            }
+          }
+        }
+      }
+    }
+
+    this.monthActivitiesCount = monthCount;
+    this.pendingCount = pending;
+    this.approvedCount = approved;
+    this.monthHours = monthHours;
+
+    // actividad más frecuente del mes
+    let maxTitle = '';
+    let maxCount = 0;
+    for (const [title, count] of Object.entries(titleCount)) {
+      if (count > maxCount) {
+        maxCount = count;
+        maxTitle = title;
+      }
+    }
+    this.mostFrequentTitle = maxTitle;
+
+    // días desde la última actividad
+    if (this.lastActivity?.fecha) {
+      const lastDate = new Date(this.lastActivity.fecha + 'T00:00:00');
+      const diffMs = today.getTime() - lastDate.getTime();
+      const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      this.daysSinceLastActivity = days >= 0 ? days : null;
+    } else {
+      this.daysSinceLastActivity = null;
+    }
   }
 
   private loadCargos(): void {
