@@ -49,7 +49,7 @@ interface UserGroup {
 }
 
 interface MonthGroup {
-  monthKey: string;  // '2025-10'
+  monthKey: string;   // '2025-10'
   monthLabel: string; // 'Octubre 2025'
   users: UserGroup[];
 }
@@ -66,7 +66,7 @@ interface MonthGroup {
     MatDatepickerModule,
     MatNativeDateModule,
     MatSelectModule,
-    MatOptionModule, // NECESARIO para mat-option en el template
+    MatOptionModule,
     LayoutComponent,
   ],
   templateUrl: './activities-history.component.html',
@@ -96,13 +96,28 @@ export class ActivitiesHistoryComponent implements OnInit {
   // Índice del mes actualmente visible (0 = más reciente)
   currentMonthIndex = 0;
 
-  // Filtros (aunque ya no tengan UI, se mantienen por si se usan luego)
+  // === Filtros (q = texto, mes = número de mes, estado) ===
   filters = this.fb.group({
     q: this.fb.control<string>(''),
-    desde: this.fb.control<Date | null>(null),
-    hasta: this.fb.control<Date | null>(null),
+    mes: this.fb.control<string>(''), // '1'..'12' o '' (todos)
     estado: this.fb.control<'' | Estado>(''),
   });
+
+  // Opciones del selector de meses (para el template)
+  meses = [
+    { value: '1', label: 'Enero' },
+    { value: '2', label: 'Febrero' },
+    { value: '3', label: 'Marzo' },
+    { value: '4', label: 'Abril' },
+    { value: '5', label: 'Mayo' },
+    { value: '6', label: 'Junio' },
+    { value: '7', label: 'Julio' },
+    { value: '8', label: 'Agosto' },
+    { value: '9', label: 'Septiembre' },
+    { value: '10', label: 'Octubre' },
+    { value: '11', label: 'Noviembre' },
+    { value: '12', label: 'Diciembre' },
+  ];
 
   get estadoValue(): '' | Estado {
     return (this.filters.controls.estado.value ?? '') as '' | Estado;
@@ -171,6 +186,7 @@ export class ActivitiesHistoryComponent implements OnInit {
   }
 
   // ================== LÓGICA DE VISTA ==================
+
   private rebuildView(): void {
     if (!this.allUsers.length || !this.allActivities.length) {
       this.groupedMonths = [];
@@ -186,8 +202,9 @@ export class ActivitiesHistoryComponent implements OnInit {
         .map((u) => u.id)
     );
 
-    const { q, desde, hasta, estado } = this.filters.getRawValue();
+    const { q, mes, estado } = this.filters.getRawValue();
     const term = (q ?? '').trim().toLowerCase();
+    const mesNumber = mes ? Number(mes) : null;
 
     const filtered = this.allActivities.filter((a) => {
       // si no tiene usuario asociado, la descartamos
@@ -196,10 +213,16 @@ export class ActivitiesHistoryComponent implements OnInit {
       // solo actividades de funcionarios
       if (!funcionarioIds.has(a.userId)) return false;
 
-      if (!this.inRange(a.fecha, desde ?? null, hasta ?? null)) return false;
+      // filtro por mes (solo número de mes, sin año)
+      if (mesNumber !== null) {
+        const activityMonth = Number(a.fecha.slice(5, 7)); // 'YYYY-MM-DD'
+        if (activityMonth !== mesNumber) return false;
+      }
 
+      // filtro por estado
       if (estado !== '' && a.estado !== estado) return false;
 
+      // filtro por texto
       if (term) {
         const user = this.allUsers.find((u) => u.id === a.userId);
         const userName = user
@@ -237,7 +260,6 @@ export class ActivitiesHistoryComponent implements OnInit {
       const byUser = new Map<number, Activity[]>();
 
       for (const a of acts) {
-        // si por alguna razón llega sin userId, la saltamos
         if (a.userId == null) continue;
 
         const ua = byUser.get(a.userId) ?? [];
@@ -274,33 +296,10 @@ export class ActivitiesHistoryComponent implements OnInit {
     );
 
     this.groupedMonths = months;
-
-    // Siempre mostrar el mes más reciente al reconstruir
     this.currentMonthIndex = this.groupedMonths.length ? 0 : 0;
   }
 
-
   // ================== UTILIDADES ==================
-
-  private toISO(d: Date): string {
-    return new Date(
-      Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())
-    )
-      .toISOString()
-      .slice(0, 10);
-  }
-
-  private inRange(
-    iso: string,
-    from?: Date | null,
-    to?: Date | null
-  ): boolean {
-    const f = from ? this.toISO(from) : null;
-    const t = to ? this.toISO(to) : null;
-    if (f && iso < f) return false;
-    if (t && iso > t) return false;
-    return true;
-  }
 
   formatDMY(iso: string): string {
     const [y, m, d] = iso.split('-').map(Number);
@@ -316,8 +315,6 @@ export class ActivitiesHistoryComponent implements OnInit {
         return 'pill-status-aprobada';
       case 'Pendiente':
         return 'pill-status-pendiente';
-      case 'Rechazada':
-        return 'pill-status-rechazada';
       default:
         return 'pill-status-default';
     }
@@ -361,8 +358,7 @@ export class ActivitiesHistoryComponent implements OnInit {
   clearFilters() {
     this.filters.reset({
       q: '',
-      desde: null,
-      hasta: null,
+      mes: '',
       estado: '',
     });
     this.rebuildView();
@@ -371,256 +367,237 @@ export class ActivitiesHistoryComponent implements OnInit {
   // ================== PDF POR MES ==================
 
   downloadMonthPdf(month: MonthGroup): void {
-  const doc = new jsPDF();
+    const doc = new jsPDF();
 
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const pageHeight = doc.internal.pageSize.getHeight();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
 
-  const marginX = 14;
-  let y = 20;
+    const marginX = 14;
+    let y = 20;
 
-  // Helper para fecha corta tipo 17-oct
-  const formatShort = (iso: string): string => {
-    const [yearStr, monthStr, dayStr] = iso.split('-');
-    const d = Number(dayStr);
-    const m = Number(monthStr);
-    const meses = [
-      'ene', 'feb', 'mar', 'abr', 'may', 'jun',
-      'jul', 'ago', 'sept', 'oct', 'nov', 'dic',
-    ];
-    return `${String(d).padStart(2, '0')}-${meses[m - 1] ?? ''}`;
-  };
+    const formatShort = (iso: string): string => {
+      const [yearStr, monthStr, dayStr] = iso.split('-');
+      const d = Number(dayStr);
+      const m = Number(monthStr);
+      const meses = [
+        'ene',
+        'feb',
+        'mar',
+        'abr',
+        'may',
+        'jun',
+        'jul',
+        'ago',
+        'sept',
+        'oct',
+        'nov',
+        'dic',
+      ];
+      return `${String(d).padStart(2, '0')}-${meses[m - 1] ?? ''}`;
+    };
 
-  // ========================
-  // TÍTULO PRINCIPAL
-  // ========================
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(18);
-  doc.setTextColor(0, 0, 0);
-  doc.text('Resumen de actividades', pageWidth / 2, y, { align: 'center' });
-  y += 8;
-
-  // Subtítulo: mes + secretaria
-  const secName = this.secretaryName || 'Secretaría (sin identificar)';
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(11);
-  doc.setTextColor(90, 90, 90);
-  doc.text(
-    `${month.monthLabel.toLowerCase()} — Informe creado por ${secName}`,
-    pageWidth / 2,
-    y,
-    { align: 'center' }
-  );
-  y += 10;
-
-  // Línea suave debajo del subtítulo
-  doc.setDrawColor(220, 220, 220);
-  doc.setLineWidth(0.5);
-  doc.line(marginX, y, pageWidth - marginX, y);
-  y += 8;
-
-  // ========================
-  // CONFIG TABLA
-  // ========================
-  const tableMarginX = marginX;
-  const tableWidth = pageWidth - tableMarginX * 2;
-  const headerHeight = 10;
-  const lineHeight = 8;
-
-  const dateColWidth = 36;
-  const statusColWidth = 42;
-  const activityColWidth = tableWidth - dateColWidth - statusColWidth;
-
-  const bottomMargin = 30;
-
-  // ========================
-  // POR CADA USUARIO
-  // ========================
-  month.users.forEach((ug) => {
-    if (y > pageHeight - bottomMargin - 40) {
-      doc.addPage();
-      y = 20;
-    }
-
-    // Nombre del usuario
+    // TÍTULO
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(13);
+    doc.setFontSize(18);
     doc.setTextColor(0, 0, 0);
-    doc.text(ug.userName, tableMarginX, y);
-    y += 6;
+    doc.text('Resumen de actividades', pageWidth / 2, y, { align: 'center' });
+    y += 8;
 
-    // ---- calcular altos de filas ----
-    let bodyHeight = 0;
-    const rowHeights: number[] = [];
+    const secName = this.secretaryName || 'Secretaría (sin identificar)';
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(11);
+    doc.setTextColor(90, 90, 90);
+    doc.text(
+      `${month.monthLabel.toLowerCase()} — Informe creado por ${secName}`,
+      pageWidth / 2,
+      y,
+      { align: 'center' }
+    );
+    y += 10;
 
-    ug.activities.forEach((a) => {
-      const lineaBase = `${a.titulo} — ${a.detalle || ''}`.trim();
-      const wrapped = doc.splitTextToSize(
-        lineaBase,
-        activityColWidth - 4
-      );
-      const rowHeight = Math.max(lineHeight, wrapped.length * lineHeight);
-      rowHeights.push(rowHeight);
-      bodyHeight += rowHeight;
-    });
+    doc.setDrawColor(220, 220, 220);
+    doc.setLineWidth(0.5);
+    doc.line(marginX, y, pageWidth - marginX, y);
+    y += 8;
 
-    const tableHeight = headerHeight + bodyHeight + 6;
+    const tableMarginX = marginX;
+    const tableWidth = pageWidth - tableMarginX * 2;
+    const headerHeight = 10;
+    const lineHeight = 8;
 
-    if (y + tableHeight > pageHeight - bottomMargin) {
-      doc.addPage();
-      y = 20;
+    const dateColWidth = 36;
+    const statusColWidth = 42;
+    const activityColWidth = tableWidth - dateColWidth - statusColWidth;
+
+    const bottomMargin = 30;
+
+    month.users.forEach((ug) => {
+      if (y > pageHeight - bottomMargin - 40) {
+        doc.addPage();
+        y = 20;
+      }
+
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(13);
       doc.setTextColor(0, 0, 0);
       doc.text(ug.userName, tableMarginX, y);
       y += 6;
-    }
 
-    const tableY = y;
+      let bodyHeight = 0;
+      const rowHeights: number[] = [];
 
-    // Contenedor redondeado (solo borde)
-    doc.setDrawColor(210, 210, 210);
-    doc.setLineWidth(0.6);
-    doc.setFillColor(255, 255, 255);
-    doc.roundedRect(tableMarginX, tableY, tableWidth, tableHeight, 4, 4, 'S');
+      ug.activities.forEach((a) => {
+        const lineaBase = `${a.titulo} — ${a.detalle || ''}`.trim();
+        const wrapped = doc.splitTextToSize(
+          lineaBase,
+          activityColWidth - 4
+        );
+        const rowHeight = Math.max(lineHeight, wrapped.length * lineHeight);
+        rowHeights.push(rowHeight);
+        bodyHeight += rowHeight;
+      });
 
-    // --- “zona segura” interna para no tocar las esquinas ---
-    const innerX = tableMarginX + 4;
-    const innerWidth = tableWidth - 2;
-    const innerTop = tableY + 1;
-    const innerBottom = tableY + tableHeight - 1;
+      const tableHeight = headerHeight + bodyHeight + 6;
 
-    // Header de la tabla (rectángulo un poco más pequeño)
-    doc.setFillColor(245, 245, 245);
-    doc.rect(innerX, innerTop, innerWidth, headerHeight - 0.3, 'F');
-
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(11);
-    doc.setTextColor(0, 0, 0);
-
-    const headerBaseline = innerTop + headerHeight - 2;
-    doc.text('Fecha', innerX + 4, headerBaseline);
-    doc.text(
-      'Actividad',
-      innerX + dateColWidth + 4,
-      headerBaseline
-    );
-    doc.text(
-      'Estado',
-      innerX + dateColWidth + activityColWidth + 4,
-      headerBaseline
-    );
-
-    // Líneas verticales (un poco más cortas para no pisar las esquinas)
-    doc.setDrawColor(230, 230, 230);
-    const v1 = innerX + dateColWidth;
-    const v2 = innerX + dateColWidth + activityColWidth;
-    doc.line(v1, innerTop, v1, innerBottom);
-    doc.line(v2, innerTop, v2, innerBottom);
-
-    // ---- CUERPO DE LA TABLA ----
-    let currentY = innerTop + headerHeight + 4;
-
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(11);
-    doc.setTextColor(0, 0, 0);
-    doc.setDrawColor(235, 235, 235);
-
-    ug.activities.forEach((a, idx) => {
-      const rowHeight = rowHeights[idx];
-
-      // Fecha
-      const fechaTxt = formatShort(a.fecha);
-      doc.text(
-        fechaTxt,
-        innerX + 4,
-        currentY + lineHeight
-      );
-
-      // Actividad
-      const actividadTxt = `${a.titulo} — ${a.detalle || ''}`.trim();
-      const wrapped = doc.splitTextToSize(
-        actividadTxt,
-        activityColWidth - 4
-      );
-      doc.text(
-        wrapped,
-        innerX + dateColWidth + 4,
-        currentY + lineHeight
-      );
-
-      // Estado como pill
-      const estadoLabel = a.estado;
-      let pillFill: [number, number, number];
-      let pillText: [number, number, number];
-
-      switch (a.estado) {
-        case 'Aprobada':
-          pillFill = [222, 247, 236];
-          pillText = [22, 101, 52];
-          break;
-        case 'Pendiente':
-          pillFill = [255, 243, 205];
-          pillText = [133, 77, 14];
-          break;
-        case 'Rechazada':
-          pillFill = [254, 226, 226];
-          pillText = [153, 27, 27];
-          break;
-        default:
-          pillFill = [229, 231, 235];
-          pillText = [55, 65, 81];
-          break;
+      if (y + tableHeight > pageHeight - bottomMargin) {
+        doc.addPage();
+        y = 20;
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(13);
+        doc.setTextColor(0, 0, 0);
+        doc.text(ug.userName, tableMarginX, y);
+        y += 6;
       }
 
-      const estadoX = innerX + dateColWidth + activityColWidth;
-      const pillPaddingX = 3;
-      const pillHeight = lineHeight + 2;
-      const textWidth = doc.getTextWidth(estadoLabel);
-      const pillWidth = textWidth + pillPaddingX * 2;
+      const tableY = y;
 
-      const pillX =
-        estadoX + (statusColWidth - pillWidth) / 2;
-      const pillY =
-        currentY + (rowHeight - pillHeight) / 2;
+      doc.setDrawColor(210, 210, 210);
+      doc.setLineWidth(0.6);
+      doc.setFillColor(255, 255, 255);
+      doc.roundedRect(tableMarginX, tableY, tableWidth, tableHeight, 4, 4, 'S');
 
-      doc.setFillColor(...pillFill);
-      doc.roundedRect(
-        pillX,
-        pillY,
-        pillWidth,
-        pillHeight,
-        3,
-        3,
-        'F'
-      );
+      const innerX = tableMarginX + 4;
+      const innerWidth = tableWidth - 2;
+      const innerTop = tableY + 1;
+      const innerBottom = tableY + tableHeight - 1;
 
-      doc.setTextColor(...pillText);
+      doc.setFillColor(245, 245, 245);
+      doc.rect(innerX, innerTop, innerWidth, headerHeight - 0.3, 'F');
+
       doc.setFont('helvetica', 'bold');
-      doc.text(
-        estadoLabel,
-        pillX + pillPaddingX,
-        pillY + pillHeight - 2
-      );
-
-      // reset
-      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(11);
       doc.setTextColor(0, 0, 0);
 
-      // Línea horizontal de la fila (también dentro de la zona segura)
-      const rowBottom = currentY + rowHeight;
-      doc.setDrawColor(235, 235, 235);
-      doc.line(innerX, rowBottom, innerX + innerWidth, rowBottom);
+      const headerBaseline = innerTop + headerHeight - 2;
+      doc.text('Fecha', innerX + 4, headerBaseline);
+      doc.text('Actividad', innerX + dateColWidth + 4, headerBaseline);
+      doc.text(
+        'Estado',
+        innerX + dateColWidth + activityColWidth + 4,
+        headerBaseline
+      );
 
-      currentY += rowHeight;
+      doc.setDrawColor(230, 230, 230);
+      const v1 = innerX + dateColWidth;
+      const v2 = innerX + dateColWidth + activityColWidth;
+      doc.line(v1, innerTop, v1, innerBottom);
+      doc.line(v2, innerTop, v2, innerBottom);
+
+      let currentY = innerTop + headerHeight + 4;
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(11);
+      doc.setTextColor(0, 0, 0);
+      doc.setDrawColor(235, 235, 235);
+
+      ug.activities.forEach((a, idx) => {
+        const rowHeight = rowHeights[idx];
+
+        const fechaTxt = formatShort(a.fecha);
+        doc.text(
+          fechaTxt,
+          innerX + 4,
+          currentY + lineHeight
+        );
+
+        const actividadTxt = `${a.titulo} — ${a.detalle || ''}`.trim();
+        const wrapped = doc.splitTextToSize(
+          actividadTxt,
+          activityColWidth - 4
+        );
+        doc.text(
+          wrapped,
+          innerX + dateColWidth + 4,
+          currentY + lineHeight
+        );
+
+        const estadoLabel = a.estado;
+        let pillFill: [number, number, number];
+        let pillText: [number, number, number];
+
+        switch (a.estado) {
+          case 'Aprobada':
+            pillFill = [222, 247, 236];
+            pillText = [22, 101, 52];
+            break;
+          case 'Pendiente':
+            pillFill = [255, 243, 205];
+            pillText = [133, 77, 14];
+            break;
+          case 'Rechazada':
+            pillFill = [254, 226, 226];
+            pillText = [153, 27, 27];
+            break;
+          default:
+            pillFill = [229, 231, 235];
+            pillText = [55, 65, 81];
+            break;
+        }
+
+        const estadoX = innerX + dateColWidth + activityColWidth;
+        const pillPaddingX = 3;
+        const pillHeight = lineHeight + 2;
+        const textWidth = doc.getTextWidth(estadoLabel);
+        const pillWidth = textWidth + pillPaddingX * 2;
+
+        const pillX =
+          estadoX + (statusColWidth - pillWidth) / 2;
+        const pillY =
+          currentY + (rowHeight - pillHeight) / 2;
+
+        doc.setFillColor(...pillFill);
+        doc.roundedRect(
+          pillX,
+          pillY,
+          pillWidth,
+          pillHeight,
+          3,
+          3,
+          'F'
+        );
+
+        doc.setTextColor(...pillText);
+        doc.setFont('helvetica', 'bold');
+        doc.text(
+          estadoLabel,
+          pillX + pillPaddingX,
+          pillY + pillHeight - 2
+        );
+
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(0, 0, 0);
+
+        const rowBottom = currentY + rowHeight;
+        doc.setDrawColor(235, 235, 235);
+        doc.line(innerX, rowBottom, innerX + innerWidth, rowBottom);
+
+        currentY += rowHeight;
+      });
+
+      y = tableY + tableHeight + 10;
     });
 
-    y = tableY + tableHeight + 10;
-  });
-
-  const cleanKey = month.monthKey.replace('-', '');
-  doc.save(`reporte_actividades_${cleanKey}.pdf`);
-}
-
-
+    const cleanKey = month.monthKey.replace('-', '');
+    doc.save(`reporte_actividades_${cleanKey}.pdf`);
+  }
 }

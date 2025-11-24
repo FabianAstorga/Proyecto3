@@ -1,5 +1,10 @@
 <app-layout [title]="'Administración'" [logoutLink]="'/login'">
-  <section class="app-page space-y-8 p-6 bg-gray-50 min-h-screen">
+  <!-- Fondo tipo dashboard -->
+  <section
+    class="min-h-[calc(100vh-32px)] px-4 py-6 md:px-8 md:py-8
+           bg-slate-50
+           dark:bg-gradient-to-b dark:from-slate-950 dark:via-slate-950 dark:to-slate-900"
+  >
     <!-- ================= Alerta flotante ================= -->
     <div
       *ngIf="alertMessage"
@@ -18,148 +23,223 @@
       </div>
     </div>
 
-    <!-- ================= Título Principal ================= -->
-    <div class="text-center md:text-left md:mb-6">
-      <h1 class="text-5xl font-extrabold text-gray-800">Gestionar cargos</h1>
-      <p class="text-gray-600 mt-1 text-2xl tracking-wide">
-        Cree, edite o elimine cargos del sistema
-      </p>
-    </div>
-
-    <!-- ================= Contenedor Formulario + Lista ================= -->
+    <!-- CARD PRINCIPAL (ancha, unificada) -->
     <div
-      class="grid md:grid-cols-2 gap-6 min-h-[80vh] w-full max-w-12xl mx-auto p-4"
+      class="w-[calc(100%-10px)] mx-auto h-full overflow-hidden rounded-3xl
+             border border-slate-200 bg-white text-slate-900
+             shadow-[0_24px_60px_rgba(15,23,42,0.08)]
+             dark:border-slate-800 dark:bg-slate-950/80 dark:text-slate-100
+             dark:shadow-[0_24px_60px_rgba(15,23,42,0.8)] dark:backdrop-blur-sm"
     >
-      <!-- ================= Formulario de Cargo ================= -->
-      <div class="app-card bg-white shadow-md rounded-lg overflow-hidden">
-        <div
-          class="app-card-header bg-yellow-400/20 px-6 py-3 border-b border-gray-200"
-        >
-          <h2 class="text-lg font-semibold text-gray-800">Datos del cargo</h2>
+      <!-- HEADER -->
+      <header
+        class="px-6 py-4 md:px-10 md:py-5 border-b border-slate-200 flex flex-col gap-3
+               md:flex-row md:items-center md:justify-between
+               bg-white
+               dark:border-slate-800 dark:bg-gradient-to-r dark:from-slate-950 dark:via-slate-900 dark:to-slate-950"
+      >
+        <div>
+          <h1 class="text-2xl md:text-3xl font-semibold leading-tight">
+            Gestionar cargos
+          </h1>
+          <p class="mt-1 text-xs md:text-sm text-slate-500 dark:text-slate-400">
+            Crea, actualiza y administra los cargos del sistema.
+          </p>
         </div>
-        <div class="app-card-body p-6">
-          <form
-            class="grid grid-cols-1 gap-6"
-            [formGroup]="form"
-            (ngSubmit)="modo === 'crear' ? crear() : actualizar()"
+
+        <!-- Botones principales ligados al formulario -->
+        <div class="flex flex-wrap gap-2">
+          <!-- Primario -->
+          <button
+            type="submit"
+            form="form-cargo"
+            class="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-yellow-400 text-[#0D1440] text-xs md:text-sm font-semibold shadow-md shadow-yellow-400/30 hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-900"
           >
-            <!-- Ocupación -->
-            <div>
-              <label
-                for="ocupacion"
-                class="block text-sm font-medium text-gray-700"
-                >Ocupación</label
+            {{ modo === 'crear' ? 'Crear cargo' : 'Actualizar cargo' }}
+          </button>
+
+          <!-- Secundario -->
+          <button
+            type="button"
+            (click)="resetForm()"
+            class="inline-flex items-center justify-center px-4 py-2 rounded-xl border border-slate-300 bg-white text-xs md:text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-300
+                   dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800 dark:hover:border-slate-400 dark:focus:ring-slate-500"
+          >
+            Limpiar
+          </button>
+        </div>
+      </header>
+
+      <!-- CONTENIDO -->
+      <div class="px-6 py-5 md:px-10 md:py-8">
+        <div class="grid gap-8 md:grid-cols-2">
+          <!-- ================= Formulario de Cargo ================= -->
+          <section aria-labelledby="datos-cargo-title">
+            <h2
+              id="datos-cargo-title"
+              class="text-base md:text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4"
+            >
+              Datos del cargo
+            </h2>
+
+            <form
+              id="form-cargo"
+              class="grid grid-cols-1 gap-5"
+              [formGroup]="form"
+              (ngSubmit)="modo === 'crear' ? crear() : actualizar()"
+            >
+              <!-- Ocupación -->
+              <div>
+                <label
+                  for="ocupacion"
+                  class="block text-xs font-medium text-slate-700 dark:text-slate-300"
+                  >Ocupación</label
+                >
+                <input
+                  id="ocupacion"
+                  placeholder="Ingrese la ocupación"
+                  class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+                         dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder-slate-500"
+                  formControlName="ocupacion"
+                />
+                <p
+                  *ngIf="f['ocupacion'].touched && f['ocupacion'].invalid"
+                  class="text-xs text-red-500 dark:text-red-400 mt-1"
+                >
+                  Obligatorio.
+                </p>
+              </div>
+
+              <!-- Descripción -->
+              <div>
+                <label
+                  for="descripcion"
+                  class="block text-xs font-medium text-slate-700 dark:text-slate-300"
+                  >Descripción</label
+                >
+                <textarea
+                  id="descripcion"
+                  placeholder="Ingrese una descripción del cargo"
+                  class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-none
+                         dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder-slate-500"
+                  formControlName="descripcion"
+                  rows="4"
+                ></textarea>
+              </div>
+            </form>
+          </section>
+
+          <!-- ================= Tabla de Cargos ================= -->
+          <section aria-labelledby="cargos-sistema-title" class="flex flex-col">
+            <div
+              class="flex items-center justify-between gap-2 mb-3 border-b border-slate-200 pb-2 dark:border-slate-800"
+            >
+              <h2
+                id="cargos-sistema-title"
+                class="text-base md:text-lg font-semibold text-slate-900 dark:text-slate-50"
               >
-              <input
-                id="ocupacion"
-                placeholder="Ingrese la ocupación"
-                class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none shadow-sm"
-                formControlName="ocupacion"
-              />
-              <p
-                *ngIf="f['ocupacion'].touched && f['ocupacion'].invalid"
-                class="text-xs text-red-600 mt-1"
-              >
-                Obligatorio.
-              </p>
+                Cargos del sistema
+              </h2>
             </div>
 
-            <!-- Descripción -->
-            <div>
-              <label
-                for="descripcion"
-                class="block text-sm font-medium text-gray-700"
-                >Descripción</label
-              >
-              <textarea
-                id="descripcion"
-                placeholder="Ingrese una descripción del cargo"
-                class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none shadow-sm resize-none"
-                formControlName="descripcion"
-                rows="3"
-              ></textarea>
-            </div>
+            <div
+              class="overflow-x-auto rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950/60 flex-1"
+            >
+              <table class="min-w-full text-xs md:text-sm">
+                <thead>
+                  <tr
+                    class="border-b border-slate-200 bg-slate-50 text-slate-600 dark:border-slate-800 dark:bg-slate-900/80 dark:text-slate-300"
+                  >
+                    <th class="px-4 py-3 text-left font-semibold w-1/4">
+                      Ocupación
+                    </th>
+                    <th class="px-4 py-3 text-left font-semibold w-1/2">
+                      Descripción
+                    </th>
+                    <th class="px-4 py-3 text-center font-semibold w-1/4">
+                      Acciones
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    *ngFor="let c of cargos()"
+                    class="border-t border-slate-100 bg-white hover:bg-slate-50 transition
+                           dark:border-slate-800 dark:bg-slate-950/60 dark:hover:bg-slate-900/80"
+                  >
+                    <td class="px-4 py-3">
+                      {{ c.ocupacion }}
+                    </td>
+                    <td
+                      class="px-4 py-3 max-w-xs truncate"
+                      [title]="c.descripcion"
+                    >
+                      {{ c.descripcion }}
+                    </td>
+                    <td class="px-4 py-3 text-center">
+                      <div class="flex gap-2 justify-center">
+                        <button
+                          type="button"
+                          class="btn-secondary px-3 py-1.5 text-[11px] md:text-xs rounded-xl
+                                 border border-slate-300 bg-white text-slate-700 hover:bg-slate-50
+                                 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
+                          (click)="editar(c)"
+                        >
+                          Editar
+                        </button>
+                        <button
+                          type="button"
+                          class="px-3 py-1.5 rounded-xl border text-[11px] md:text-xs
+                                 border-red-200 bg-red-50 text-red-600 hover:bg-red-100
+                                 dark:bg-red-50/10 dark:text-red-300 dark:border-red-500/40 dark:hover:bg-red-500/10"
+                          (click)="eliminar(c.id_cargo!)"
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
 
-            <!-- Botones Crear/Actualizar y Limpiar -->
-            <div class="flex flex-wrap gap-3 pt-4">
-              <button
-                type="submit"
-                class="btn-primary shadow hover:shadow-lg transition"
-              >
-                {{ modo === "crear" ? "Crear" : "Actualizar" }}
-              </button>
-              <button
-                type="button"
-                (click)="resetForm()"
-                class="btn-secondary shadow hover:shadow-lg transition"
-              >
-                Limpiar
-              </button>
+                  <tr *ngIf="cargos().length === 0">
+                    <td
+                      colspan="3"
+                      class="px-4 py-8 text-center text-slate-500 dark:text-slate-500"
+                    >
+                      Sin registros.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
-          </form>
+          </section>
         </div>
       </div>
 
-      <!-- ================= Tabla de Cargos ================= -->
+      <!-- (Opcional) Modal para descripción larga, si quieres usar abrirModal/cerrarModal -->
+      <!--
       <div
-        class="app-card bg-white shadow-md rounded-lg overflow-hidden flex flex-col"
+        *ngIf="modalDescripcion"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
       >
         <div
-          class="app-card-header bg-yellow-400/20 px-6 py-3 border-b border-gray-200"
+          class="max-w-lg w-full mx-4 rounded-2xl border border-slate-700 bg-slate-950 text-slate-50 shadow-xl p-6 space-y-4"
         >
-          <h2 class="text-lg font-semibold text-gray-800">
-            Cargos del sistema
-          </h2>
-        </div>
-        <div class="app-card-body p-6 flex-1 overflow-y-auto max-h-[500px]">
-          <table class="min-w-full divide-y divide-gray-200 text-sm">
-            <thead class="bg-gray-50 sticky top-0">
-              <tr class="text-gray-600 uppercase text-xs">
-                <th class="px-4 py-2 text-left w-1/4">Ocupación</th>
-                <!-- 25% ancho -->
-                <th class="px-2 py-2 text-left w-1/2">Descripción</th>
-                <!-- 50% ancho -->
-                <th class="px-4 py-2 text-center w-1/4">Acciones</th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-100">
-              <tr
-                *ngFor="let c of cargos()"
-                class="hover:bg-gray-50 transition"
-              >
-                <td class="px-4 py-2">{{ c.ocupacion }}</td>
-                <td
-                  class="px-4 py-2 max-w-xs truncate"
-                  title="{{ c.descripcion }}"
-                >
-                  {{ c.descripcion }}
-                </td>
-                <td class="px-4 py-2 text-center">
-                  <div class="flex gap-2 justify-center">
-                    <button
-                      class="btn-secondary px-3 py-1.5 text-xs hover:bg-gray-200 transition"
-                      (click)="editar(c)"
-                    >
-                      Editar
-                    </button>
-                    <button
-                      class="px-3 py-1.5 rounded-md bg-red-50 text-red-700 border border-red-200 text-xs hover:bg-red-100 transition"
-                      (click)="eliminar(c.id_cargo)"
-                    >
-                      Eliminar
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <tr *ngIf="cargos().length === 0">
-                <td colspan="3" class="px-4 py-6 text-center text-gray-400">
-                  Sin registros
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <h3 class="text-lg font-semibold">Descripción del cargo</h3>
+          <p class="text-sm leading-relaxed">
+            {{ modalDescripcion }}
+          </p>
+          <div class="flex justify-end">
+            <button
+              type="button"
+              (click)="cerrarModal()"
+              class="px-4 py-2 rounded-xl border border-slate-600 text-sm font-medium hover:bg-slate-800"
+            >
+              Cerrar
+            </button>
+          </div>
         </div>
       </div>
+      -->
     </div>
   </section>
 </app-layout>
