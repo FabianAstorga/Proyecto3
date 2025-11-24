@@ -1,6 +1,6 @@
-import { Component, inject } from "@angular/core";
-import { CommonModule } from "@angular/common";
-import { RouterLink } from "@angular/router";
+// src/app/modules/activity-new/activity-new.component.ts
+import { Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
   FormBuilder,
@@ -8,27 +8,28 @@ import {
   FormArray,
   AbstractControl,
   ValidationErrors,
-} from "@angular/forms";
+} from '@angular/forms';
+import { RouterLink } from '@angular/router';
 
-import { MatFormFieldModule } from "@angular/material/form-field";
-import { MatInputModule } from "@angular/material/input";
-import { MatDatepickerModule } from "@angular/material/datepicker";
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 import {
   MatNativeDateModule,
   DateAdapter,
   MAT_DATE_FORMATS,
   MAT_DATE_LOCALE,
   NativeDateAdapter,
-} from "@angular/material/core";
-import { MatSelectModule } from "@angular/material/select";
+} from '@angular/material/core';
+import { MatSelectModule } from '@angular/material/select';
 
-import { LayoutComponent } from "../../components/layout/layout.component";
-import { AuthService } from "../../services/auth.service";
+import { LayoutComponent } from '../../components/layout/layout.component';
+import { AuthService } from '../../services/auth.service';
 import {
-  CreateActividadPayload,
   DataService,
-} from "../../services/data.service";
-import { ModoCreacion } from "../../services/backend/activity-backend.model";
+  CreateActividadPayload,
+  ModoCreacion,
+} from '../../services/data.service';
 
 type WeekFlags = {
   mon: boolean;
@@ -40,7 +41,7 @@ type WeekFlags = {
   sun: boolean;
 };
 
-type MultiMode = "none" | "specific" | "weekly";
+type MultiMode = 'none' | 'specific' | 'weekly';
 
 /** Semana parte en lunes */
 class MondayFirstDateAdapter extends NativeDateAdapter {
@@ -51,18 +52,18 @@ class MondayFirstDateAdapter extends NativeDateAdapter {
 
 /** Formatos de fecha: dd/MM/yyyy */
 export const ES_DATE_FORMATS = {
-  parse: { dateInput: "dd/MM/yyyy" },
+  parse: { dateInput: 'dd/MM/yyyy' },
   display: {
-    dateInput: "dd/MM/yyyy",
-    monthYearLabel: "MMMM yyyy",
-    dateA11yLabel: "dd/MM/yyyy",
-    monthYearA11yLabel: "MMMM yyyy",
+    dateInput: 'dd/MM/yyyy',
+    monthYearLabel: 'MMMM yyyy',
+    dateA11yLabel: 'dd/MM/yyyy',
+    monthYearA11yLabel: 'MMMM yyyy',
   },
 };
 
 @Component({
   standalone: true,
-  selector: "app-activity-new",
+  selector: 'app-activity-new',
   imports: [
     CommonModule,
     RouterLink,
@@ -74,9 +75,9 @@ export const ES_DATE_FORMATS = {
     MatSelectModule,
     LayoutComponent,
   ],
-  templateUrl: "./activity-new.component.html",
+  templateUrl: './activity-new.component.html',
   providers: [
-    { provide: MAT_DATE_LOCALE, useValue: "es-CL" },
+    { provide: MAT_DATE_LOCALE, useValue: 'es-CL' },
     { provide: DateAdapter, useClass: MondayFirstDateAdapter },
     { provide: MAT_DATE_FORMATS, useValue: ES_DATE_FORMATS },
   ],
@@ -86,23 +87,23 @@ export class ActivityNewComponent {
   private auth = inject(AuthService);
   private dataService = inject(DataService);
 
-  // 📌 Link para volver al perfil del funcionario logueado
+  // Link para volver al perfil del funcionario logueado (por si luego lo usas)
   get perfilLink(): string {
     const id = this.auth.getUserId();
-    return id != null ? `/funcionario/perfil/${id}` : "/funcionario/perfil";
+    return id != null ? `/funcionario/perfil/${id}` : '/funcionario/perfil';
   }
 
   // Catálogos
   tiposActividad = [
-    "Taller",
-    "Seminario",
-    "Voluntariado",
-    "Investigación",
-    "Deportivo",
-    "Cultural",
-    "Otro (especificar)",
+    'Taller',
+    'Seminario',
+    'Voluntariado',
+    'Investigación',
+    'Deportivo',
+    'Cultural',
+    'Otro (especificar)',
   ];
-  estados = ["Realizada", "Pendiente"];
+  estados = ['Pendiente', 'Realizada'];
 
   // Mes actual (para MULTI-DÍA)
   private readonly now = new Date();
@@ -120,43 +121,43 @@ export class ActivityNewComponent {
   readonly monthStartISO = this.toISO(this.firstDay);
   readonly monthEndISO = this.toISO(this.lastDay);
 
-  // Feriados 2025 (Chile) 
+  // Feriados 2025 (Chile) -> usados solo en multi-día
   private readonly feriadosISO = new Set<string>([
-    "2025-01-01",
-    "2025-04-18",
-    "2025-04-19",
-    "2025-05-01",
-    "2025-05-21",
-    "2025-06-07",
-    "2025-06-20",
-    "2025-06-29",
-    "2025-07-16",
-    "2025-08-15",
-    "2025-09-18",
-    "2025-09-19",
-    "2025-10-12",
-    "2025-10-31",
-    "2025-11-01",
-    "2025-11-16",
-    "2025-12-08",
-    "2025-12-14",
-    "2025-12-25",
+    '2025-01-01',
+    '2025-04-18',
+    '2025-04-19',
+    '2025-05-01',
+    '2025-05-21',
+    '2025-06-07',
+    '2025-06-20',
+    '2025-06-29',
+    '2025-07-16',
+    '2025-08-15',
+    '2025-09-18',
+    '2025-09-19',
+    '2025-10-12',
+    '2025-10-31',
+    '2025-11-01',
+    '2025-11-16',
+    '2025-12-08',
+    '2025-12-14',
+    '2025-12-25',
   ]);
 
   // === Form ===
   form = this.fb.group(
     {
-      descripcionAct: ["", [Validators.required, Validators.maxLength(500)]],
+      descripcionAct: ['', [Validators.required, Validators.maxLength(500)]],
 
       // fecha principal sin restricción de mes
       fecha: [new Date(), Validators.required],
 
-      tipo_actividad: [this.tiposActividad[0], Validators.required],
-      tipo_actividad_otro: [""], // requerido si se elige “Otro (especificar)”
-      estado: [this.estados[0], Validators.required],
+      tipo_actividad: [<string>this.tiposActividad[0], Validators.required],
+      tipo_actividad_otro: [''], // requerido si se elige “Otro (especificar)”
+      estado: [<string>this.estados[0], Validators.required],
 
       multi: this.fb.group({
-        mode: ["none" as MultiMode],
+        mode: ['none' as MultiMode],
         specificDates: this.fb.array<Date>([]),
         weekly: this.fb.group({
           start: [new Date(), Validators.required],
@@ -179,22 +180,22 @@ export class ActivityNewComponent {
   constructor() {
     // Validador condicional para “tipo_actividad_otro”
     this.form
-      .get("tipo_actividad")!
+      .get('tipo_actividad')!
       .valueChanges.subscribe((val: string | null) => {
-        const otroCtrl = this.form.get("tipo_actividad_otro")!;
-        if (val === "Otro (especificar)") {
+        const otroCtrl = this.form.get('tipo_actividad_otro')!;
+        if (val === 'Otro (especificar)') {
           otroCtrl.addValidators([
             Validators.required,
             Validators.maxLength(100),
           ]);
         } else {
           otroCtrl.clearValidators();
-          otroCtrl.reset("");
+          otroCtrl.reset('');
         }
         otroCtrl.updateValueAndValidity({ emitEvent: false });
       });
 
-    // Validador SOLO para la sección MULTI-DÍA (mes vigente + no feriados + rango)
+    // Validación específica de la sección multi-día
     this.multi.addValidators(this.validateMultiSection.bind(this));
   }
 
@@ -203,17 +204,16 @@ export class ActivityNewComponent {
     return this.form.controls;
   }
   get multi() {
-    return this.form.get("multi")!;
+    return this.form.get('multi')!;
   }
   get specificDates(): FormArray {
-    return this.multi.get("specificDates") as FormArray;
+    return this.multi.get('specificDates') as FormArray;
   }
   get weekly() {
-    return this.multi.get("weekly")!;
+    return this.multi.get('weekly')!;
   }
 
   // ==== Filtros de calendario ====
-
   /** FECHA PRINCIPAL: sin restricciones */
   dateFilterMain = (_d: Date | null): boolean => true;
 
@@ -228,19 +228,12 @@ export class ActivityNewComponent {
     );
   };
 
-  /** Estilo visual en calendario */
-  dateClass = (d: Date): string => {
-    return this.feriadosISO.has(this.toISO(d))
-      ? "holiday-cell"
-      : "available-cell";
-  };
-
   // ==== Validación MULTI-DÍA ====
   private validateMultiSection(
     group: AbstractControl
   ): ValidationErrors | null {
-    const mode = group.get("mode")?.value as MultiMode;
-    if (!mode || mode === "none") return null;
+    const mode = group.get('mode')?.value as MultiMode;
+    if (!mode || mode === 'none') return null;
 
     let anyError = false;
 
@@ -249,8 +242,8 @@ export class ActivityNewComponent {
       this.toISO(dt) >= this.monthStartISO &&
       this.toISO(dt) <= this.monthEndISO;
 
-    if (mode === "specific") {
-      const fa = group.get("specificDates") as FormArray;
+    if (mode === 'specific') {
+      const fa = group.get('specificDates') as FormArray;
       fa.controls.forEach((c) => {
         const v = c.value as Date | null;
         c.setErrors(null);
@@ -263,8 +256,8 @@ export class ActivityNewComponent {
         }
       });
     } else {
-      const startCtrl = group.get("weekly.start")!;
-      const endCtrl = group.get("weekly.end")!;
+      const startCtrl = group.get('weekly.start')!;
+      const endCtrl = group.get('weekly.end')!;
       const s = startCtrl.value as Date | null;
       const e = endCtrl.value as Date | null;
       startCtrl.setErrors(null);
@@ -289,7 +282,9 @@ export class ActivityNewComponent {
 
   // ==== Utilidades ====
   private toISO(d: Date): string {
-    return new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()))
+    return new Date(
+      Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())
+    )
       .toISOString()
       .slice(0, 10);
   }
@@ -303,29 +298,29 @@ export class ActivityNewComponent {
   }
 
   private selectedWeekdays(): number[] {
-    const w = this.weekly.get("weekdays")!.value as WeekFlags;
+    const w = this.weekly.get('weekdays')!.value as WeekFlags;
     const map: [keyof WeekFlags, number][] = [
-      ["sun", 0],
-      ["mon", 1],
-      ["tue", 2],
-      ["wed", 3],
-      ["thu", 4],
-      ["fri", 5],
-      ["sat", 6],
+      ['sun', 0],
+      ['mon', 1],
+      ['tue', 2],
+      ['wed', 3],
+      ['thu', 4],
+      ['fri', 5],
+      ['sat', 6],
     ];
     return map.filter(([k]) => (w as any)[k]).map(([, num]) => num);
   }
-  // Mapeo de días para el backend
+
   private getDiasSemanaNombres(): string[] {
-    const w = this.weekly.get("weekdays")!.value as WeekFlags;
+    const w = this.weekly.get('weekdays')!.value as WeekFlags;
     const map: [keyof WeekFlags, string][] = [
-      ["sun", "Domingo"],
-      ["mon", "Lunes"],
-      ["tue", "Martes"],
-      ["wed", "Miércoles"],
-      ["thu", "Jueves"],
-      ["fri", "Viernes"],
-      ["sat", "Sábado"],
+      ['sun', 'Domingo'],
+      ['mon', 'Lunes'],
+      ['tue', 'Martes'],
+      ['wed', 'Miércoles'],
+      ['thu', 'Jueves'],
+      ['fri', 'Viernes'],
+      ['sat', 'Sábado'],
     ];
     return map.filter(([k]) => (w as any)[k]).map(([, nombre]) => nombre);
   }
@@ -342,13 +337,13 @@ export class ActivityNewComponent {
   // ==== Reset limpio ====
   onReset(): void {
     this.form.reset({
-      descripcionAct: "",
+      descripcionAct: '',
       fecha: new Date(),
       tipo_actividad: this.tiposActividad[0],
-      tipo_actividad_otro: "",
+      tipo_actividad_otro: '',
       estado: this.estados[0],
       multi: {
-        mode: "none" as MultiMode,
+        mode: 'none' as MultiMode,
         specificDates: [],
         weekly: {
           start: new Date(),
@@ -366,13 +361,12 @@ export class ActivityNewComponent {
       },
     });
 
-    // Vaciar el FormArray manualmente
     while (this.specificDates.length > 0) {
       this.specificDates.removeAt(0);
     }
   }
 
-  // ==== Envío ====
+  // ==== Envío (modo-compatible con backend del equipo) ====
   submit() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -381,70 +375,68 @@ export class ActivityNewComponent {
 
     const base = this.form.value;
 
-    // Tipo final
     const tipoFinal =
-      (base.tipo_actividad === "Otro (especificar)" && base.tipo_actividad_otro
+      (base.tipo_actividad === 'Otro (especificar)' && base.tipo_actividad_otro
         ? base.tipo_actividad_otro
-        : base.tipo_actividad) ?? "";
+        : base.tipo_actividad) ?? '';
 
     const multi = base.multi!;
     const mode = multi.mode as MultiMode | undefined;
 
     let payload: CreateActividadPayload;
 
-    // Construir payload según el modo
-    if (!mode || mode === "none") {
+    if (!mode || mode === 'none') {
       // MODO SIMPLE
       payload = {
         modo: 'simple' as ModoCreacion,
         titulo: tipoFinal,
-        descripcion: base.descripcionAct ?? "",
+        descripcion: base.descripcionAct ?? '',
         tipo: tipoFinal,
-        estado: base.estado ?? "Pendiente",
+        estado: base.estado ?? 'Pendiente',
         fecha: this.toISO(base.fecha as Date),
       };
-    } else if (mode === "specific") {
+    } else if (mode === 'specific') {
       // MODO FECHAS ESPECÍFICAS
-      const fechasEspecificas = this.specificDates.controls.map(c => ({
-    fecha: this.toISO(c.value as Date)
-  }));
+      const fechas_especificas = this.specificDates.controls.map((c) => ({
+        fecha: this.toISO(c.value as Date),
+      }));
 
       payload = {
         modo: 'fechas_especificas' as ModoCreacion,
         titulo: tipoFinal,
-        descripcion: base.descripcionAct ?? "",
+        descripcion: base.descripcionAct ?? '',
         tipo: tipoFinal,
-        estado: base.estado ?? "Pendiente",
-        fechas_especificas: fechasEspecificas,
+        estado: base.estado ?? 'Pendiente',
+        fechas_especificas,
       };
     } else {
       // MODO REPETICIÓN SEMANAL
       const s = multi.weekly!.start as Date;
       const e = multi.weekly!.end as Date;
-      const diasSemana = this.getDiasSemanaNombres();
+      const dias_semana = this.getDiasSemanaNombres();
 
       payload = {
         modo: 'repeticion_semanal' as ModoCreacion,
         titulo: tipoFinal,
-        descripcion: base.descripcionAct ?? "",
+        descripcion: base.descripcionAct ?? '',
         tipo: tipoFinal,
-        estado: base.estado ?? "Pendiente",
+        estado: base.estado ?? 'Pendiente',
         fecha_desde: this.toISO(s),
         fecha_hasta: this.toISO(e),
-        dias_semana: diasSemana,
+        dias_semana,
       };
     }
 
-    console.log("Payload que se enviará al backend:", payload);
+    console.log('Payload que se enviará al backend:', payload);
 
     this.dataService.crearActividad(payload).subscribe({
       next: () => {
-        alert("✔ Actividad registrada correctamente");
+        alert('✔ Actividad registrada correctamente');
         this.onReset();
       },
       error: (err) => {
-        console.error("Error al crear actividad:", err);
-        alert("❌ Ocurrió un error al registrar la actividad");
+        console.error('Error al crear actividad:', err);
+        alert('❌ Ocurrió un error al registrar la actividad');
       },
     });
   }

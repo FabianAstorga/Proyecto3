@@ -1,19 +1,20 @@
-import { Component, OnInit } from "@angular/core";
-import { CommonModule } from "@angular/common";
-import { ActivatedRoute } from "@angular/router";
+// src/app/modules/profile-home/profile-home.component.ts
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 
-import { LayoutComponent } from "../../components/layout/layout.component";
-import { User } from "../../models/user.model";
-import { Activity } from "../../models/activity.model";
-import { Cargo } from "../../models/charge.model";
-import { DataService } from "../../services/data.service";
-import { AuthService } from "../../services/auth.service";
+import { LayoutComponent } from '../../components/layout/layout.component';
+import { User } from '../../models/user.model';
+import { Activity } from '../../models/activity.model';
+import { Cargo } from '../../models/charge.model';
+import { DataService } from '../../services/data.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   standalone: true,
-  selector: "app-profile-home",
-  imports: [CommonModule, LayoutComponent],
-  templateUrl: "./profile-home.component.html",
+  selector: 'app-profile-home',
+  imports: [CommonModule, LayoutComponent, RouterLink],
+  templateUrl: './profile-home.component.html',
 })
 export class ProfileHomeComponent implements OnInit {
   user: User | undefined;
@@ -22,9 +23,20 @@ export class ProfileHomeComponent implements OnInit {
   activitiesCount = 0;
   cargoDescripcion: string[] = [];
 
+  // KPIs adicionales
+  monthActivitiesCount = 0;
+  pendingCount = 0;
+  approvedCount = 0;
+  monthHours = 0;
+
+  // Resúmenes
+  lastActivity: Activity | undefined;
+  mostFrequentTitle = '';
+
   // Dinámicos
-  notificationLabel = "";
-  lastSession = "";
+  notificationLabel = '';
+  lastSession = '';
+  daysSinceLastActivity: number | null = null;
 
   showDetails = false;
 
@@ -35,60 +47,34 @@ export class ProfileHomeComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // 1) Calcula la próxima fecha de entrega
+    // 1) Próxima fecha de entrega
     this.notificationLabel = this.computeNextDeliveryLabel();
 
-    // 2) Última sesión real registrada en este navegador
-    const lastIso = this.authService.getLastSessionISO();
+    // 2) Última sesión guardada (desde AuthService)
+    const lastIso = this.authService.getLastSessionISO?.();
     if (lastIso) {
       const d = new Date(lastIso);
-      this.lastSession = this.formatDateTime(d); // dd/mm/aaaa HH:MM
+      this.lastSession = this.formatDateTime(d);
     } else {
-      this.lastSession = "Sin registro de sesión";
+      this.lastSession = 'Sin registro de sesión';
     }
 
-    const token = this.authService.getToken();
-    if (!token) {
-      return;
-    }
-    
+    // 3) Resolver fuente de usuario: por ruta o perfil propio
+    const idFromRoute = this.route.snapshot.paramMap.get('id');
 
+    const source$ = idFromRoute && !Number.isNaN(Number(idFromRoute))
+      ? this.dataService.getUser(Number(idFromRoute))
+      : this.dataService.getMyProfile();
 
-    // 3) Carga de usuario + datos
-    const idParam = this.route.snapshot.paramMap.get("id");
-    let userId: number;
-
-    if (idParam) {
-      // Si hay ID en la ruta, usarlo
-      userId = Number(idParam);
-    } else {
-      // Si no hay ID en la ruta, usar el del usuario logueado
-      const loggedUserId = this.authService.getUserId();
-      if (!loggedUserId) {
-        console.error("No hay usuario logueado");
-        return;
-      }
-      userId = loggedUserId;
-    }
-
-    if (!Number.isFinite(userId)) {
-      console.error("ID de usuario inválido en la ruta");
-      return;
-    }
-
-    this.dataService.getUser(userId).subscribe({
-      next: (user) => {
+    source$.subscribe({
+      next: user => {
         this.user = user;
-        if (!this.user) {
-          return;
-        }
-
-        // Cargar actividades y cargos en paralelo
-        this.loadActivities(userId);
-        this.loadCargos(userId);
+        // Cargar actividades y cargos del usuario real
+        this.loadActivities(user.id);
+        this.loadCargos(user.id);
       },
-      error: (err) => {
-        console.error("Error cargando usuario:", err);
+      error: err => {
+        console.error('Error cargando usuario en profile-home:', err);
       },
     });
   }
@@ -101,21 +87,14 @@ export class ProfileHomeComponent implements OnInit {
     return `La entrega es el ${formatted}`;
   }
 
-  /**
-   * Devuelve la próxima fecha de entrega:
-   * - Fijada a 5 días antes del último día del mes.
-   * - Si la fecha actual ya pasó la entrega de este mes, usa el mes siguiente.
-   */
   private getNextDueDate(from: Date): Date {
     let year = from.getFullYear();
-    let month = from.getMonth(); // 0 = enero
+    let month = from.getMonth();
 
-    // Último día del mes actual
     let lastDayOfMonth = new Date(year, month + 1, 0);
     let due = new Date(lastDayOfMonth);
     due.setDate(lastDayOfMonth.getDate() - 5);
 
-    // Si ya pasó la fecha de entrega de este mes, se usa el próximo mes
     if (from > due) {
       month += 1;
       if (month > 11) {
@@ -130,47 +109,116 @@ export class ProfileHomeComponent implements OnInit {
     return due;
   }
 
-  /** Formatea Date a dd/mm/aaaa */
   private formatDate(d: Date): string {
     const y = d.getFullYear();
     const m = d.getMonth() + 1;
     const day = d.getDate();
-    const dd = String(day).padStart(2, "0");
-    const mm = String(m).padStart(2, "0");
+    const dd = String(day).padStart(2, '0');
+    const mm = String(m).padStart(2, '0');
     return `${dd}/${mm}/${y}`;
   }
 
-  /** Formatea Date a dd/mm/aaaa HH:MM */
   private formatDateTime(d: Date): string {
     const datePart = this.formatDate(d);
-    const hh = String(d.getHours()).padStart(2, "0");
-    const mi = String(d.getMinutes()).padStart(2, "0");
+    const hh = String(d.getHours()).padStart(2, '0');
+    const mi = String(d.getMinutes()).padStart(2, '0');
     return `${datePart} ${hh}:${mi}`;
   }
 
+  // --------- Actividades ---------
+
   private loadActivities(userId: number): void {
     this.dataService.getActivitiesByUser(userId).subscribe({
-      next: (activities) => {
+      next: activities => {
         this.activitiesCount = activities.length;
-        this.recent = [...activities]
-          .sort((a, b) => (a.fecha < b.fecha ? 1 : a.fecha > b.fecha ? -1 : 0))
-          .slice(0, 10);
+
+        const sorted = [...activities].sort((a, b) =>
+          a.fecha < b.fecha ? 1 : a.fecha > b.fecha ? -1 : 0
+        );
+        this.recent = sorted.slice(0, 10);
+        this.lastActivity = sorted[0];
+
+        this.computeActivityMetrics(activities);
       },
-      error: (err) => {
-        console.error("Error cargando actividades:", err);
+      error: err => {
+        console.error('Error cargando actividades desde DataService:', err);
         this.activitiesCount = 0;
         this.recent = [];
       },
     });
   }
 
+  private computeActivityMetrics(activities: Activity[]): void {
+    const today = new Date();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+
+    let monthCount = 0;
+    let pending = 0;
+    let approved = 0;
+    let monthHours = 0;
+    const titleCount: Record<string, number> = {};
+
+    for (const a of activities) {
+      if (a.estado === 'Pendiente') pending++;
+      if (a.estado === 'Aprobada') approved++;
+
+      if (a.fecha) {
+        const [yStr, mStr, dStr] = a.fecha.split('-');
+        const y = Number(yStr);
+        const m = Number(mStr) - 1;
+        const d = Number(dStr);
+
+        if (!isNaN(y) && !isNaN(m) && !isNaN(d)) {
+          if (y === currentYear && m === currentMonth) {
+            monthCount++;
+            const horasNum = Number(a.horas) || 0;
+            monthHours += horasNum;
+
+            if (a.titulo) {
+              titleCount[a.titulo] = (titleCount[a.titulo] ?? 0) + 1;
+            }
+          }
+        }
+      }
+    }
+
+    this.monthActivitiesCount = monthCount;
+    this.pendingCount = pending;
+    this.approvedCount = approved;
+    this.monthHours = monthHours;
+
+    let maxTitle = '';
+    let maxCount = 0;
+    for (const [title, count] of Object.entries(titleCount)) {
+      if (count > maxCount) {
+        maxCount = count;
+        maxTitle = title;
+      }
+    }
+    this.mostFrequentTitle = maxTitle;
+
+    if (this.lastActivity?.fecha) {
+      const lastDate = new Date(this.lastActivity.fecha + 'T00:00:00');
+      const diffMs = today.getTime() - lastDate.getTime();
+      const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      this.daysSinceLastActivity = days >= 0 ? days : null;
+    } else {
+      this.daysSinceLastActivity = null;
+    }
+  }
+
+  // --------- Cargos ---------
+
   private loadCargos(userId: number): void {
     this.dataService.getCargosByUsuario(userId).subscribe({
       next: (cargos: Cargo[]) => {
-        this.cargoDescripcion = cargos.map((c) => c.descripcion ?? "");
+        this.cargoDescripcion = cargos
+          .map(c => c.descripcion ?? '')
+          .filter(d => d.trim() !== '');
       },
-      error: (err) => {
-        console.error("Error cargando cargos:", err);
+      error: err => {
+        console.error('Error cargando cargos desde DataService:', err);
         this.cargoDescripcion = [];
       },
     });
@@ -178,11 +226,11 @@ export class ProfileHomeComponent implements OnInit {
 
   // Utilidad para mostrar fecha en dd/mm/aaaa (para las actividades)
   formatDMY(iso: string): string {
-    if (!iso) return "";
-    const [y, m, d] = iso.split("-").map(Number);
+    if (!iso) return '';
+    const [y, m, d] = iso.split('-').map(Number);
     if (!y || !m || !d) return iso;
-    const dd = String(d).padStart(2, "0");
-    const mm = String(m).padStart(2, "0");
+    const dd = String(d).padStart(2, '0');
+    const mm = String(m).padStart(2, '0');
     return `${dd}/${mm}/${y}`;
   }
 
@@ -195,6 +243,6 @@ export class ProfileHomeComponent implements OnInit {
   }
 
   onAvatarError(e: Event): void {
-    (e.target as HTMLImageElement).src = "/avatar-de-usuario.png";
+    (e.target as HTMLImageElement).src = '/avatar-de-usuario.png';
   }
 }

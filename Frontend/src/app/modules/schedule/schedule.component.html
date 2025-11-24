@@ -1,197 +1,280 @@
 <app-layout [logoutLink]="'/login'">
-  <section class="page-container">
-    <!-- CARD ÚNICA -->
-    <div class="card-base overflow-hidden border-blue-400">
-      <!-- Franja superior: título + ayuda -->
-      <div
-  class="px-6 py-4 border-b border-[#0D1440] bg-[#EAF2FF] flex flex-wrap items-center justify-between gap-4"
->
-  <h1 class="text-2xl md:text-3xl font-bold text-[#0D1440]">
-    Horario {{ userFirstName }}
-  </h1>
-</div>
+  <!-- Fondo tipo dashboard -->
+  <section
+    class="min-h-[calc(100vh-32px)] px-4 py-6 md:px-8 md:py-8
+           bg-slate-50
+           dark:bg-gradient-to-b dark:from-slate-950 dark:via-slate-950 dark:to-slate-900"
+  >
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div
+      class="h-full w-full overflow-hidden rounded-3xl
+             border border-slate-200 bg-white text-slate-900
+             shadow-[0_24px_60px_rgba(15,23,42,0.08)]
+             dark:border-slate-800 dark:bg-slate-950/80 dark:text-slate-100
+             dark:shadow-[0_24px_60px_rgba(15,23,42,0.8)] dark:backdrop-blur-sm"
+    >
+      <!-- HEADER -->
+      <header
+        class="flex flex-col gap-3 border-b border-slate-200 px-6 py-4
+               md:flex-row md:items-center md:justify-between md:px-10
+               bg-white
+               dark:border-slate-800 dark:bg-slate-950/80"
+      >
+        <div>
+          <h1 class="text-2xl md:text-3xl font-semibold leading-tight">
+            Horario
+            <span *ngIf="userFirstName">— {{ userFirstName }}</span>
+          </h1>
+          <p class="mt-1 text-xs md:text-sm text-slate-500 dark:text-slate-400">
+            Haz clic en una celda para agregar o editar información del bloque.
+          </p>
+        </div>
 
-      <!-- Horario: ocupa todo el espacio de la card -->
-      <div class="overflow-x-auto">
         <div
-          class="grid w-full"
-          [ngStyle]="{ 'grid-template-columns': '180px repeat(5, 1fr)' }"
+          class="flex items-center gap-2 text-[11px] md:text-xs text-slate-500 dark:text-slate-400"
         >
-          <!-- Encabezados -->
-          <div
-            class="bg-gray-50 border border-gray-200 p-3 text-center font-semibold text-gray-900"
-          >
-            Bloque
-          </div>
-          <div
-            *ngFor="let d of days"
-            class="bg-gray-50 border border-gray-200 p-3 text-center font-semibold text-gray-900"
-          >
-            {{ d.label }}
-          </div>
+          <span class="inline-flex h-3 w-3 rounded-full bg-slate-200 mr-1 dark:bg-slate-800"></span>
+          Bloque vacío
+          <span
+            class="ml-3 inline-flex h-3 w-3 rounded-full bg-indigo-500/20 border border-indigo-300 mr-1
+                   dark:bg-indigo-500/40 dark:border-indigo-400"
+          ></span>
+          Bloque con actividad
+        </div>
+      </header>
 
-          <!-- Filas -->
-          <ng-container *ngFor="let b of blocks; let bi = index">
-            <!-- Columna izquierda: bloque -->
+      <!-- TABLA DE HORARIO -->
+      <div class="px-4 pb-6 pt-4 md:px-6 md:pb-8">
+        <div class="overflow-x-auto">
+          <div
+            class="grid w-full text-xs md:text-sm"
+            [ngStyle]="{ 'grid-template-columns': '160px repeat(5, minmax(0,1fr))' }"
+          >
+            <!-- Encabezado: columna Bloque -->
             <div
-              class="border border-gray-200 p-3 text-center bg-white text-gray-800"
-              [ngClass]="{
-                'bg-gray-100 font-semibold text-gray-900': b.isLunch
-              }"
+              class="bg-slate-100 border border-slate-200 px-3 py-3 text-center font-semibold uppercase tracking-wide text-[11px] text-slate-700
+                     dark:bg-slate-950 dark:border-slate-800 dark:text-slate-300"
             >
-              <!-- Para bloques normales: hora + código -->
-              <ng-container *ngIf="!b.isLunch; else almuerzoLabel">
-                <div>{{ b.label }}</div>
-                <div class="text-[12px] text-gray-500">
-                  {{ b.code }}
+              Bloque
+            </div>
+
+            <!-- Encabezados: días -->
+            <div
+              *ngFor="let d of days"
+              class="bg-slate-100 border border-slate-200 px-3 py-3 text-center font-semibold uppercase tracking-wide text-[11px] text-slate-700
+                     dark:bg-slate-950 dark:border-slate-800 dark:text-slate-300"
+            >
+              {{ d.label }}
+            </div>
+
+            <!-- Filas por bloque -->
+            <ng-container *ngFor="let b of blocks; let bi = index">
+              <!-- Columna izquierda: info bloque -->
+              <div
+                class="border border-slate-200 px-3 py-3 text-center
+                       dark:border-slate-800"
+                [ngClass]="{
+                  'bg-slate-50 font-semibold text-slate-900 dark:bg-slate-900/80 dark:text-slate-100': !b.isLunch,
+                  'bg-amber-50 text-amber-700 font-semibold dark:bg-slate-900 dark:text-amber-200': b.isLunch
+                }"
+              >
+                <ng-container *ngIf="!b.isLunch; else almuerzoLabel">
+                  <div class="text-[12px] md:text-sm leading-tight">
+                    {{ b.label }}
+                  </div>
+                  <div class="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">
+                    {{ b.code }}
+                  </div>
+                </ng-container>
+
+                <ng-template #almuerzoLabel>
+                  <div class="text-xs md:text-sm tracking-wide">
+                    Almuerzo
+                  </div>
+                </ng-template>
+              </div>
+
+              <!-- Celdas editables (no almuerzo) -->
+              <ng-container *ngIf="!b.isLunch; else lunchRow">
+                <div
+                  *ngFor="let d of days"
+                  class="border border-slate-200 bg-white hover:bg-slate-50 transition-colors cursor-pointer
+                         dark:border-slate-800 dark:bg-slate-950/70 dark:hover:bg-slate-900/80"
+                  (click)="openModal(d.key, bi)"
+                  title="Editar bloque"
+                >
+                  <div
+                    class="h-20 md:h-24 flex items-center justify-center text-center px-2"
+                    [ngClass]="{
+                      'bg-indigo-50 dark:bg-indigo-500/5':
+                        schedule[d.key][visibleIndexToDataIndex(bi)] !== null
+                    }"
+                  >
+                    <ng-container
+                      [ngTemplateOutlet]="cellTpl"
+                      [ngTemplateOutletContext]="{
+                        c: schedule[d.key][visibleIndexToDataIndex(bi)]
+                      }"
+                    ></ng-container>
+                  </div>
                 </div>
               </ng-container>
 
-              <!-- Para almuerzo: solo la palabra -->
-              <ng-template #almuerzoLabel>
-                <div class="text-sm">Almuerzo</div>
+              <!-- Fila de almuerzo: banda visual en todo el ancho -->
+              <ng-template #lunchRow>
+                <div class="col-span-5 border border-slate-200 dark:border-slate-800">
+                  <div
+                    class="h-10 md:h-12 bg-slate-100 text-slate-500 flex items-center justify-center text-[11px] md:text-xs tracking-wide uppercase
+                           dark:bg-slate-900/80 dark:text-slate-400"
+                  >
+                    Pausa de almuerzo
+                  </div>
+                </div>
               </ng-template>
-            </div>
-
-            <!-- Celdas editables (no almuerzo) -->
-            <ng-container *ngIf="!b.isLunch; else lunchRow">
-              <div
-                *ngFor="let d of days"
-                class="border border-gray-200 bg-white hover:bg-gray-50 transition cursor-pointer"
-                (click)="openModal(d.key, bi)"
-                title="Editar"
-              >
-                <div
-                  class="h-20 flex items-center justify-center text-center px-2"
-                >
-                  <ng-container
-                    [ngTemplateOutlet]="cellTpl"
-                    [ngTemplateOutletContext]="{
-                      c: schedule[d.key][visibleIndexToDataIndex(bi)]
-                    }"
-                  ></ng-container>
-                </div>
-              </div>
             </ng-container>
-
-            <!-- Fila de almuerzo: banda completa -->
-            <ng-template #lunchRow>
-              <div class="col-span-5 border border-gray-200">
-                <div
-                  class="h-14 bg-gray-100 text-gray-800 font-medium flex items-center justify-center text-sm"
-                >
-                  <!-- Franja de almuerzo visual -->
-                </div>
-              </div>
-            </ng-template>
-          </ng-container>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
   <!-- ===== Modal de edición ===== -->
-  <div *ngIf="modal.open" class="fixed inset-0 z-50">
+  <div
+    *ngIf="modal.open"
+    class="fixed inset-0 z-50 flex items-center justify-center"
+  >
     <!-- Backdrop -->
-    <div class="absolute inset-0 bg-black/40" (click)="closeModal()"></div>
+    <div
+      class="absolute inset-0 bg-black/40 backdrop-blur-sm"
+      (click)="closeModal()"
+    ></div>
 
     <!-- Diálogo -->
-    <div class="absolute inset-0 flex items-center justify-center p-4">
+    <div
+      class="relative w-[92%] max-w-md rounded-2xl
+             border border-slate-200 bg-white text-slate-900 shadow-2xl
+             dark:border-slate-800 dark:bg-slate-950/95 dark:text-slate-100"
+    >
+      <!-- Header modal -->
       <div
-        class="w-full max-w-md bg-white rounded-2xl shadow-xl border border-blue-200"
+        class="px-5 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50 rounded-t-2xl
+               dark:border-slate-800 dark:bg-slate-900/80"
       >
-        <div class="px-4 py-3 border-b flex items-center justify-between">
-          <div>
-            <div class="text-xs text-gray-500">Editando</div>
-            <div class="font-semibold text-[#0D1440] leading-tight">
-              {{ modal.dayLabel }} — {{ modal.blockLabel }}
-            </div>
+        <div>
+          <div class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400">
+            Editando bloque
           </div>
-          <button
-            class="p-2 rounded hover:bg-gray-100"
-            (click)="closeModal()"
-            aria-label="Cerrar"
+          <div class="mt-0.5 text-sm md:text-base font-semibold">
+            {{ modal.dayLabel }} — {{ modal.blockLabel }}
+          </div>
+        </div>
+        <button
+          class="p-2 rounded-full hover:bg-slate-100 text-slate-500 hover:text-slate-900 transition
+                 dark:hover:bg-slate-800 dark:text-slate-400 dark:hover:text-slate-100"
+          (click)="closeModal()"
+          aria-label="Cerrar"
+        >
+          ✕
+        </button>
+      </div>
+
+      <!-- Formulario -->
+      <form (ngSubmit)="saveFromModal()" class="px-5 py-4 space-y-3">
+        <div>
+          <label class="text-[11px] font-medium text-slate-700 dark:text-slate-300"
+            >Título *</label
           >
-            ✕
-          </button>
+          <input
+            type="text"
+            class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder-slate-400
+                   focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+                   dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder-slate-500"
+            placeholder="Ej.: Programación"
+            [(ngModel)]="modal.model.title"
+            name="title"
+            required
+            autofocus
+          />
         </div>
 
-        <form (ngSubmit)="saveFromModal()" class="p-4 space-y-3">
-          <div>
-            <label class="text-xs text-gray-600">Título *</label>
-            <input
-              type="text"
-              class="w-full border rounded-md px-3 py-2 text-sm"
-              placeholder="Ej.: Programación"
-              [(ngModel)]="modal.model.title"
-              name="title"
-              required
-              autofocus
-            />
-          </div>
-          <div>
-            <label class="text-xs text-gray-600">Sala (opcional)</label>
-            <input
-              type="text"
-              class="w-full border rounded-md px-3 py-2 text-sm"
-              placeholder="Ej.: B-105"
-              [(ngModel)]="modal.model.room"
-              name="room"
-            />
-          </div>
-          <div>
-            <label class="text-xs text-gray-600">Nota (opcional)</label>
-            <input
-              type="text"
-              class="w-full border rounded-md px-3 py-2 text-sm"
-              placeholder="Observaciones…"
-              [(ngModel)]="modal.model.note"
-              name="note"
-            />
-          </div>
+        <div>
+          <label class="text-[11px] font-medium text-slate-700 dark:text-slate-300"
+            >Sala (opcional)</label
+          >
+          <input
+            type="text"
+            class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder-slate-400
+                   focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+                   dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder-slate-500"
+            placeholder="Ej.: B-105"
+            [(ngModel)]="modal.model.room"
+            name="room"
+          />
+        </div>
 
-          <div class="flex items-center gap-2 pt-1">
-            <button
-              type="submit"
-              class="px-3 py-2 rounded-md bg-blue-600 text-white text-sm hover:bg-blue-700"
-            >
-              Guardar
-            </button>
-            <button
-              type="button"
-              class="px-3 py-2 rounded-md bg-gray-100 border text-sm hover:bg-gray-200"
-              (click)="closeModal()"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              class="ml-auto px-3 py-2 rounded-md bg-red-50 text-red-700 border border-red-200 text-sm hover:bg-red-100"
-              (click)="clearFromModal()"
-            >
-              Limpiar celda
-            </button>
-          </div>
-        </form>
-      </div>
+        <div>
+          <label class="text-[11px] font-medium text-slate-700 dark:text-slate-300"
+            >Nota (opcional)</label
+          >
+          <input
+            type="text"
+            class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder-slate-400
+                   focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+                   dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder-slate-500"
+            placeholder="Observaciones…"
+            [(ngModel)]="modal.model.note"
+            name="note"
+          />
+        </div>
+
+        <div class="flex items-center gap-2 pt-2">
+          <!-- Botón guardar -->
+          <button
+            type="submit"
+            class="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-500/30 hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-950"
+          >
+            Guardar
+          </button>
+
+          <button
+            type="button"
+            class="px-4 py-2 rounded-xl border border-slate-300 bg-white text-sm text-slate-700 hover:bg-slate-50
+                   dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+            (click)="closeModal()"
+          >
+            Cancelar
+          </button>
+
+          <button
+            type="button"
+            class="ml-auto px-4 py-2 rounded-xl border border-red-200 bg-red-50 text-sm text-red-700 hover:bg-red-100
+                   dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-300 dark:hover:bg-red-500/20"
+            (click)="clearFromModal()"
+          >
+            Limpiar celda
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
   <!-- Vista de celda -->
   <ng-template #cellTpl let-c="c">
     <div *ngIf="c; else empty" class="px-2">
-      <div class="text-sm font-semibold text-[#0D1440] leading-tight">
+      <div
+        class="text-[11px] md:text-sm font-semibold text-slate-900 dark:text-slate-50 leading-tight"
+      >
         {{ c.title }}
       </div>
-      <div class="text-xs text-gray-600" *ngIf="c.room">
+      <div class="text-[11px] text-slate-600 dark:text-slate-300" *ngIf="c.room">
         Sala: {{ c.room }}
       </div>
-      <div class="text-xs text-gray-500" *ngIf="c.note">
+      <div class="text-[11px] text-slate-500 dark:text-slate-400" *ngIf="c.note">
         {{ c.note }}
       </div>
     </div>
     <ng-template #empty>
-      <div class="text-[11px] text-gray-400">—</div>
+      <div class="text-[11px] text-slate-400 dark:text-slate-500">—</div>
     </ng-template>
   </ng-template>
 </app-layout>
