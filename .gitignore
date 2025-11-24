@@ -1,0 +1,33 @@
+@"
+# Dependencies
+node_modules/
+**/node_modules/
+package-lock.json
+
+# Angular
+.angular/
+**/.angular/
+dist/
+**/dist/
+tmp/
+out-tsc/
+
+# Environment
+.env
+.env.local
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+"@ | Out-File -FilePath ".gitignore" -Encoding utf8
