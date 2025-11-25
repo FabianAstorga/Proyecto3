@@ -41,6 +41,10 @@ let ActividadService = class ActividadService {
                 throw new common_1.BadRequestException('Modo de creación no válido.');
         }
     }
+    crearFechaLocal(fechaString) {
+        const [year, month, day] = fechaString.split('-').map(Number);
+        return new Date(year, month - 1, day);
+    }
     async crearSimple(dto, userId) {
         if (!dto.fecha) {
             throw new common_1.BadRequestException('Se requiere fecha para el modo simple.');
@@ -51,7 +55,7 @@ let ActividadService = class ActividadService {
         if (!usuario) {
             throw new common_1.NotFoundException('Usuario no encontrado');
         }
-        const fecha = new Date(dto.fecha);
+        const fecha = this.crearFechaLocal(dto.fecha);
         const informe = await this.informesService.obtenerOCrearInforme(userId, fecha);
         const actividad = this.actividadRepository.create({
             titulo: dto.titulo,
@@ -77,7 +81,7 @@ let ActividadService = class ActividadService {
         }
         const actividades = [];
         for (const f of dto.fechas_especificas) {
-            const fecha = new Date(f.fecha);
+            const fecha = this.crearFechaLocal(f.fecha);
             const informe = await this.informesService.obtenerOCrearInforme(userId, fecha);
             const actividad = this.actividadRepository.create({
                 titulo: dto.titulo,
@@ -140,8 +144,8 @@ let ActividadService = class ActividadService {
         if (diasNumeros.length === 0) {
             return [];
         }
-        const inicio = new Date(desde);
-        const fin = new Date(hasta);
+        const inicio = this.crearFechaLocal(desde);
+        const fin = this.crearFechaLocal(hasta);
         const fechas = [];
         for (let d = new Date(inicio); d <= fin; d.setDate(d.getDate() + 1)) {
             if (diasNumeros.includes(d.getDay())) {

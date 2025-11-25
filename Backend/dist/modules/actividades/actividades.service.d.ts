@@ -10,6 +10,7 @@ export declare class ActividadService {
     private readonly informesService;
     constructor(actividadRepository: Repository<Actividad>, usuarioRepository: Repository<Usuario>, informesService: InformesService);
     create(dto: CreateActividadDto, userId: number): Promise<Actividad | Actividad[]>;
+    private crearFechaLocal;
     private crearSimple;
     private crearConFechasEspecificas;
     private crearConRepeticionSemanal;

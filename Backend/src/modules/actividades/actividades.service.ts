@@ -38,6 +38,12 @@ export class ActividadService {
         throw new BadRequestException('Modo de creación no válido.');
     }
   }
+  private crearFechaLocal(fechaString: string): Date {
+    const [year, month, day] = fechaString.split('-').map(Number);
+    return new Date(year, month - 1, day);
+  }
+
+
 
   // --- Modo 1: Simple ---
   private async crearSimple(dto: CreateActividadDto, userId: number) {
@@ -53,7 +59,7 @@ export class ActividadService {
       throw new NotFoundException('Usuario no encontrado');
     }
 
-    const fecha = new Date(dto.fecha);
+    const fecha = this.crearFechaLocal(dto.fecha);
     const informe = await this.informesService.obtenerOCrearInforme(userId, fecha);
 
     const actividad = this.actividadRepository.create({
@@ -87,7 +93,7 @@ export class ActividadService {
     const actividades: Actividad[] = [];
 
     for (const f of dto.fechas_especificas) {
-      const fecha = new Date(f.fecha);
+      const fecha = this.crearFechaLocal(f.fecha);
       const informe = await this.informesService.obtenerOCrearInforme(userId, fecha);
 
       const actividad = this.actividadRepository.create({
@@ -178,8 +184,8 @@ export class ActividadService {
       return [];
     }
 
-    const inicio = new Date(desde);
-    const fin = new Date(hasta);
+    const inicio = this.crearFechaLocal(desde);
+    const fin = this.crearFechaLocal(hasta);
     const fechas: Date[] = [];
 
     for (let d = new Date(inicio); d <= fin; d.setDate(d.getDate() + 1)) {
