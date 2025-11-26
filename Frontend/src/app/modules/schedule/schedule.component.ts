@@ -7,6 +7,7 @@ import { ActivatedRoute } from '@angular/router';
 import { LayoutComponent } from '../../components/layout/layout.component';
 import { User } from '../../models/user.model';
 import { DataService } from '../../services/data.service';
+import { BackendHorario, SaveHorarioPayload } from '../../models/horario.models';
 
 type Block = { label: string; code: string; isLunch?: boolean };
 type DayKey = 'lun' | 'mar' | 'mie' | 'jue' | 'vie';
@@ -28,6 +29,7 @@ export class ScheduleComponent implements OnInit {
 
   canEdit = true; // por ahora todo editable en front
 
+  // Bloques visibles en la tabla
   blocks: Block[] = [
     { label: '08:00 - 09:30', code: '(1 - 2)' },
     { label: '09:40 - 11:10', code: '(3 - 4)' },
@@ -46,6 +48,15 @@ export class ScheduleComponent implements OnInit {
     { key: 'jue', label: 'Jueves' },
     { key: 'vie', label: 'Viernes' },
   ];
+
+  // Fecha de ejemplo por día (ajusta a la semana que quieras)
+  fechaPorDia: Record<DayKey, string> = {
+    lun: '2024-12-30', // Lunes
+    mar: '2024-12-31', // Martes
+    mie: '2025-01-01', // Miércoles
+    jue: '2025-01-02', // Jueves
+    vie: '2025-01-03', // Viernes
+  };
 
   // 7 slots (todos menos almuerzo) por día
   schedule: Record<DayKey, Cell[]> = {
@@ -66,6 +77,14 @@ export class ScheduleComponent implements OnInit {
     model: { title: '', room: '', note: '' },
   };
 
+  // ===== Toast (notificación) =====
+  toast = {
+    show: false,
+    type: 'success' as 'success' | 'error',
+    message: '',
+  };
+  private toastTimeout: any;
+
   constructor(
     private route: ActivatedRoute,
     private dataService: DataService
@@ -73,25 +92,127 @@ export class ScheduleComponent implements OnInit {
 
   ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
-    const id = idParam ? Number(idParam) : NaN;
+    const routeId = idParam ? Number(idParam) : NaN;
 
-    if (!Number.isFinite(id)) {
-      console.error('ID de usuario inválido en la ruta de horario');
-      return;
-    }
-
-    // Usamos el DataService del equipo
-    this.dataService.getUser(id).subscribe({
+    // Usamos el perfil del usuario logueado
+    this.dataService.getMyProfile().subscribe({
       next: (user) => {
         this.user = user;
-        if (!this.user) {
-          console.error('Usuario no encontrado para id =', id);
+
+        // Solo para debug: si el id de la ruta no coincide con el logueado
+        if (Number.isFinite(routeId) && routeId !== user.id) {
+          console.warn(
+            'El id de la ruta no coincide con el usuario logueado:',
+            'ruta =', routeId, 'user.id =', user.id
+          );
+        }
+
+        // Cargar horario desde el backend para este usuario
+        this.dataService.getHorarioByUser(user.id!).subscribe({
+          next: (horarios) => this.applyBackendHorario(horarios),
+          error: (err) =>
+            console.error('Error cargando horario desde backend:', err),
+        });
+      },
+      error: (err) => {
+        console.error('Error cargando perfil para horario:', err);
+      },
+    });
+  }
+
+  // ===== Cargar horario que viene del back en el grid =====
+  applyBackendHorario(horarios: BackendHorario[]): void {
+    // Limpio primero
+    (Object.keys(this.schedule) as DayKey[]).forEach((day) => {
+      this.schedule[day] = [null, null, null, null, null, null, null];
+    });
+
+    // Mapa bloque -> { day, index } construido en base a los mismos days/blocks
+    const bloqueToIndex: Record<string, { day: DayKey; index: number }> = {};
+
+    this.days.forEach((d) => {
+      this.blocks.forEach((b, visibleIndex) => {
+        if (b.isLunch) return;
+        const dataIndex = this.visibleIndexToDataIndex(visibleIndex);
+        if (dataIndex === -1) return;
+
+        const key = `${d.label} ${b.code}`; // Ej: "Lunes (1 - 2)"
+        bloqueToIndex[key] = { day: d.key, index: dataIndex };
+      });
+    });
+
+    horarios.forEach((h) => {
+      const info = bloqueToIndex[h.bloque];
+      if (!info) return;
+
+      this.schedule[info.day][info.index] = {
+        title: h.titulo,
+        room: h.sala || undefined,
+        note: h.descripcion || undefined,
+      };
+    });
+  }
+
+  // ===== Guardar TODO el horario en el backend =====
+  // (lo usamos cuando el usuario guarda una celda)
+  saveSchedule(showToast = true): void {
+    if (!this.user?.id) return;
+
+    const payload: SaveHorarioPayload[] = [];
+
+    this.blocks.forEach((b, visibleIndex) => {
+      if (b.isLunch) return;
+
+      const dataIndex = this.visibleIndexToDataIndex(visibleIndex);
+      const [horaInicioLabel, horaFinLabel] = b.label.split(' - '); // "08:00", "09:30"
+
+      this.days.forEach((d) => {
+        const cell = this.schedule[d.key][dataIndex];
+        if (!cell) return;
+
+        const fecha = this.fechaPorDia[d.key];
+
+        payload.push({
+          bloque: `${d.label} ${b.code}`, // Ej: "Lunes (1 - 2)"
+          fecha,
+          horaInicio: horaInicioLabel,
+          horaFin: horaFinLabel,
+          esDisponible: true,
+          titulo: cell.title,
+          sala: cell.room || null,
+          descripcion: cell.note || null,
+        });
+      });
+    });
+
+    this.dataService.saveHorarioByUser(this.user.id!, payload).subscribe({
+      next: () => {
+        if (showToast) {
+          this.showToast('success', 'Horario guardado correctamente');
         }
       },
       error: (err) => {
-        console.error('Error cargando usuario para horario:', err);
+        console.error('Error guardando horario:', err);
+        if (showToast) {
+          this.showToast('error', 'Error al guardar el horario');
+        }
       },
     });
+  }
+
+  // ===== Toast helper =====
+  private showToast(type: 'success' | 'error', message: string) {
+    this.toast.type = type;
+    this.toast.message = message;
+    this.toast.show = true;
+
+    if (this.toastTimeout) {
+      clearTimeout(this.toastTimeout);
+    }
+
+    this.toastTimeout = setTimeout(() => {
+      this.toast.show = false;
+    }, 2500);
   }
 
   // índice visible (incluye lunch) → índice real (sin lunch)
@@ -123,8 +244,10 @@ export class ScheduleComponent implements OnInit {
     };
   }
 
+  // Ahora: guardar celda -> actualizar grid -> guardar TODO el horario -> toast
   saveFromModal(): void {
     if (!this.modal.open || !this.modal.day) return;
+
     const t = this.modal.model.title.trim();
     const payload: Cell = t
       ? {
@@ -133,13 +256,22 @@ export class ScheduleComponent implements OnInit {
           note: this.modal.model.note?.trim() || undefined,
         }
       : null;
+
     this.schedule[this.modal.day][this.modal.index] = payload;
+
+    // Auto-save del horario completo
+    this.saveSchedule(true);
+
     this.closeModal();
   }
 
   clearFromModal(): void {
     if (!this.modal.open || !this.modal.day) return;
     this.schedule[this.modal.day][this.modal.index] = null;
+
+    // También persistimos el cambio (se borra ese bloque)
+    this.saveSchedule(true);
+
     this.closeModal();
   }
 

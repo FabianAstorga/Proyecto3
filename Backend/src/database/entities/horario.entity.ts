@@ -1,5 +1,4 @@
-// Asumiendo que la entidad Usuario existe y se importa
-import { Usuario } from './usuario.entity'; 
+import { Usuario } from './usuario.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -10,29 +9,35 @@ import {
 
 @Entity('horario')
 export class Horario {
-
   @PrimaryGeneratedColumn()
   id_agenda: number;
 
   @Column({ type: 'varchar', length: 255 })
   bloque: string;
 
-  // Si solo necesitamos la fecha
   @Column({ type: 'date' })
   fecha: Date;
 
-  // Asumiendo que necesitas la fecha y hora
   @Column({ type: 'datetime' })
-  horaInicio: Date; 
+  horaInicio: Date;
 
-  @Column({ type: 'datetime', nullable : true})
-  horaFin: Date;
+  @Column({ type: 'datetime', nullable: true })
+  horaFin: Date | null;
 
   @Column({ type: 'boolean', default: true })
   esDisponible: boolean;
 
-  // CLAVE FORÁNEA FALTANTE: Relación con el Usuario
-  @ManyToOne(() => Usuario, usuario => usuario.horarios) // Define la relación
-  @JoinColumn({ name: 'usuario_id' }) // Columna de la clave foránea en la tabla 'agenda'
+  // 🔹 NUEVOS CAMPOS
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  titulo: string | null;
+
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  sala: string | null;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  descripcion: string | null;
+
+  @ManyToOne(() => Usuario, (usuario) => usuario.horarios)
+  @JoinColumn({ name: 'usuario_id' })
   usuario: Usuario;
 }

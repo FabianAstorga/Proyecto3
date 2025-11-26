@@ -9,6 +9,7 @@ import { EmpleadoCargosModule } from "./modules/empleado-cargos/empleado-cargos.
 import { CargosModule } from "./modules/cargos/cargos.module";
 import { UsuariosModule } from "./modules/usuarios/usuarios.module";
 import { InformesModule } from './modules/informes/informes.module';
+import { HorariosModule } from "./modules/horarios/horarios.module";
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { InformesModule } from './modules/informes/informes.module';
     CargosModule,
     UsuariosModule,
     InformesModule,
+    HorariosModule
     // InformesModule
   ],
   controllers: [AppController],

@@ -2,7 +2,7 @@
 import { Injectable } from "@angular/core";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Observable, map } from "rxjs";
-
+import { BackendHorario, SaveHorarioPayload } from '../models/horario.models';
 import { User } from "../models/user.model";
 import { Activity } from "../models/activity.model";
 import { Cargo } from "../models/charge.model";
@@ -327,6 +327,26 @@ export class DataService {
       map((list) =>
         list.filter((ec) => ec.usuario.id === usuarioId).map((ec) => ec.cargo)
       )
+    );
+  }
+
+    // ================= HORARIOS =================
+
+
+// ================= HORARIOS =================
+
+  getHorarioByUser(usuarioId: number) {
+    return this.http.get<BackendHorario[]>(
+      `${this.apiUrl}/horarios/usuario/${usuarioId}`,
+      this.getAuthOptions()
+    );
+  }
+
+  saveHorarioByUser(usuarioId: number, items: SaveHorarioPayload[]) {
+    return this.http.put(
+      `${this.apiUrl}/horarios/usuario/${usuarioId}`,
+      items,
+      this.getAuthOptions()
     );
   }
 }
