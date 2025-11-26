@@ -366,7 +366,7 @@ export class ActivitiesHistoryComponent implements OnInit {
 
   // ================== PDF POR MES ==================
 
- // ================== PDF POR MES (REHACER PARA ASEGURAR GRID SIN DESFASE) ==================
+ // ================== PDF POR MES (CON CENTRADO DE CELDAS) ==================
 
 downloadMonthPdf(month: MonthGroup): void {
     const doc = new jsPDF();
@@ -407,12 +407,6 @@ downloadMonthPdf(month: MonthGroup): void {
       { align: 'center' }
     );
     y += 10;
-    // Línea de separación opcional después del título
-    // doc.setDrawColor(220, 220, 220);
-    // doc.setLineWidth(0.5);
-    // doc.line(marginX, y, pageWidth - marginX, y);
-    // y += 8;
-
 
     const tableMarginX = marginX;
     const tableWidth = pageWidth - tableMarginX * 2;
@@ -435,7 +429,7 @@ downloadMonthPdf(month: MonthGroup): void {
 
       // Nombre del Funcionario
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(14); // Un poco más grande para el nombre
+      doc.setFontSize(14);
       doc.setTextColor(0, 0, 0);
       doc.text(ug.userName, tableMarginX, y);
       y += 6;
@@ -452,20 +446,19 @@ downloadMonthPdf(month: MonthGroup): void {
           lineaBase,
           activityColWidth - 8 // Margen interno de 4px a cada lado
         );
-        // La altura de la fila es el mayor entre la altura mínima y el espacio que ocupa el texto
+        // Altura de la fila: El espacio necesario para el texto multilínea, más un pequeño padding.
         const minRowHeight = 14; 
-        const rowHeight = Math.max(minRowHeight, wrapped.length * lineHeight + 4); // +4 para padding vertical
+        const rowHeight = Math.max(minRowHeight, wrapped.length * lineHeight + 4); 
         rowHeights.push(rowHeight);
         bodyHeight += rowHeight;
       });
 
-      const tableHeight = headerHeight + bodyHeight + 2; // +2 para compensar bordes
+      const tableHeight = headerHeight + bodyHeight + 2; 
       
       // Control de salto de página antes de dibujar la tabla del usuario
       if (y + tableHeight > pageHeight - bottomMargin) {
         doc.addPage();
         y = 20;
-        // Redibujar nombre del funcionario en la nueva página
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(14);
         doc.setTextColor(0, 0, 0);
@@ -509,7 +502,7 @@ downloadMonthPdf(month: MonthGroup): void {
       const v2 = innerX + dateColWidth + activityColWidth;
       doc.line(v1, innerTop, v1, innerBottom);
       doc.line(v2, innerTop, v2, innerBottom);
-      doc.line(innerX, innerTop + headerHeight + 1, innerX + innerWidth, innerTop + headerHeight + 1); // Separador bajo el header
+      doc.line(innerX, innerTop + headerHeight + 1, innerX + innerWidth, innerTop + headerHeight + 1); // Separador bajo el header
 
       let currentY = innerTop + headerHeight + 1; 
 
@@ -521,83 +514,64 @@ downloadMonthPdf(month: MonthGroup): void {
 
       ug.activities.forEach((a, idx) => {
         const rowHeight = rowHeights[idx];
+        
+        // La posición central vertical (línea base del texto) de la fila.
+        // Se utiliza para centrar Fecha y la píldora de Estado.
+        const centerBaselineY = currentY + rowHeight / 2 + 1.5; 
 
-        // 1. FECHA (Centrado vertical en la columna)
+
+        // 1. FECHA (Centrado vertical)
         const fechaTxt = formatShort(a.fecha);
         doc.text(
           fechaTxt,
           innerX + 5,
-          currentY + rowHeight / 2 + 1.5 // Centrado vertical (ajuste +1.5 para la línea base del texto)
+          centerBaselineY
         );
 
-        // 2. ACTIVIDAD (Justificación superior con padding)
+        // 2. ACTIVIDAD (Centrado vertical: Usaremos un "pseudo-centrado" vertical)
         const actividadTxt = `${a.titulo} — ${a.detalle || ''}`.trim();
         const wrapped = doc.splitTextToSize(
           actividadTxt,
           activityColWidth - 8
         );
+        
+        // Para centrar verticalmente, calculamos el punto de partida Y:
+        const textBlockHeight = wrapped.length * lineHeight;
+        const activityStartPaddingY = (rowHeight - textBlockHeight) / 2;
+
         doc.text(
           wrapped,
           innerX + dateColWidth + 5,
-          currentY + 4 // Pequeño padding vertical desde arriba
+          currentY + activityStartPaddingY + lineHeight // Sumar lineHeight para la primera línea base
         );
 
-        // 3. ESTADO (PÍLDORA, Centrada vertical y horizontalmente)
+
+        // 3. ESTADO (PÍLDORA SIN COLOR, Centrada vertical y horizontalmente)
         const estadoLabel = a.estado;
-        let pillFill: [number, number, number];
-        let pillText: [number, number, number];
-
-        // Configuración de colores de la píldora
-        switch (a.estado) {
-          case 'Aprobada':
-            pillFill = [222, 247, 236]; // Verde claro
-            pillText = [22, 101, 52];
-            break;
-          case 'Pendiente':
-            pillFill = [255, 243, 205]; // Amarillo claro
-            pillText = [133, 77, 14];
-            break;
-          case 'Rechazada':
-            pillFill = [254, 226, 226]; // Rojo claro
-            pillText = [153, 27, 27];
-            break;
-          default:
-            pillFill = [229, 231, 235];
-            pillText = [55, 65, 81];
-            break;
-        }
-
+        // Asignamos el color del texto a negro, ya que no queremos fondo de color
+        const pillFill: [number, number, number] = [255, 255, 255]; 
+        const pillText: [number, number, number] = [0, 0, 0]; 
+        
         // Cálculo de dimensiones y posición de la píldora
-        const pillTextSize = 10;
+        const pillTextSize = 11; // Usamos tamaño normal de 11, pero centrado
         doc.setFontSize(pillTextSize);
-        const textWidth = doc.getTextWidth(estadoLabel);
-        const pillPaddingX = 3;
-        const pillWidth = textWidth + pillPaddingX * 2 + 1; // +1 de ajuste
-        const pillHeight = pillTextSize + 4;
-
+        
+        // Simulación del centrado de la píldora (ahora solo texto)
         const estadoX = innerX + dateColWidth + activityColWidth;
-        const pillX = estadoX + (statusColWidth - pillWidth) / 2;
-        const pillY = currentY + (rowHeight - pillHeight) / 2;
+        const textWidth = doc.getTextWidth(estadoLabel);
+        
+        // Posición X centrada del texto
+        const pillTextX = estadoX + (statusColWidth - textWidth) / 2;
 
-        // DIBUJAR RECTÁNGULO DE LA PÍLDORA
-        doc.setFillColor(...pillFill);
-        doc.roundedRect(
-          pillX,
-          pillY,
-          pillWidth,
-          pillHeight,
-          3, 3, 'F'
-        );
-
-        // DIBUJAR TEXTO DE LA PÍLDORA
+        // DIBUJAR TEXTO DEL ESTADO (Centrado Verticalmente)
         doc.setTextColor(...pillText);
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(pillTextSize);
         
         doc.text(
           estadoLabel,
-          pillX + pillPaddingX,
-          pillY + pillHeight - 2 // Línea base del texto
+          pillTextX,
+          centerBaselineY // Usamos la misma línea base central que la Fecha
         );
 
         // Volver a configuración por defecto para el texto normal
