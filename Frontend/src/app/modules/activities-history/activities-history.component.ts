@@ -366,238 +366,260 @@ export class ActivitiesHistoryComponent implements OnInit {
 
   // ================== PDF POR MES ==================
 
-  downloadMonthPdf(month: MonthGroup): void {
-    const doc = new jsPDF();
+ // ================== PDF POR MES (REHACER PARA ASEGURAR GRID SIN DESFASE) ==================
 
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
+downloadMonthPdf(month: MonthGroup): void {
+    const doc = new jsPDF();
 
-    const marginX = 14;
-    let y = 20;
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
 
-    const formatShort = (iso: string): string => {
-      const [yearStr, monthStr, dayStr] = iso.split('-');
-      const d = Number(dayStr);
-      const m = Number(monthStr);
-      const meses = [
-        'ene',
-        'feb',
-        'mar',
-        'abr',
-        'may',
-        'jun',
-        'jul',
-        'ago',
-        'sept',
-        'oct',
-        'nov',
-        'dic',
-      ];
-      return `${String(d).padStart(2, '0')}-${meses[m - 1] ?? ''}`;
-    };
+    const marginX = 14;
+    let y = 20;
 
-    // TÍTULO
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(18);
-    doc.setTextColor(0, 0, 0);
-    doc.text('Resumen de actividades', pageWidth / 2, y, { align: 'center' });
-    y += 8;
+    // Función para formatear la fecha a 'DD-mes' (ej: 21-nov)
+    const formatShort = (iso: string): string => {
+      const [yearStr, monthStr, dayStr] = iso.split('-');
+      const d = Number(dayStr);
+      const m = Number(monthStr); // 1..12
+      const meses = [
+        'ene', 'feb', 'mar', 'abr', 'may', 'jun',
+        'jul', 'ago', 'sept', 'oct', 'nov', 'dic',
+      ];
+      return `${String(d).padStart(2, '0')}-${meses[m - 1] ?? ''}`;
+    };
 
-    const secName = this.secretaryName || 'Secretaría (sin identificar)';
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(11);
-    doc.setTextColor(90, 90, 90);
-    doc.text(
-      `${month.monthLabel.toLowerCase()} — Informe creado por ${secName}`,
-      pageWidth / 2,
-      y,
-      { align: 'center' }
-    );
-    y += 10;
+    // === 1. ENCABEZADO PRINCIPAL (TÍTULO Y SECRETARIA) ===
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(18);
+    doc.setTextColor(0, 0, 0);
+    doc.text('Resumen de actividades', pageWidth / 2, y, { align: 'center' });
+    y += 8;
 
-    doc.setDrawColor(220, 220, 220);
-    doc.setLineWidth(0.5);
-    doc.line(marginX, y, pageWidth - marginX, y);
-    y += 8;
+    const secName = this.secretaryName || 'Secretaría (sin identificar)';
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(11);
+    doc.setTextColor(90, 90, 90);
+    doc.text(
+      `${month.monthLabel.toLowerCase()} — Informe creado por ${secName}`,
+      pageWidth / 2,
+      y,
+      { align: 'center' }
+    );
+    y += 10;
+    // Línea de separación opcional después del título
+    // doc.setDrawColor(220, 220, 220);
+    // doc.setLineWidth(0.5);
+    // doc.line(marginX, y, pageWidth - marginX, y);
+    // y += 8;
 
-    const tableMarginX = marginX;
-    const tableWidth = pageWidth - tableMarginX * 2;
-    const headerHeight = 10;
-    const lineHeight = 8;
 
-    const dateColWidth = 36;
-    const statusColWidth = 42;
-    const activityColWidth = tableWidth - dateColWidth - statusColWidth;
+    const tableMarginX = marginX;
+    const tableWidth = pageWidth - tableMarginX * 2;
+    const headerHeight = 10;
+    const lineHeight = 8; // Altura base de línea de texto (para calcular salto de línea)
 
-    const bottomMargin = 30;
+    const dateColWidth = 36;
+    const statusColWidth = 42;
+    const activityColWidth = tableWidth - dateColWidth - statusColWidth; // Columna flexible
 
-    month.users.forEach((ug) => {
-      if (y > pageHeight - bottomMargin - 40) {
-        doc.addPage();
-        y = 20;
-      }
+    const bottomMargin = 30;
 
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(13);
-      doc.setTextColor(0, 0, 0);
-      doc.text(ug.userName, tableMarginX, y);
-      y += 6;
+    // === 2. ITERAR POR FUNCIONARIO Y DIBUJAR TABLA ===
+    month.users.forEach((ug) => {
+      // Verificar espacio y agregar página si es necesario
+      if (y > pageHeight - bottomMargin - 40) {
+        doc.addPage();
+        y = 20;
+      }
 
-      let bodyHeight = 0;
-      const rowHeights: number[] = [];
+      // Nombre del Funcionario
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(14); // Un poco más grande para el nombre
+      doc.setTextColor(0, 0, 0);
+      doc.text(ug.userName, tableMarginX, y);
+      y += 6;
 
-      ug.activities.forEach((a) => {
-        const lineaBase = `${a.titulo} — ${a.detalle || ''}`.trim();
-        const wrapped = doc.splitTextToSize(
-          lineaBase,
-          activityColWidth - 4
-        );
-        const rowHeight = Math.max(lineHeight, wrapped.length * lineHeight);
-        rowHeights.push(rowHeight);
-        bodyHeight += rowHeight;
-      });
+      // --- 2.1. Calcular altura de la tabla ---
+      let bodyHeight = 0;
+      const rowHeights: number[] = [];
+      
+      doc.setFontSize(11);
+      ug.activities.forEach((a) => {
+        const lineaBase = `${a.titulo} — ${a.detalle || ''}`.trim();
+        // Cálculo de líneas que ocupará el texto de la actividad
+        const wrapped = doc.splitTextToSize(
+          lineaBase,
+          activityColWidth - 8 // Margen interno de 4px a cada lado
+        );
+        // La altura de la fila es el mayor entre la altura mínima y el espacio que ocupa el texto
+        const minRowHeight = 14; 
+        const rowHeight = Math.max(minRowHeight, wrapped.length * lineHeight + 4); // +4 para padding vertical
+        rowHeights.push(rowHeight);
+        bodyHeight += rowHeight;
+      });
 
-      const tableHeight = headerHeight + bodyHeight + 6;
+      const tableHeight = headerHeight + bodyHeight + 2; // +2 para compensar bordes
+      
+      // Control de salto de página antes de dibujar la tabla del usuario
+      if (y + tableHeight > pageHeight - bottomMargin) {
+        doc.addPage();
+        y = 20;
+        // Redibujar nombre del funcionario en la nueva página
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(14);
+        doc.setTextColor(0, 0, 0);
+        doc.text(ug.userName, tableMarginX, y);
+        y += 6;
+      }
 
-      if (y + tableHeight > pageHeight - bottomMargin) {
-        doc.addPage();
-        y = 20;
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(13);
-        doc.setTextColor(0, 0, 0);
-        doc.text(ug.userName, tableMarginX, y);
-        y += 6;
-      }
+      const tableY = y;
 
-      const tableY = y;
+      // --- 2.2. DIBUJO DEL CONTENEDOR DE LA TABLA (RECUADRO) ---
+      doc.setDrawColor(210, 210, 210);
+      doc.setLineWidth(0.6);
+      doc.setFillColor(255, 255, 255);
+      doc.roundedRect(tableMarginX, tableY, tableWidth, tableHeight, 4, 4, 'S');
 
-      doc.setDrawColor(210, 210, 210);
-      doc.setLineWidth(0.6);
-      doc.setFillColor(255, 255, 255);
-      doc.roundedRect(tableMarginX, tableY, tableWidth, tableHeight, 4, 4, 'S');
+      const innerX = tableMarginX;
+      const innerWidth = tableWidth;
+      const innerTop = tableY;
+      const innerBottom = tableY + tableHeight;
 
-      const innerX = tableMarginX + 4;
-      const innerWidth = tableWidth - 2;
-      const innerTop = tableY + 1;
-      const innerBottom = tableY + tableHeight - 1;
+      // --- 2.3. DIBUJO DEL ENCABEZADO DE COLUMNAS ---
+      doc.setFillColor(245, 245, 245);
+      doc.rect(innerX + 1, innerTop + 1, innerWidth - 2, headerHeight, 'F');
 
-      doc.setFillColor(245, 245, 245);
-      doc.rect(innerX, innerTop, innerWidth, headerHeight - 0.3, 'F');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(0, 0, 0);
 
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(11);
-      doc.setTextColor(0, 0, 0);
+      const headerBaseline = innerTop + headerHeight - 2;
+      doc.text('Fecha', innerX + 5, headerBaseline);
+      doc.text('Actividad', innerX + dateColWidth + 5, headerBaseline);
+      doc.text(
+        'Estado',
+        innerX + dateColWidth + activityColWidth + 5,
+        headerBaseline
+      );
 
-      const headerBaseline = innerTop + headerHeight - 2;
-      doc.text('Fecha', innerX + 4, headerBaseline);
-      doc.text('Actividad', innerX + dateColWidth + 4, headerBaseline);
-      doc.text(
-        'Estado',
-        innerX + dateColWidth + activityColWidth + 4,
-        headerBaseline
-      );
+      // Líneas divisorias verticales
+      doc.setDrawColor(230, 230, 230);
+      const v1 = innerX + dateColWidth;
+      const v2 = innerX + dateColWidth + activityColWidth;
+      doc.line(v1, innerTop, v1, innerBottom);
+      doc.line(v2, innerTop, v2, innerBottom);
+      doc.line(innerX, innerTop + headerHeight + 1, innerX + innerWidth, innerTop + headerHeight + 1); // Separador bajo el header
 
-      doc.setDrawColor(230, 230, 230);
-      const v1 = innerX + dateColWidth;
-      const v2 = innerX + dateColWidth + activityColWidth;
-      doc.line(v1, innerTop, v1, innerBottom);
-      doc.line(v2, innerTop, v2, innerBottom);
+      let currentY = innerTop + headerHeight + 1; 
 
-      let currentY = innerTop + headerHeight + 4;
+      // --- 2.4. DIBUJO DE LAS FILAS DE ACTIVIDADES ---
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(11);
+      doc.setTextColor(0, 0, 0);
+      doc.setDrawColor(235, 235, 235);
 
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(11);
-      doc.setTextColor(0, 0, 0);
-      doc.setDrawColor(235, 235, 235);
+      ug.activities.forEach((a, idx) => {
+        const rowHeight = rowHeights[idx];
 
-      ug.activities.forEach((a, idx) => {
-        const rowHeight = rowHeights[idx];
+        // 1. FECHA (Centrado vertical en la columna)
+        const fechaTxt = formatShort(a.fecha);
+        doc.text(
+          fechaTxt,
+          innerX + 5,
+          currentY + rowHeight / 2 + 1.5 // Centrado vertical (ajuste +1.5 para la línea base del texto)
+        );
 
-        const fechaTxt = formatShort(a.fecha);
-        doc.text(
-          fechaTxt,
-          innerX + 4,
-          currentY + lineHeight
-        );
+        // 2. ACTIVIDAD (Justificación superior con padding)
+        const actividadTxt = `${a.titulo} — ${a.detalle || ''}`.trim();
+        const wrapped = doc.splitTextToSize(
+          actividadTxt,
+          activityColWidth - 8
+        );
+        doc.text(
+          wrapped,
+          innerX + dateColWidth + 5,
+          currentY + 4 // Pequeño padding vertical desde arriba
+        );
 
-        const actividadTxt = `${a.titulo} — ${a.detalle || ''}`.trim();
-        const wrapped = doc.splitTextToSize(
-          actividadTxt,
-          activityColWidth - 4
-        );
-        doc.text(
-          wrapped,
-          innerX + dateColWidth + 4,
-          currentY + lineHeight
-        );
+        // 3. ESTADO (PÍLDORA, Centrada vertical y horizontalmente)
+        const estadoLabel = a.estado;
+        let pillFill: [number, number, number];
+        let pillText: [number, number, number];
 
-        const estadoLabel = a.estado;
-        let pillFill: [number, number, number];
-        let pillText: [number, number, number];
+        // Configuración de colores de la píldora
+        switch (a.estado) {
+          case 'Aprobada':
+            pillFill = [222, 247, 236]; // Verde claro
+            pillText = [22, 101, 52];
+            break;
+          case 'Pendiente':
+            pillFill = [255, 243, 205]; // Amarillo claro
+            pillText = [133, 77, 14];
+            break;
+          case 'Rechazada':
+            pillFill = [254, 226, 226]; // Rojo claro
+            pillText = [153, 27, 27];
+            break;
+          default:
+            pillFill = [229, 231, 235];
+            pillText = [55, 65, 81];
+            break;
+        }
 
-        switch (a.estado) {
-          case 'Aprobada':
-            pillFill = [222, 247, 236];
-            pillText = [22, 101, 52];
-            break;
-          case 'Pendiente':
-            pillFill = [255, 243, 205];
-            pillText = [133, 77, 14];
-            break;
-          case 'Rechazada':
-            pillFill = [254, 226, 226];
-            pillText = [153, 27, 27];
-            break;
-          default:
-            pillFill = [229, 231, 235];
-            pillText = [55, 65, 81];
-            break;
-        }
+        // Cálculo de dimensiones y posición de la píldora
+        const pillTextSize = 10;
+        doc.setFontSize(pillTextSize);
+        const textWidth = doc.getTextWidth(estadoLabel);
+        const pillPaddingX = 3;
+        const pillWidth = textWidth + pillPaddingX * 2 + 1; // +1 de ajuste
+        const pillHeight = pillTextSize + 4;
 
-        const estadoX = innerX + dateColWidth + activityColWidth;
-        const pillPaddingX = 3;
-        const pillHeight = lineHeight + 2;
-        const textWidth = doc.getTextWidth(estadoLabel);
-        const pillWidth = textWidth + pillPaddingX * 2;
+        const estadoX = innerX + dateColWidth + activityColWidth;
+        const pillX = estadoX + (statusColWidth - pillWidth) / 2;
+        const pillY = currentY + (rowHeight - pillHeight) / 2;
 
-        const pillX =
-          estadoX + (statusColWidth - pillWidth) / 2;
-        const pillY =
-          currentY + (rowHeight - pillHeight) / 2;
+        // DIBUJAR RECTÁNGULO DE LA PÍLDORA
+        doc.setFillColor(...pillFill);
+        doc.roundedRect(
+          pillX,
+          pillY,
+          pillWidth,
+          pillHeight,
+          3, 3, 'F'
+        );
 
-        doc.setFillColor(...pillFill);
-        doc.roundedRect(
-          pillX,
-          pillY,
-          pillWidth,
-          pillHeight,
-          3,
-          3,
-          'F'
-        );
+        // DIBUJAR TEXTO DE LA PÍLDORA
+        doc.setTextColor(...pillText);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(pillTextSize);
+        
+        doc.text(
+          estadoLabel,
+          pillX + pillPaddingX,
+          pillY + pillHeight - 2 // Línea base del texto
+        );
 
-        doc.setTextColor(...pillText);
-        doc.setFont('helvetica', 'bold');
-        doc.text(
-          estadoLabel,
-          pillX + pillPaddingX,
-          pillY + pillHeight - 2
-        );
+        // Volver a configuración por defecto para el texto normal
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(11);
+        doc.setTextColor(0, 0, 0);
 
-        doc.setFont('helvetica', 'normal');
-        doc.setTextColor(0, 0, 0);
+        // 4. LÍNEA DIVISORIA HORIZONTAL (entre filas, excepto la última)
+        if (idx < ug.activities.length - 1) {
+          const rowBottom = currentY + rowHeight;
+          doc.setDrawColor(235, 235, 235);
+          doc.line(innerX + 1, rowBottom, innerX + innerWidth - 1, rowBottom);
+        }
 
-        const rowBottom = currentY + rowHeight;
-        doc.setDrawColor(235, 235, 235);
-        doc.line(innerX, rowBottom, innerX + innerWidth, rowBottom);
+        currentY += rowHeight;
+      });
 
-        currentY += rowHeight;
-      });
+      y = tableY + tableHeight + 10;
+    });
 
-      y = tableY + tableHeight + 10;
-    });
-
-    const cleanKey = month.monthKey.replace('-', '');
-    doc.save(`reporte_actividades_${cleanKey}.pdf`);
-  }
+    // === 3. GUARDAR EL ARCHIVO ===
+    const cleanKey = month.monthKey.replace('-', '');
+    doc.save(`reporte_actividades_${cleanKey}.pdf`);
+  }
 }
