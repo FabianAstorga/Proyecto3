@@ -41,7 +41,6 @@ export class UsuariosController {
   // Obtener mi perfil usando mi token
   @Get("get/:id")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles("administrador")
   findOne(@Param("id", ParseIntPipe) id: number) {
     return this.usuariosService.findOne(id);
   }
