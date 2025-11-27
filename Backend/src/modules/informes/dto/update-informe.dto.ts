@@ -1,6 +1,6 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateInformeDto } from './create-informe.dto';
-import { IsOptional, IsString, IsDateString, IsEnum } from 'class-validator';
+import { PartialType } from "@nestjs/mapped-types";
+import { CreateInformeDto } from "./create-informe.dto";
+import { IsOptional, IsString, IsDateString, IsEnum } from "class-validator";
 
 export class UpdateInformeDto extends PartialType(CreateInformeDto) {
   @IsOptional()
@@ -12,7 +12,7 @@ export class UpdateInformeDto extends PartialType(CreateInformeDto) {
   fechaRevision?: string;
 
   @IsOptional()
-  @IsEnum(['pendiente', 'enviado', 'revisado', 'aprobado', 'rechazado'])
+  @IsEnum(["pendiente", "enviado", "revisado", "aprobado", "rechazado"])
   estado?: string;
 
   @IsOptional()

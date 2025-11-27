@@ -2,12 +2,15 @@
 import { Injectable } from "@angular/core";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Observable, map } from "rxjs";
-import { BackendHorario, SaveHorarioPayload } from '../models/horario.models';
+import { BackendHorario, SaveHorarioPayload } from "../models/horario.models";
 import { User } from "../models/user.model";
 import { Activity } from "../models/activity.model";
 import { Cargo } from "../models/charge.model";
 import { AuthService } from "./auth.service";
-import { CreateActividadPayload, ModoCreacion } from "./backend/activity-backend.model";
+import {
+  CreateActividadPayload,
+  ModoCreacion,
+} from "./backend/activity-backend.model";
 import { LoginResponse } from "./backend/logindata-backend.model";
 import { BackendUser } from "./backend/user-backend.model";
 import { BackendActividad } from "./backend/activity-backend2.model";
@@ -25,7 +28,7 @@ export class DataService {
   private readonly actividadesEndpoint = `${this.apiUrl}/actividades`;
   private readonly cargosEndpoint = `${this.apiUrl}/charges`;
   private readonly loginEndpoint = `${this.apiUrl}/auth/login`;
-    private readonly informesEndpoint = `${this.apiUrl}/informes`;
+  private readonly informesEndpoint = `${this.apiUrl}/informes`;
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
@@ -47,42 +50,42 @@ export class DataService {
       firstName: u.nombre,
       lastName: u.apellido,
       email: u.correo,
-      // pasa de 'funcionario' -> 'Funcionario', etc.
+      phone: u.telefono,
       role: u.rol.charAt(0).toUpperCase() + u.rol.slice(1),
-      password: undefined,
+      password: "",
       photoUrl: u.foto_url ?? "/usuario(1).png",
     };
   }
 
   // ------- mapeo actividad backend -> front -------
   private mapBackendActividad(a: BackendActividad): Activity {
-  // El backend ahora devuelve estado como string directamente
-  const estadoMap: Record<string, Activity['estado']> = {
-    'Pendiente': 'Pendiente',
-    'En Progreso': 'Pendiente', // o ajusta según tu modelo front
-    'Realizada': 'Aprobada',
-    'Cancelada': 'Rechazada'
-  };
-  
-  const estado = estadoMap[a.estado] || 'Pendiente';
+    // El backend ahora devuelve estado como string directamente
+    const estadoMap: Record<string, Activity["estado"]> = {
+      Pendiente: "Pendiente",
+      "En Progreso": "Pendiente", // o ajusta según tu modelo front
+      Realizada: "Aprobada",
+      Cancelada: "Rechazada",
+    };
 
-  const userId = a.usuario ? a.usuario.id : null;
-  const userName = a.usuario
-    ? `${a.usuario.nombre} ${a.usuario.apellido}`
-    : "Usuario sin asignar";
+    const estado = estadoMap[a.estado] || "Pendiente";
 
-  return {
-    id: a.id_actividad,
-    titulo: a.titulo,
-    detalle: a.descripcion ?? "",
-    fecha: a.fecha,
-    tipo: a.tipo,
-    horas: 0,
-    estado,
-    userId,
-    userName,
-  };
-}
+    const userId = a.usuario ? a.usuario.id : null;
+    const userName = a.usuario
+      ? `${a.usuario.nombre} ${a.usuario.apellido}`
+      : "Usuario sin asignar";
+
+    return {
+      id: a.id_actividad,
+      titulo: a.titulo,
+      detalle: a.descripcion ?? "",
+      fecha: a.fecha,
+      tipo: a.tipo,
+      horas: 0,
+      estado,
+      userId,
+      userName,
+    };
+  }
 
   // ================= USUARIO - CRUD =================
 
@@ -186,7 +189,10 @@ export class DataService {
     );
   }
 
-  updateActividad(id: number, payload: Partial<CreateActividadPayload>): Observable<any> {
+  updateActividad(
+    id: number,
+    payload: Partial<CreateActividadPayload>
+  ): Observable<any> {
     return this.http.patch(
       `${this.actividadesEndpoint}/${id}`,
       payload,
@@ -202,7 +208,7 @@ export class DataService {
   }
 
   // ================= INFORMES =================
-  
+
   // Obtener mis informes
   getMisInformes(): Observable<any[]> {
     return this.http.get<any[]>(
@@ -330,10 +336,9 @@ export class DataService {
     );
   }
 
-    // ================= HORARIOS =================
+  // ================= HORARIOS =================
 
-
-// ================= HORARIOS =================
+  // ================= HORARIOS =================
 
   getHorarioByUser(usuarioId: number) {
     return this.http.get<BackendHorario[]>(

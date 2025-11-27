@@ -1,10 +1,10 @@
-import { Component, Input, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { User } from '../../models/user.model';
-import { AuthService } from '../../services/auth.service';
+import { Component, Input, OnInit, inject } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { Router, RouterLink, RouterLinkActive } from "@angular/router";
+import { User } from "../../models/user.model";
+import { AuthService } from "../../services/auth.service";
 
-export type NavIcon = 'home' | 'plus' | 'chart' | 'calendar' | 'users' | 'docs';
+export type NavIcon = "home" | "plus" | "chart" | "calendar" | "users" | "docs";
 
 export type NavItem = {
   label: string;
@@ -14,13 +14,13 @@ export type NavItem = {
 
 @Component({
   standalone: true,
-  selector: 'app-layout',
+  selector: "app-layout",
   imports: [CommonModule, RouterLink, RouterLinkActive],
-  templateUrl: './layout.component.html',
+  templateUrl: "./layout.component.html",
 })
 export class LayoutComponent implements OnInit {
   // Inputs desde el padre
-  @Input() logoutLink = '/';
+  @Input() logoutLink = "/";
   @Input() user: User | undefined;
   @Input() navItems: NavItem[] = [];
 
@@ -29,7 +29,7 @@ export class LayoutComponent implements OnInit {
   showMenu = false;
 
   /** Tema actual */
-  currentTheme: 'light' | 'dark' = 'light';
+  currentTheme: "light" | "dark" = "light";
 
   private _showT?: ReturnType<typeof setTimeout>;
   private _hideT?: ReturnType<typeof setTimeout>;
@@ -47,7 +47,7 @@ export class LayoutComponent implements OnInit {
     if (!this.user) {
       const storedUser = this.authService.getUserFromStorage();
       if (!storedUser || !this.authService.isLoggedIn()) {
-        this.router.navigate(['/login']);
+        this.router.navigate(["/login"]);
         return;
       }
       this.user = storedUser;
@@ -67,82 +67,82 @@ export class LayoutComponent implements OnInit {
     const id = this.user.id;
 
     switch (role) {
-      case 'funcionario':
+      case "funcionario":
         this.navItems = [
           {
-            label: 'Inicio perfil',
+            label: "Inicio perfil",
             link: `/funcionario/${id}/perfil`,
-            icon: 'home',
+            icon: "home",
           },
           {
-            label: 'Ingresar registro',
+            label: "Ingresar registro",
             link: `/funcionario/${id}/actividades/nueva`,
-            icon: 'plus',
+            icon: "plus",
           },
           {
-            label: 'Mi historial',
+            label: "Mi historial",
             link: `/funcionario/${id}/actividades/historial`,
-            icon: 'chart',
+            icon: "chart",
           },
           {
-            label: 'Mi horario',
+            label: "Mi horario",
             link: `/funcionario/${id}/horario`,
-            icon: 'calendar',
+            icon: "calendar",
           },
         ];
         break;
 
-      case 'secretaria':
+      case "secretaria":
         this.navItems = [
           {
-            label: 'Perfil secretaria',
+            label: "Perfil secretaria",
             link: `/secretaria/${id}/perfil`,
-            icon: 'home',
+            icon: "home",
           },
           {
-            label: 'Historial funcionarios',
+            label: "Historial funcionarios",
             link: `/secretaria/${id}/actividades/historial`,
-            icon: 'docs',
+            icon: "docs",
           },
           {
-            label: 'Mi horario',
+            label: "Mi horario",
             link: `/secretaria/${id}/horario`,
-            icon: 'calendar',
+            icon: "calendar",
           },
           {
-            label: 'Gestionar calendario',
+            label: "Gestionar calendario",
             link: `/secretaria/${id}/calendario`,
-            icon: 'calendar',
+            icon: "calendar",
           },
         ];
         break;
 
-      case 'administrador':
+      case "administrador":
         this.navItems = [
           {
-            label: 'Panel de Control',
+            label: "Panel de Control",
             link: `/admin/${id}/perfil`,
-            icon: 'home',
+            icon: "home",
           },
           {
-            label: 'Gestionar Calendario',
+            label: "Gestionar Calendario",
             link: `/admin/${id}/calendario`,
-            icon: 'calendar',
+            icon: "calendar",
           },
           {
-            label: 'Gestionar Funcionarios',
+            label: "Gestionar Funcionarios",
             link: `/admin/${id}/funcionarios`,
-            icon: 'users',
+            icon: "users",
           },
           {
-            label: 'Gestionar Cargos',
+            label: "Gestionar Cargos",
             link: `/admin/${id}/cargos`,
-            icon: 'docs',
+            icon: "docs",
           },
           {
-            label: 'Asignar Cargos',
+            label: "Asignar Cargos",
             link: `/admin/${id}/asignar`,
-            icon: 'plus',
+            icon: "plus",
           },
         ];
         break;
@@ -156,22 +156,22 @@ export class LayoutComponent implements OnInit {
   /** Inicializa el tema desde localStorage o media query */
   private initTheme(): void {
     const stored =
-      (localStorage.getItem('theme') as 'light' | 'dark' | null) ?? null;
+      (localStorage.getItem("theme") as "light" | "dark" | null) ?? null;
     const prefersDark =
-      typeof window !== 'undefined' &&
-      window.matchMedia?.('(prefers-color-scheme: dark)').matches;
+      typeof window !== "undefined" &&
+      window.matchMedia?.("(prefers-color-scheme: dark)").matches;
 
-    this.currentTheme = stored ?? (prefersDark ? 'dark' : 'light');
+    this.currentTheme = stored ?? (prefersDark ? "dark" : "light");
 
     const html = document.documentElement;
-    html.classList.toggle('dark', this.currentTheme === 'dark');
+    html.classList.toggle("dark", this.currentTheme === "dark");
   }
 
   toggleTheme(): void {
-    this.currentTheme = this.currentTheme === 'light' ? 'dark' : 'light';
+    this.currentTheme = this.currentTheme === "light" ? "dark" : "light";
     const html = document.documentElement;
-    html.classList.toggle('dark', this.currentTheme === 'dark');
-    localStorage.setItem('theme', this.currentTheme);
+    html.classList.toggle("dark", this.currentTheme === "dark");
+    localStorage.setItem("theme", this.currentTheme);
   }
 
   // Sidebar hover
