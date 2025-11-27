@@ -129,7 +129,13 @@ export class GestionarFuncionarioComponent implements OnInit {
       },
       error: (err) => {
         console.error("Error creando usuario:", err);
-        this.showAlert("Error creando funcionario", "danger");
+        if (err.status === 409) {
+        this.showAlert("❌ El correo ya está registrado", "danger");
+      } else if (err.error?.message) {
+        this.showAlert(`❌ ${err.error.message}`, "danger");
+      } else {
+        this.showAlert("❌ Error creando funcionario", "danger");
+      }
       },
     });
   }
@@ -143,24 +149,52 @@ export class GestionarFuncionarioComponent implements OnInit {
   }
 
   actualizar() {
-    if (!this.editId) {
-      this.showAlert("No se ha seleccionado un funcionario", "danger");
-      return;
-    }
-
-    const updated: Partial<User> = this.form.value;
-    this.dataService.updateUser(this.editId, updated).subscribe({
-      next: () => {
-        this.cargarUsuarios();
-        this.resetForm();
-        this.showAlert("Funcionario actualizado correctamente", "success");
-      },
-      error: (err) => {
-        console.error(err);
-        this.showAlert("Error actualizando funcionario", "danger");
-      },
-    });
+  if (!this.editId) {
+    this.showAlert("No se ha seleccionado un funcionario", "danger");
+    return;
   }
+
+  if (this.form.invalid) {
+    this.form.markAllAsTouched();
+    this.showAlert("Por favor complete correctamente los campos", "danger");
+    return;
+  }
+
+  const formValue = this.form.value;
+
+  
+  const payload: any = {
+    nombre: formValue.firstName,
+    apellido: formValue.lastName,
+    correo: formValue.email,
+    telefono: formValue.phone,
+    rol: formValue.role?.toLowerCase(), 
+  };
+
+  
+  if (formValue.photoUrl && formValue.photoUrl !== '') {
+    payload.foto_url = formValue.photoUrl;
+  }
+
+  
+  if (formValue.password && formValue.password.trim() !== '') {
+    payload.contrasena = formValue.password;
+  }
+
+  console.log("Actualizando usuario con payload:", payload);
+
+  this.dataService.updateUser(this.editId, payload).subscribe({
+    next: () => {
+      this.cargarUsuarios();
+      this.resetForm();
+      this.showAlert("Funcionario actualizado correctamente", "success");
+    },
+    error: (err) => {
+      console.error("Error actualizando funcionario:", err);
+      this.showAlert("Error actualizando funcionario", "danger");
+    },
+  });
+}
 
   eliminar(id: number) {
     if (!confirm("¿Eliminar funcionario?")) return;

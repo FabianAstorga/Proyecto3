@@ -29,7 +29,7 @@ export class UpdateUsuarioDto {
   estado?: boolean;
 
   @IsOptional()
-  @IsPhoneNumber()
+  //@IsPhoneNumber()
   @IsString()
   telefono?: string;
 

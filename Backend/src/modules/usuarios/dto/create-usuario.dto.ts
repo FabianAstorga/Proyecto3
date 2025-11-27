@@ -30,7 +30,7 @@ export class CreateUsuarioDto {
   contrasena: string;
 
 
-  @IsPhoneNumber()
+  @IsOptional()
   @IsString()
   telefono: string;
 

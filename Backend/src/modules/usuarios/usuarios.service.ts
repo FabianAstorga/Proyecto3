@@ -23,6 +23,18 @@ export class UsuariosService {
    * Crear usuario — Solo administrador (según tu controlador)
    */
   async create(createUsuarioDto: CreateUsuarioDto) {
+
+
+    const existeCorreo = await this.usuarioRepository.findOne({
+          where: { correo: createUsuarioDto.correo },
+        });
+
+        if (existeCorreo) {
+          throw new ConflictException('El correo ya está registrado');
+        }
+
+
+
     // 1) Hashear la contraseña que viene en el DTO
     const hash = await bcrypt.hash(createUsuarioDto.contrasena, 10);
 
@@ -83,6 +95,20 @@ export class UsuariosService {
     if (!usuario) {
       throw new NotFoundException(`Usuario con ID ${id} no encontrado.`);
     }
+
+
+
+  // Si se está cambiando el correo, validar que no exista
+      if (updateUsuarioDto.correo && updateUsuarioDto.correo !== usuario.correo) {
+        const existeCorreo = await this.usuarioRepository.findOne({
+          where: { correo: updateUsuarioDto.correo },
+        });
+
+        if (existeCorreo) {
+          throw new ConflictException('El correo ya está registrado por otro usuario');
+        }
+      }
+
 
     // Encriptar contraseña si llega
     if (updateUsuarioDto.contrasena) {
