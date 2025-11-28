@@ -1,7 +1,7 @@
+// src/app/modules/asignar-cargo/asignar-cargo.component.ts
 import { Component, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
-import { forkJoin } from "rxjs";
 import { DataService } from "../../services/data.service";
 import { User } from "../../models/user.model";
 import { Cargo } from "../../models/charge.model";
@@ -10,23 +10,37 @@ import { LayoutComponent } from "../../components/layout/layout.component";
 
 @Component({
   selector: "app-asignar-cargo",
+  standalone: true,
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, LayoutComponent],
   templateUrl: "./asignar-cargo.component.html",
   styleUrls: ["./asignar-cargo.component.scss"],
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, LayoutComponent],
 })
 export class AsignarCargoComponent implements OnInit {
-  // Datos
+  // Datos base
   usuarios: User[] = [];
+  usuariosFiltrados: User[] = [];
   cargos: Cargo[] = [];
   asignaciones: EmpleadoCargo[] = [];
 
-  // UI / estado
-  cargoSeleccionado: number | null = null;
-  usuariosSeleccionados: number[] = [];
-  cargando: boolean = false;
+  // Filtros
+  filtroNombre: string = "";
+  filtroRol: string | null = null;
+  filtroCargo: number | null = null;
 
-  // Alertas
+  // Selección actual
+  selectedUser: User | null = null;
+  selectedUserAssignments: {
+    id: number;
+    cargoId: number;
+    ocupacion: string;
+    descripcion?: string;
+  }[] = [];
+
+  // Cargo seleccionado en el panel derecho para agregar / cambiar
+  selectedCargoId: number | null = null;
+
+  // Estado UI
+  cargando: boolean = false;
   alertMessage = "";
   alertType: "success" | "danger" | "warning" = "success";
 
@@ -38,7 +52,7 @@ export class AsignarCargoComponent implements OnInit {
     this.cargarAsignaciones();
   }
 
-  // ------------------ Alerts ------------------
+  // ------------------ Alertas ------------------
   private showAlert(
     message: string,
     type: "success" | "danger" | "warning" = "success"
@@ -56,12 +70,6 @@ export class AsignarCargoComponent implements OnInit {
     });
   }
 
-  // Propiedades de filtro
-  usuariosFiltrados: User[] = [];
-  filtroNombre: string = "";
-  filtroRol: string | null = null; // nuevo filtro
-  filtroCargo: number | null = null;
-  // Cuando cargas usuarios:
   cargarUsuarios() {
     this.dataService.getUsers().subscribe({
       next: (list) => {
@@ -72,26 +80,17 @@ export class AsignarCargoComponent implements OnInit {
     });
   }
 
-  // Obtener todos los cargos de un usuario
-  // Devuelve los cargos de un usuario, o un array con un "N/A" ficticio si no tiene
-  getCargosUsuario(
-    usuarioId: number
-  ): { ocupacion: string; descripcion?: string }[] {
-    const cargosUsuario = this.asignaciones
-      .filter((a) => a.usuario?.id === usuarioId)
-      .map((a) => ({
-        ocupacion: a.cargo!.ocupacion,
-        descripcion: a.cargo!.descripcion,
-      }));
-
-    if (cargosUsuario.length === 0) {
-      return [{ ocupacion: "N/A" }]; // Solo para mostrar en UI
-    }
-
-    return cargosUsuario;
+  cargarAsignaciones() {
+    this.dataService.getEmpleadoCargos().subscribe({
+      next: (list) => {
+        this.asignaciones = list;
+        this.actualizarCargosUsuarioSeleccionado();
+      },
+      error: () => this.showAlert("Error cargando asignaciones", "danger"),
+    });
   }
 
-  // Funciones de filtrado
+  // ------------------ Filtros ------------------
   aplicarFiltros() {
     this.usuariosFiltrados = this.usuarios.filter((u) => {
       const coincideNombre =
@@ -103,7 +102,7 @@ export class AsignarCargoComponent implements OnInit {
       const coincideCargo = this.filtroCargo
         ? this.asignaciones.some(
             (a) =>
-              a.usuario.id === u.id && a.cargo.id_cargo === this.filtroCargo
+              a.usuario?.id === u.id && a.cargo?.id_cargo === this.filtroCargo
           )
         : true;
 
@@ -113,72 +112,70 @@ export class AsignarCargoComponent implements OnInit {
 
   limpiarFiltros() {
     this.filtroNombre = "";
+    this.filtroRol = null;
     this.filtroCargo = null;
     this.aplicarFiltros();
   }
 
-  cargarAsignaciones() {
-    this.dataService.getEmpleadoCargos().subscribe({
-      next: (list) => {
-        this.asignaciones = list;
-        this.aplicarFiltros();
-      },
-      error: () => this.showAlert("Error cargando asignaciones", "danger"),
-    });
+  // Resumen para la tabla (texto de cargos del usuario)
+  getCargosResumen(usuarioId: number): string {
+    const cargosUsuario = this.asignaciones
+      .filter((a) => a.usuario?.id === usuarioId)
+      .map((a) => a.cargo?.ocupacion)
+      .filter((x): x is string => !!x);
+
+    if (!cargosUsuario.length) return "Sin cargo asignado";
+    return cargosUsuario.join(", ");
   }
 
-  // ------------------ Selección ------------------
-  toggleSeleccion(usuarioId: number, ev: Event) {
-    const target = ev.target as HTMLInputElement;
-    if (target.checked) {
-      if (!this.usuariosSeleccionados.includes(usuarioId)) {
-        this.usuariosSeleccionados.push(usuarioId);
-      }
-    } else {
-      this.usuariosSeleccionados = this.usuariosSeleccionados.filter(
-        (id) => id !== usuarioId
-      );
-    }
+  // ------------------ Selección de usuario ------------------
+  onSelectUser(usuario: User) {
+    this.selectedUser = usuario;
+    this.actualizarCargosUsuarioSeleccionado();
   }
 
-  toggleAll(ev: Event) {
-    const target = ev.target as HTMLInputElement;
-    if (target.checked) {
-      this.usuariosSeleccionados = this.usuarios.map((u) => u.id!);
-    } else {
-      this.usuariosSeleccionados = [];
-    }
-  }
-
-  // Evita duplicados visuales
-  tieneAsignacion(usuarioId: number, cargoId: number): boolean {
-    return this.asignaciones.some(
-      (a) => a.usuario?.id === usuarioId && a.cargo?.id_cargo === cargoId
-    );
-  }
-
-  // ------------------ Asignación masiva ------------------
-  asignarCargo() {
-    this.alertMessage = "";
-    this.alertType = "success";
-
-    if (!this.cargoSeleccionado) {
-      this.showAlert("Debes seleccionar un cargo.", "warning");
+  private actualizarCargosUsuarioSeleccionado() {
+    if (!this.selectedUser) {
+      this.selectedUserAssignments = [];
       return;
     }
 
-    if (this.usuariosSeleccionados.length === 0) {
-      this.showAlert("Debes seleccionar al menos un usuario.", "warning");
+    this.selectedUserAssignments = this.asignaciones
+      .filter((a) => a.usuario?.id === this.selectedUser!.id)
+      .map((a) => ({
+        id: a.id!,
+        cargoId: a.cargo!.id_cargo,
+        ocupacion: a.cargo!.ocupacion,
+        descripcion: a.cargo!.descripcion,
+      }));
+  }
+  cerrarModalUsuario() {
+  this.selectedUser = null;
+  this.selectedUserAssignments = [];
+  this.selectedCargoId = null;
+  }
+
+  // ------------------ Gestión de cargos del usuario ------------------
+  agregarCargoAUsuario() {
+    if (!this.selectedUser) {
+      this.showAlert("Primero selecciona un usuario.", "warning");
       return;
     }
 
-    const toAssign = this.usuariosSeleccionados.filter(
-      (uid) => !this.tieneAsignacion(uid, this.cargoSeleccionado!)
+    if (!this.selectedCargoId) {
+      this.showAlert("Selecciona un cargo para asignar.", "warning");
+      return;
+    }
+
+    const yaTiene = this.asignaciones.some(
+      (a) =>
+        a.usuario?.id === this.selectedUser!.id &&
+        a.cargo?.id_cargo === this.selectedCargoId
     );
 
-    if (toAssign.length === 0) {
+    if (yaTiene) {
       this.showAlert(
-        "Todos los usuarios seleccionados ya tienen este cargo.",
+        "Este usuario ya tiene asignado ese cargo.",
         "warning"
       );
       return;
@@ -186,24 +183,75 @@ export class AsignarCargoComponent implements OnInit {
 
     this.cargando = true;
 
-    const requests = toAssign.map((id_usuario) =>
-      this.dataService.createEmpleadoCargo({
-  usuarioId: id_usuario,
-  cargoId: this.cargoSeleccionado!,
-})
-    );
+    this.dataService
+      .createEmpleadoCargo({
+        usuarioId: this.selectedUser.id!,
+        cargoId: this.selectedCargoId,
+      })
+      .subscribe({
+        next: () => {
+          this.cargando = false;
+          this.showAlert("Cargo asignado correctamente.", "success");
+          this.cargarAsignaciones();
+        },
+        error: (err) => {
+          this.cargando = false;
+          console.error("Error asignando cargo:", err);
+          this.showAlert("Ocurrió un error al asignar el cargo.", "danger");
+        },
+      });
+  }
 
-    forkJoin(requests).subscribe({
+  cambiarCargoAsignacion(asignacionId: number) {
+    if (!this.selectedCargoId) {
+      this.showAlert(
+        "Selecciona un cargo en el selector para cambiar esta asignación.",
+        "warning"
+      );
+      return;
+    }
+
+    this.cargando = true;
+
+    this.dataService
+      .updateEmpleadoCargo(asignacionId, {
+        cargoId: this.selectedCargoId,
+      })
+      .subscribe({
+        next: () => {
+          this.cargando = false;
+          this.showAlert("Cargo actualizado correctamente.", "success");
+          this.cargarAsignaciones();
+        },
+        error: (err) => {
+          this.cargando = false;
+          console.error("Error actualizando cargo:", err);
+          this.showAlert("Ocurrió un error al actualizar el cargo.", "danger");
+        },
+      });
+  }
+
+  eliminarAsignacion(asignacionId: number) {
+    if (!confirm("¿Seguro que quieres quitar este cargo del usuario?")) {
+      return;
+    }
+
+    this.cargando = true;
+
+    this.dataService.deleteEmpleadoCargo(asignacionId).subscribe({
       next: () => {
         this.cargando = false;
-        this.usuariosSeleccionados = [];
-        this.cargarAsignaciones();
-        this.showAlert("Cargos asignados correctamente", "success");
+        this.showAlert("Cargo quitado correctamente.", "success");
+        this.asignaciones = this.asignaciones.filter(
+          (a) => a.id !== asignacionId
+        );
+        this.actualizarCargosUsuarioSeleccionado();
+        this.aplicarFiltros();
       },
       error: (err) => {
         this.cargando = false;
-        console.error("Error asignando cargos:", err);
-        this.showAlert("Ocurrió un error al asignar cargos", "danger");
+        console.error("Error quitando cargo:", err);
+        this.showAlert("Ocurrió un error al quitar el cargo.", "danger");
       },
     });
   }

@@ -312,17 +312,23 @@ export class DataService {
     );
   }
 
+  
+
   // Actualizar asignación (cambiar el cargo de un usuario) -> PUT /employee-charge/update/:id
   updateEmpleadoCargo(
-    id: number,
-    payload: { usuarioId?: number; cargoId?: number }
-  ): Observable<EmpleadoCargo> {
-    return this.http.put<EmpleadoCargo>(
-      `${this.empleadoCargoEndpoint}/update/${id}`,
-      payload,
-      this.getAuthOptions()
-    );
-  }
+  id: number,
+  payload: { usuarioId?: number; cargoId?: number }
+): Observable<EmpleadoCargo> {
+  const body: any = {};
+  if (payload.usuarioId !== undefined) body.id_usuario = payload.usuarioId;
+  if (payload.cargoId !== undefined) body.id_cargo = payload.cargoId;
+
+  return this.http.put<EmpleadoCargo>(
+    `${this.empleadoCargoEndpoint}/update/${id}`,
+    body,
+    this.getAuthOptions()
+  );
+}
 
   // Eliminar asignación -> DELETE /employee-charge/delete/:id
   deleteEmpleadoCargo(id: number): Observable<any> {

@@ -1,8 +1,10 @@
 import { Routes } from "@angular/router";
 import { AuthGuard } from "./services/auth.guard";
 
-// HOME público
 export const routes: Routes = [
+  // ============================
+  // HOME público
+  // ============================
   {
     path: "",
     loadComponent: () =>
