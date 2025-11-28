@@ -188,9 +188,9 @@ export class AsignarCargoComponent implements OnInit {
 
     const requests = toAssign.map((id_usuario) =>
       this.dataService.createEmpleadoCargo({
-        usuarioId: id_usuario, // ⚠ corregido
-        cargoId: this.cargoSeleccionado!, // ⚠ corregido
-      })
+  usuarioId: id_usuario,
+  cargoId: this.cargoSeleccionado!,
+})
     );
 
     forkJoin(requests).subscribe({

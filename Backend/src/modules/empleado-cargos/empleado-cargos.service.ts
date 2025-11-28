@@ -15,25 +15,28 @@ export class EmpleadoCargoService {
   // Crear asignación cargo ↔ usuario
   async create(dto: CreateEmpleadoCargoDto): Promise<EmpleadoCargo> {
     const nuevo = this.repository.create({
-      usuario: { id: dto.id_usuario } as any, // solo ID
-      cargo: { id: dto.id_cargo } as any, // solo ID
+      id_usuario: dto.id_usuario,
+      id_cargo: dto.id_cargo,
     });
-    return this.repository.save(nuevo);
+
+    const saved = await this.repository.save(nuevo);
+    // devolvemos con relaciones cargadas
+    return this.findOne(saved.id);
   }
 
   // Obtener todas las asignaciones
   async findAll(): Promise<EmpleadoCargo[]> {
-    return this.repository.find({ relations: ["usuario", "cargo"] });
+    // las relaciones ya son eager, pero esto es seguro igual
+    return this.repository.find();
   }
 
   // Obtener asignación por ID
   async findOne(id: number): Promise<EmpleadoCargo> {
-    const registro = await this.repository.findOne({
-      where: { id },
-      relations: ["usuario", "cargo"],
-    });
-    if (!registro)
+    const registro = await this.repository.findOne({ where: { id } });
+
+    if (!registro) {
       throw new NotFoundException(`EmpleadoCargo #${id} no encontrado`);
+    }
     return registro;
   }
 
@@ -42,12 +45,22 @@ export class EmpleadoCargoService {
     id: number,
     dto: UpdateEmpleadoCargoDto
   ): Promise<EmpleadoCargo> {
-    const registro = await this.findOne(id);
+    const partial: Partial<EmpleadoCargo> = {};
 
-    if (dto.id_usuario) registro.usuario = { id: dto.id_usuario } as any;
-    if (dto.id_cargo) registro.cargo = { id: dto.id_cargo } as any;
+    if (dto.id_usuario !== undefined) {
+      partial.id_usuario = dto.id_usuario;
+    }
+    if (dto.id_cargo !== undefined) {
+      partial.id_cargo = dto.id_cargo;
+    }
 
-    return this.repository.save(registro);
+    // si no hay nada que actualizar, devolvemos el registro actual
+    if (!Object.keys(partial).length) {
+      return this.findOne(id);
+    }
+
+    await this.repository.update(id, partial);
+    return this.findOne(id);
   }
 
   // Eliminar asignación
@@ -59,8 +72,7 @@ export class EmpleadoCargoService {
   // Obtener todas las asignaciones de un usuario
   async findByUser(usuarioId: number): Promise<EmpleadoCargo[]> {
     return this.repository.find({
-      where: { usuario: { id: usuarioId } },
-      relations: ["usuario", "cargo"],
+      where: { id_usuario: usuarioId },
     });
   }
 }
