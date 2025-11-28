@@ -23,8 +23,6 @@ export class UsuariosService {
    * Crear usuario — Solo administrador (según tu controlador)
    */
   async create(createUsuarioDto: CreateUsuarioDto) {
-
-
     const existeCorreo = await this.usuarioRepository.findOne({
           where: { correo: createUsuarioDto.correo },
         });
@@ -32,16 +30,8 @@ export class UsuariosService {
         if (existeCorreo) {
           throw new ConflictException('El correo ya está registrado');
         }
-
-
-
-    // 1) Hashear la contraseña que viene en el DTO
     const hash = await bcrypt.hash(createUsuarioDto.contrasena, 10);
-
-    // 2) Reemplazarla por el hash
     createUsuarioDto.contrasena = hash;
-
-    // 3) Crear y guardar la entidad
     const usuario = this.usuarioRepository.create(createUsuarioDto);
     return this.usuarioRepository.save(usuario);
   }

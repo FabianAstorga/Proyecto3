@@ -74,6 +74,10 @@ export class AsignarCargoComponent implements OnInit {
     });
   }
 
+  getAsignacionesPorUsuario(usuarioId: number) {
+    return this.asignaciones.filter((a) => a.usuario?.id === usuarioId);
+  }
+
   cargarAsignaciones() {
     this.dataService.getEmpleadoCargos().subscribe({
       next: (list) => {
@@ -181,8 +185,7 @@ export class AsignarCargoComponent implements OnInit {
     for (const u of usuariosSeleccionados) {
       const yaTiene = this.asignaciones.some(
         (a) =>
-          a.usuario?.id === u.id &&
-          a.cargo?.id_cargo === this.selectedCargoId
+          a.usuario?.id === u.id && a.cargo?.id_cargo === this.selectedCargoId
       );
 
       if (yaTiene) {
@@ -211,7 +214,10 @@ export class AsignarCargoComponent implements OnInit {
     forkJoin(peticiones).subscribe({
       next: () => {
         this.cargando = false;
-        this.showAlert("Cargo asignado correctamente a los usuarios.", "success");
+        this.showAlert(
+          "Cargo asignado correctamente a los usuarios.",
+          "success"
+        );
         this.cargarAsignaciones();
         // opcional: limpiar selección
         this.selectedUserIds.clear();

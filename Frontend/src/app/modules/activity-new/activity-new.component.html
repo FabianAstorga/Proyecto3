@@ -3,18 +3,11 @@
   <section class="page-container">
     <!-- CARD PRINCIPAL -->
     <div
-  class="card-base overflow-hidden
-         border border-slate-200 bg-white text-slate-900
-         dark:border-slate-800 dark:bg-slate-950/80 dark:text-slate-100
-         shadow-[0_24px_60px_rgba(15,23,42,0.08)]
-         dark:shadow-[0_24px_60px_rgba(15,23,42,0.8)] dark:backdrop-blur-sm"
->
+      class="card-base overflow-hidden border border-slate-200 bg-white text-slate-900 dark:border-slate-800 dark:bg-slate-950/80 dark:text-slate-100 shadow-[0_24px_60px_rgba(15,23,42,0.08)] dark:shadow-[0_24px_60px_rgba(15,23,42,0.8)] dark:backdrop-blur-sm"
+    >
       <!-- HEADER -->
       <header
-        class="flex flex-col gap-4 border-b border-slate-200
-               px-6 py-4 lg:flex-row lg:items-center lg:justify-between lg:px-8
-               bg-slate-50
-               dark:border-slate-800 dark:bg-slate-950/80"
+        class="flex flex-col gap-4 border-b border-slate-200 px-6 py-4 lg:flex-row lg:items-center lg:justify-between lg:px-8 bg-slate-50 dark:border-slate-800 dark:bg-slate-950/80"
       >
         <div>
           <h1 class="text-2xl md:text-3xl font-semibold leading-tight">
@@ -29,14 +22,7 @@
         <button
           type="button"
           (click)="submit()"
-          class="inline-flex items-center justify-center rounded-xl
-                 bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white
-                 shadow-md shadow-indigo-500/30
-                 transition
-                 hover:bg-indigo-500
-                 focus:outline-none focus:ring-2 focus:ring-indigo-400
-                 focus:ring-offset-2 focus:ring-offset-white
-                 dark:focus:ring-offset-slate-900"
+          class="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-500/30 transition hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-900"
         >
           Guardar actividad
         </button>
@@ -62,7 +48,10 @@
                   [matDatepickerFilter]="dateFilterMain"
                   placeholder="dd/mm/aaaa"
                 />
-                <mat-datepicker-toggle matSuffix [for]="dpMain"></mat-datepicker-toggle>
+                <mat-datepicker-toggle
+                  matSuffix
+                  [for]="dpMain"
+                ></mat-datepicker-toggle>
                 <mat-datepicker #dpMain></mat-datepicker>
               </mat-form-field>
             </div>
@@ -83,7 +72,9 @@
               </mat-form-field>
 
               <div
-                *ngIf="form.get('tipo_actividad')?.value === 'Otro (especificar)'"
+                *ngIf="
+                  form.get('tipo_actividad')?.value === 'Otro (especificar)'
+                "
                 class="mt-2"
               >
                 <label
@@ -94,10 +85,7 @@
                 <input
                   type="text"
                   formControlName="tipo_actividad_otro"
-                  class="w-full rounded-md border border-slate-300 bg-white text-slate-900
-                         px-3 py-2 text-sm placeholder-slate-400
-                         focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
-                         dark:border-[#1E2638] dark:bg-[#121A2E] dark:text-slate-100 dark:placeholder-slate-400"
+                  class="w-full rounded-md border border-slate-300 bg-white text-slate-900 px-3 py-2 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:border-[#1E2638] dark:bg-[#121A2E] dark:text-slate-100 dark:placeholder-slate-400"
                   placeholder="Ej.: Actividad de vinculación…"
                 />
               </div>
@@ -143,22 +131,22 @@
             class="space-y-4"
           >
             <div
-              class="border border-slate-200 rounded-2xl p-4 space-y-4 bg-slate-50
-                     dark:border-slate-800 dark:bg-slate-900/60"
+              class="border border-slate-200 rounded-2xl p-4 space-y-4 bg-slate-50 dark:border-slate-800 dark:bg-slate-900/60"
             >
               <!-- FECHAS ESPECÍFICAS -->
-              <div *ngIf="multi.get('mode')?.value === 'specific'" class="space-y-3">
+              <div
+                *ngIf="multi.get('mode')?.value === 'specific'"
+                class="space-y-3"
+              >
                 <div class="flex items-center justify-between gap-2">
                   <span class="text-xs text-slate-600 dark:text-slate-300">
-                    Se crearán copias en fechas específicas dentro del mes actual
-                    (no feriados).
+                    Se crearán copias en fechas específicas dentro del mes
+                    actual (no feriados).
                   </span>
                   <button
                     type="button"
                     (click)="addSpecificDate()"
-                    class="px-3 py-1.5 text-xs rounded-md bg-indigo-600 text-white font-semibold
-                           hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-400
-                           focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-900"
+                    class="px-3 py-1.5 text-xs rounded-md bg-indigo-600 text-white font-semibold hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-900"
                   >
                     Agregar fecha
                   </button>
@@ -169,7 +157,10 @@
                     *ngFor="let c of specificDates.controls; let i = index"
                     class="flex flex-col md:flex-row md:items-center gap-2"
                   >
-                    <mat-form-field appearance="outline" class="flex-1 dark-field">
+                    <mat-form-field
+                      appearance="outline"
+                      class="flex-1 dark-field"
+                    >
                       <input
                         matInput
                         [matDatepicker]="dpSpec"
@@ -177,16 +168,17 @@
                         [matDatepickerFilter]="dateFilterMulti"
                         placeholder="dd/mm/aaaa"
                       />
-                      <mat-datepicker-toggle matSuffix [for]="dpSpec"></mat-datepicker-toggle>
+                      <mat-datepicker-toggle
+                        matSuffix
+                        [for]="dpSpec"
+                      ></mat-datepicker-toggle>
                       <mat-datepicker #dpSpec></mat-datepicker>
                     </mat-form-field>
 
                     <button
                       type="button"
                       (click)="removeSpecificDate(i)"
-                      class="px-2.5 py-1.5 text-xs rounded-md border border-red-200 bg-red-50 text-red-600
-                             hover:bg-red-100
-                             dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-300 dark:hover:bg-red-500/20"
+                      class="px-2.5 py-1.5 text-xs rounded-md border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-300 dark:hover:bg-red-500/20"
                     >
                       Eliminar
                     </button>
@@ -209,11 +201,14 @@
               </div>
 
               <!-- REPETICIÓN SEMANAL -->
-              <div *ngIf="multi.get('mode')?.value === 'weekly'" class="space-y-3">
+              <div
+                *ngIf="multi.get('mode')?.value === 'weekly'"
+                class="space-y-3"
+              >
                 <div formGroupName="weekly" class="space-y-3">
                   <p class="text-xs text-slate-600 dark:text-slate-300">
-                    Se repetirán las fechas seleccionadas por semana dentro del mes
-                    actual (no feriados).
+                    Se repetirán las fechas seleccionadas por semana dentro del
+                    mes actual (no feriados).
                   </p>
 
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -223,7 +218,10 @@
                       >
                         Desde *
                       </label>
-                      <mat-form-field appearance="outline" class="w-full dark-field">
+                      <mat-form-field
+                        appearance="outline"
+                        class="w-full dark-field"
+                      >
                         <input
                           matInput
                           [matDatepicker]="dpFrom"
@@ -231,7 +229,10 @@
                           [matDatepickerFilter]="dateFilterMulti"
                           placeholder="dd/mm/aaaa"
                         />
-                        <mat-datepicker-toggle matSuffix [for]="dpFrom"></mat-datepicker-toggle>
+                        <mat-datepicker-toggle
+                          matSuffix
+                          [for]="dpFrom"
+                        ></mat-datepicker-toggle>
                         <mat-datepicker #dpFrom></mat-datepicker>
                       </mat-form-field>
                     </div>
@@ -242,7 +243,10 @@
                       >
                         Hasta *
                       </label>
-                      <mat-form-field appearance="outline" class="w-full dark-field">
+                      <mat-form-field
+                        appearance="outline"
+                        class="w-full dark-field"
+                      >
                         <input
                           matInput
                           [matDatepicker]="dpTo"
@@ -250,14 +254,22 @@
                           [matDatepickerFilter]="dateFilterMulti"
                           placeholder="dd/mm/aaaa"
                         />
-                        <mat-datepicker-toggle matSuffix [for]="dpTo"></mat-datepicker-toggle>
+                        <mat-datepicker-toggle
+                          matSuffix
+                          [for]="dpTo"
+                        ></mat-datepicker-toggle>
                         <mat-datepicker #dpTo></mat-datepicker>
                       </mat-form-field>
                     </div>
                   </div>
 
-                  <div formGroupName="weekdays" class="flex flex-wrap gap-3 text-xs">
-                    <span class="w-full text-slate-600 dark:text-slate-300 mb-1">
+                  <div
+                    formGroupName="weekdays"
+                    class="flex flex-wrap gap-3 text-xs"
+                  >
+                    <span
+                      class="w-full text-slate-600 dark:text-slate-300 mb-1"
+                    >
                       Selecciona los días de la semana:
                     </span>
 
@@ -306,8 +318,8 @@
                   </div>
 
                   <p class="text-xs text-slate-500 dark:text-slate-400">
-                    Solo se considerarán fechas dentro del mes actual y que no sean
-                    feriados.
+                    Solo se considerarán fechas dentro del mes actual y que no
+                    sean feriados.
                   </p>
                 </div>
               </div>
@@ -316,7 +328,8 @@
                 *ngIf="multi.invalid && multi.touched"
                 class="text-xs text-red-500 dark:text-red-400"
               >
-                Revisa las fechas del bloque multi-día (rango válido y dentro del mes).
+                Revisa las fechas del bloque multi-día (rango válido y dentro
+                del mes).
               </p>
             </div>
           </div>
@@ -331,11 +344,7 @@
             <textarea
               formControlName="descripcionAct"
               rows="8"
-              class="w-full rounded-2xl border border-slate-300 bg-white text-slate-900
-                     px-4 py-3 text-base placeholder-slate-400
-                     focus:outline-none focus:ring-2 focus:ring-indigo-500
-                     min-h-[260px]
-                     dark:border-[#1E2638] dark:bg-[#121A2E] dark:text-slate-100 dark:placeholder-slate-400"
+              class="w-full rounded-2xl border border-slate-300 bg-white text-slate-900 px-4 py-3 text-base placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[260px] dark:border-[#1E2638] dark:bg-[#121A2E] dark:text-slate-100 dark:placeholder-slate-400"
               placeholder="Ej.: Participación en taller de actualización docente…"
             ></textarea>
 
@@ -347,80 +356,13 @@
             </p>
 
             <p class="pt-2 text-sm text-slate-500 dark:text-slate-400">
-              Consejo: sé específico en la descripción (objetivo, actividad realizada,
-              resultados). Esto ayuda a una mejor evaluación de tu registro.
+              Consejo: sé específico en la descripción (objetivo, actividad
+              realizada, resultados). Esto ayuda a una mejor evaluación de tu
+              registro.
             </p>
           </div>
         </form>
       </div>
     </div>
   </section>
-
-  <!-- Estilos específicos Material -->
-  <style>
-    .dark-field .mat-mdc-text-field-wrapper {
-      border-radius: 12px !important;
-    }
-
-    :host-context(.dark) .dark-field .mat-mdc-text-field-wrapper {
-      background-color: #121a2e !important;
-    }
-
-    :host-context(.dark) .dark-field .mat-mdc-form-field-flex {
-      color: #e5e7eb !important;
-    }
-
-    :host-context(.dark) .dark-field .mat-mdc-form-field-outline {
-      color: #1f2942 !important;
-    }
-
-    :host-context(.dark) .dark-field .mat-mdc-form-field-outline-thick {
-      color: #3b82f6 !important;
-    }
-
-    :host-context(.dark) .dark-field input.mat-mdc-input-element {
-      color: #e5e7eb !important;
-    }
-
-    :host-context(.dark)
-      .dark-field
-      .mat-mdc-select-trigger,
-    :host-context(.dark)
-      .dark-field
-      .mat-mdc-select-value-text,
-    :host-context(.dark)
-      .dark-field
-      .mat-mdc-select-placeholder {
-      color: #e5e7eb !important;
-      opacity: 1 !important;
-    }
-
-    :host-context(.dark) .dark-field .mat-mdc-select-arrow {
-      color: #9ca3af !important;
-    }
-
-    :host-context(.dark) .dark-field .mat-mdc-form-field-infix {
-      padding: 10px 0 !important;
-    }
-
-    :host-context(.dark) ::ng-deep .mat-mdc-select-panel {
-      background-color: #020617 !important;
-      color: #e5e7eb !important;
-    }
-
-    :host-context(.dark) ::ng-deep .mat-mdc-option {
-      color: #e5e7eb !important;
-    }
-
-    :host-context(.dark)
-      ::ng-deep
-      .mat-mdc-option.mdc-list-item--selected {
-      background-color: #1d283a !important;
-      color: #e5e7eb !important;
-    }
-
-    :host-context(.dark) ::ng-deep .mat-mdc-option:hover {
-      background-color: #111827 !important;
-    }
-  </style>
 </app-layout>
