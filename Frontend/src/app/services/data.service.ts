@@ -281,15 +281,20 @@ export class DataService {
 
   // Crear asignación (asignar cargo a usuario) -> POST /employee-charge/create
   createEmpleadoCargo(payload: {
-    usuarioId: number;
-    cargoId: number;
-  }): Observable<EmpleadoCargo> {
-    return this.http.post<EmpleadoCargo>(
-      `${this.empleadoCargoEndpoint}/create`,
-      payload,
-      this.getAuthOptions()
-    );
-  }
+  usuarioId: number;
+  cargoId: number;
+}): Observable<EmpleadoCargo> {
+  const body = {
+    id_usuario: payload.usuarioId,
+    id_cargo: payload.cargoId,
+  };
+
+  return this.http.post<EmpleadoCargo>(
+    `${this.empleadoCargoEndpoint}/create`,
+    body,
+    this.getAuthOptions()
+  );
+}
 
   // Obtener todas las asignaciones -> GET /employee-charge/get
   getEmpleadoCargos(): Observable<EmpleadoCargo[]> {
