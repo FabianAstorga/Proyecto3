@@ -15,7 +15,7 @@ import { LoginResponse } from "./backend/logindata-backend.model";
 import { BackendUser } from "./backend/user-backend.model";
 import { BackendActividad } from "./backend/activity-backend2.model";
 import { EmpleadoCargo } from "./backend/charge-backend.model";
-
+import { GlobalEventBackend, GlobalEventPayload } from '../models/horario.models';
 export type UserRole = User["role"];
 
 @Injectable({ providedIn: "root" })
@@ -346,6 +346,24 @@ export class DataService {
       )
     );
   }
+
+ getEventosGlobalesSemana(isoWeek: string) {
+  return this.http.get<GlobalEventBackend[]>(
+    `${this.apiUrl}/eventos-globales/semana/${isoWeek}`,
+    this.getAuthOptions()                    // ← AÑADIDO
+  );
+}
+
+/**
+ * Reemplaza TODOS los eventos globales de una semana ISO por los del payload.
+ */
+saveEventosGlobalesSemana(isoWeek: string, items: GlobalEventPayload[]) {
+  return this.http.put<GlobalEventBackend[]>(
+    `${this.apiUrl}/eventos-globales/semana/${isoWeek}`,
+    items,
+    this.getAuthOptions()                    // ← AÑADIDO
+  );
+}
 
   // ================= HORARIOS =================
 

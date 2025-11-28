@@ -10,6 +10,7 @@ import { CargosModule } from "./modules/cargos/cargos.module";
 import { UsuariosModule } from "./modules/usuarios/usuarios.module";
 import { InformesModule } from './modules/informes/informes.module';
 import { HorariosModule } from "./modules/horarios/horarios.module";
+import { EventosGlobalesModule } from './modules/eventos-globales/eventos-globales.module';
 
 @Module({
   imports: [
@@ -21,7 +22,8 @@ import { HorariosModule } from "./modules/horarios/horarios.module";
     CargosModule,
     UsuariosModule,
     InformesModule,
-    HorariosModule
+    HorariosModule,
+    EventosGlobalesModule
     // InformesModule
   ],
   controllers: [AppController],

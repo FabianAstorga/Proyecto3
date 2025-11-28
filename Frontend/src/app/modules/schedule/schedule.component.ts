@@ -7,10 +7,14 @@ import { ActivatedRoute } from '@angular/router';
 import { LayoutComponent } from '../../components/layout/layout.component';
 import { User } from '../../models/user.model';
 import { DataService } from '../../services/data.service';
-import { BackendHorario, SaveHorarioPayload } from '../../models/horario.models';
+import {
+  BackendHorario,
+  SaveHorarioPayload,
+  DayKey,
+  GlobalEventBackend,
+} from '../../models/horario.models';
 
 type Block = { label: string; code: string; isLunch?: boolean };
-type DayKey = 'lun' | 'mar' | 'mie' | 'jue' | 'vie';
 type Cell = { title: string; room?: string; note?: string } | null;
 
 @Component({
@@ -49,13 +53,13 @@ export class ScheduleComponent implements OnInit {
     { key: 'vie', label: 'Viernes' },
   ];
 
-  // Fecha de ejemplo por día (ajusta a la semana que quieras)
+  // Fecha ejemplo por día (se usa solo al guardar el horario personal)
   fechaPorDia: Record<DayKey, string> = {
-    lun: '2024-12-30', // Lunes
-    mar: '2024-12-31', // Martes
-    mie: '2025-01-01', // Miércoles
-    jue: '2025-01-02', // Jueves
-    vie: '2025-01-03', // Viernes
+    lun: '2024-12-30',
+    mar: '2024-12-31',
+    mie: '2025-01-01',
+    jue: '2025-01-02',
+    vie: '2025-01-03',
   };
 
   // 7 slots (todos menos almuerzo) por día
@@ -65,6 +69,15 @@ export class ScheduleComponent implements OnInit {
     mie: [null, null, null, null, null, null, null],
     jue: [null, null, null, null, null, null, null],
     vie: [null, null, null, null, null, null, null],
+  };
+
+  // Eventos globales por día e índice (capa visual)
+  globalEvents: Record<DayKey, { [index: number]: GlobalEventBackend }> = {
+    lun: {},
+    mar: {},
+    mie: {},
+    jue: {},
+    vie: {},
   };
 
   // ===== Modal =====
@@ -88,28 +101,40 @@ export class ScheduleComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private dataService: DataService
-  ) {}
+  ) {
+    console.log('[SCHEDULE] Constructor ejecutado');
+  }
 
   ngOnInit(): void {
+    console.log('[SCHEDULE] ngOnInit ejecutado');
+
     const idParam = this.route.snapshot.paramMap.get('id');
     const routeId = idParam ? Number(idParam) : NaN;
 
-    // Usamos el perfil del usuario logueado
     this.dataService.getMyProfile().subscribe({
       next: (user) => {
         this.user = user;
+        console.log('[SCHEDULE] Perfil cargado:', user);
 
-        // Solo para debug: si el id de la ruta no coincide con el logueado
         if (Number.isFinite(routeId) && routeId !== user.id) {
           console.warn(
             'El id de la ruta no coincide con el usuario logueado:',
-            'ruta =', routeId, 'user.id =', user.id
+            'ruta =',
+            routeId,
+            'user.id =',
+            user.id
           );
         }
 
-        // Cargar horario desde el backend para este usuario
+        // Cargar horario personal
         this.dataService.getHorarioByUser(user.id!).subscribe({
-          next: (horarios) => this.applyBackendHorario(horarios),
+          next: (horarios) => {
+            console.log('[SCHEDULE] Horario personal cargado:', horarios);
+            this.applyBackendHorario(horarios);
+
+            // Luego eventos globales de la semana actual
+            this.loadGlobalEventsForWeek();
+          },
           error: (err) =>
             console.error('Error cargando horario desde backend:', err),
         });
@@ -120,14 +145,12 @@ export class ScheduleComponent implements OnInit {
     });
   }
 
-  // ===== Cargar horario que viene del back en el grid =====
+  // ===== Cargar horario personal =====
   applyBackendHorario(horarios: BackendHorario[]): void {
-    // Limpio primero
     (Object.keys(this.schedule) as DayKey[]).forEach((day) => {
       this.schedule[day] = [null, null, null, null, null, null, null];
     });
 
-    // Mapa bloque -> { day, index } construido en base a los mismos days/blocks
     const bloqueToIndex: Record<string, { day: DayKey; index: number }> = {};
 
     this.days.forEach((d) => {
@@ -153,8 +176,7 @@ export class ScheduleComponent implements OnInit {
     });
   }
 
-  // ===== Guardar TODO el horario en el backend =====
-  // (lo usamos cuando el usuario guarda una celda)
+  // ===== Guardar TODO el horario personal =====
   saveSchedule(showToast = true): void {
     if (!this.user?.id) return;
 
@@ -164,7 +186,7 @@ export class ScheduleComponent implements OnInit {
       if (b.isLunch) return;
 
       const dataIndex = this.visibleIndexToDataIndex(visibleIndex);
-      const [horaInicioLabel, horaFinLabel] = b.label.split(' - '); // "08:00", "09:30"
+      const [horaInicioLabel, horaFinLabel] = b.label.split(' - ');
 
       this.days.forEach((d) => {
         const cell = this.schedule[d.key][dataIndex];
@@ -173,7 +195,7 @@ export class ScheduleComponent implements OnInit {
         const fecha = this.fechaPorDia[d.key];
 
         payload.push({
-          bloque: `${d.label} ${b.code}`, // Ej: "Lunes (1 - 2)"
+          bloque: `${d.label} ${b.code}`,
           fecha,
           horaInicio: horaInicioLabel,
           horaFin: horaFinLabel,
@@ -184,6 +206,8 @@ export class ScheduleComponent implements OnInit {
         });
       });
     });
+
+    console.log('[SCHEDULE] Guardando horario personal payload:', payload);
 
     this.dataService.saveHorarioByUser(this.user.id!, payload).subscribe({
       next: () => {
@@ -244,7 +268,7 @@ export class ScheduleComponent implements OnInit {
     };
   }
 
-  // Ahora: guardar celda -> actualizar grid -> guardar TODO el horario -> toast
+  // Guardar celda -> actualizar grid -> guardar TODO el horario -> toast
   saveFromModal(): void {
     if (!this.modal.open || !this.modal.day) return;
 
@@ -258,20 +282,14 @@ export class ScheduleComponent implements OnInit {
       : null;
 
     this.schedule[this.modal.day][this.modal.index] = payload;
-
-    // Auto-save del horario completo
     this.saveSchedule(true);
-
     this.closeModal();
   }
 
   clearFromModal(): void {
     if (!this.modal.open || !this.modal.day) return;
     this.schedule[this.modal.day][this.modal.index] = null;
-
-    // También persistimos el cambio (se borra ese bloque)
     this.saveSchedule(true);
-
     this.closeModal();
   }
 
@@ -282,5 +300,131 @@ export class ScheduleComponent implements OnInit {
     this.modal.dayLabel = '';
     this.modal.blockLabel = '';
     this.modal.model = { title: '', room: '', note: '' };
+  }
+
+  // ===== Helpers para fechas / semanas y eventos globales =====
+
+  private pad(n: number): string {
+    return n.toString().padStart(2, '0');
+  }
+
+  // ISO week para una fecha (en local)
+  private weekKey(fecha: Date): string {
+    const d = new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate());
+    const day = d.getDay() || 7;
+    d.setDate(d.getDate() + 4 - day);
+    const year = d.getFullYear();
+    const yearStart = new Date(year, 0, 1);
+    const week = Math.ceil(
+      ((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7
+    );
+    return `${year}-W${this.pad(week)}`;
+  }
+
+  /**
+   * Conversión segura de 'YYYY-MM-DD' -> DayKey
+   * Usamos constructor con year, month, day para evitar el desfase por UTC
+   * que hacía que '2025-11-24' (lunes) se convirtiera en domingo en zonas -03.
+   */
+  private fechaToDayKey(fecha: string): DayKey | null {
+    const [yearStr, monthStr, dayStr] = fecha.split('-');
+    const year = Number(yearStr);
+    const month = Number(monthStr);
+    const dayNum = Number(dayStr);
+
+    const d = new Date(year, month - 1, dayNum); // local, sin shift de zona
+    const dayOfWeek = d.getDay(); // 0-dom, 1-lun, ...
+
+    const map: Record<number, DayKey> = {
+      1: 'lun',
+      2: 'mar',
+      3: 'mie',
+      4: 'jue',
+      5: 'vie',
+    };
+
+    return map[dayOfWeek] ?? null;
+  }
+
+  private blockCodeToDataIndex(code: string): number | null {
+    const codes = [
+      '(1 - 2)',
+      '(3 - 4)',
+      '(5 - 6)',
+      '(7 - 8)',
+      '(9 - 10)',
+      '(11 - 12)',
+      '(13 - 14)',
+      '(15 - 16)',
+    ];
+    const position = codes.indexOf(code);
+    if (position === -1) return null;
+
+    if (code === '(7 - 8)') return null; // almuerzo
+    if (position < 3) return position; // 0,1,2 -> 0,1,2
+    if (position > 3) return position - 1; // 4..7 -> 3..6
+
+    return null;
+  }
+
+  private loadGlobalEventsForWeek(): void {
+    const today = new Date();
+    const isoWeek = this.weekKey(today);
+
+    console.log('[SCHEDULE] Solicitando eventos globales para semana ISO:', isoWeek);
+
+    // Reset
+    this.globalEvents = { lun: {}, mar: {}, mie: {}, jue: {}, vie: {} };
+
+    this.dataService.getEventosGlobalesSemana(isoWeek).subscribe({
+      next: (items: GlobalEventBackend[]) => {
+        console.log('[SCHEDULE] Eventos globales recibidos:', items);
+
+        items.forEach((ev) => {
+          const dayKey = this.fechaToDayKey(ev.fecha as any);
+          const dataIndex = this.blockCodeToDataIndex(ev.blockCode);
+
+          console.log(
+            '[SCHEDULE] Mapeando evento:',
+            ev,
+            '→ dayKey =',
+            dayKey,
+            'dataIndex =',
+            dataIndex
+          );
+
+          if (!dayKey || dataIndex === null) return;
+          this.globalEvents[dayKey][dataIndex] = ev;
+        });
+
+        console.log('[SCHEDULE] Estado final de globalEvents:', this.globalEvents);
+      },
+      error: (err) => {
+        console.error('Error cargando eventos globales en horario:', err);
+      },
+    });
+  }
+
+  hasGlobalEvent(day: DayKey, dataIndex: number): boolean {
+    return !!this.globalEvents[day]?.[dataIndex];
+  }
+
+  getGlobalEventTitle(day: DayKey, dataIndex: number): string | null {
+    return this.globalEvents[day]?.[dataIndex]?.titulo ?? null;
+  }
+
+  // ===== Clases visuales de cada celda =====
+  getCellClasses(dayKey: DayKey, dataIndex: number) {
+    const hasGlobal = this.hasGlobalEvent(dayKey, dataIndex);
+    const cell = this.schedule[dayKey]?.[dataIndex] ?? null;
+
+    return {
+      // Solo actividad personal (sin evento global)
+      'bg-indigo-50 dark:bg-indigo-500/10': !!cell && !hasGlobal,
+
+      // Evento global presente
+      'bg-red-50 border border-red-200 dark:bg-red-500/10 dark:border-red-500/40':
+        hasGlobal,
+    };
   }
 }

@@ -24,3 +24,21 @@ export interface SaveHorarioPayload {
   sala?: string | null;
   descripcion?: string | null;
 }
+
+export type DayKey = 'lun' | 'mar' | 'mie' | 'jue' | 'vie';
+
+export interface GlobalEventBackend {
+  id: number;
+  fecha: string;       // "2025-01-01"
+  blockCode: string;   // "(1 - 2)", "(3 - 4)", etc.
+  titulo: string;
+  descripcion: string | null;
+}
+
+// Lo que mandamos desde el front al backend
+export interface GlobalEventPayload {
+  dayKey: DayKey;
+  blockCode: string;
+  titulo: string;
+  descripcion?: string;
+}

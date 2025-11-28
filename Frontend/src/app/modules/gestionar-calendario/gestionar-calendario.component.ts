@@ -1,9 +1,15 @@
-import { Component } from '@angular/core';
+// src/app/modules/gestionar-calendario/gestionar-calendario.component.ts
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LayoutComponent } from '../../components/layout/layout.component';
 
-type DayKey = 'lun' | 'mar' | 'mie' | 'jue' | 'vie';
+import {
+  DayKey,
+  GlobalEventBackend,
+  GlobalEventPayload,
+} from '../../models/horario.models';
+import { DataService } from '../../services/data.service';
 
 interface Block {
   label: string;
@@ -46,7 +52,7 @@ function mondayOfISOWeek(iso: string) {
   imports: [CommonModule, FormsModule, LayoutComponent],
   templateUrl: './gestionar-calendario.component.html',
 })
-export class GestionarCalendarioComponent {
+export class GestionarCalendarioComponent implements OnInit {
   // Semana actual (ISO week)
   current = weekKey(new Date());
 
@@ -70,7 +76,7 @@ export class GestionarCalendarioComponent {
     { key: 'vie', label: 'Viernes' },
   ];
 
-  // Eventos transversales por día
+  // Eventos transversales por día (en memoria)
   eventsByDay: Record<DayKey, ScheduleEvent[]> = {
     lun: [],
     mar: [],
@@ -102,6 +108,24 @@ export class GestionarCalendarioComponent {
     availableBlocks: [],
   };
 
+  // Alertas sencillas del componente
+  alertMessage = '';
+  alertType: 'success' | 'danger' | 'warning' = 'success';
+
+  constructor(private dataService: DataService) {}
+
+  ngOnInit(): void {
+    this.cargarEventosSemana();
+  }
+
+  /* ===== Alertas ===== */
+
+  private showAlert(msg: string, type: 'success' | 'danger' | 'warning') {
+    this.alertMessage = msg;
+    this.alertType = type;
+    setTimeout(() => (this.alertMessage = ''), 2500);
+  }
+
   /* ===== Etiquetas semana ===== */
 
   weekLabel(): string {
@@ -119,15 +143,74 @@ export class GestionarCalendarioComponent {
     return `año ${anio} - semana ${semana}`;
   }
 
+  /* ===== Helpers para mapear backend -> front ===== */
+
+  private resetEvents() {
+    this.eventsByDay = {
+      lun: [],
+      mar: [],
+      mie: [],
+      jue: [],
+      vie: [],
+    };
+  }
+
+  // convierte "2025-01-01" -> 'mie' (por ejemplo)
+  private fechaToDayKey(fecha: string): DayKey | null {
+    const d = new Date(fecha);
+    const day = d.getDay(); // 0-dom, 1-lun, ..., 6-sab
+
+    const map: Record<number, DayKey> = {
+      1: 'lun',
+      2: 'mar',
+      3: 'mie',
+      4: 'jue',
+      5: 'vie',
+    };
+
+    return map[day] ?? null;
+  }
+
+  private blockCodeToIndex(code: string): number | null {
+    const idx = this.blocks.findIndex((b) => b.code === code);
+    return idx === -1 ? null : idx;
+  }
+
+  /* ===== Cargar eventos globales de la semana ===== */
+
+  cargarEventosSemana() {
+    this.resetEvents();
+
+    this.dataService.getEventosGlobalesSemana(this.current).subscribe({
+      next: (items: GlobalEventBackend[]) => {
+        items.forEach((ev) => {
+          const dayKey = this.fechaToDayKey(ev.fecha);
+          const blockIndex = this.blockCodeToIndex(ev.blockCode);
+          if (!dayKey || blockIndex === null) return;
+
+          this.eventsByDay[dayKey].push({
+            title: ev.titulo,
+            blockIndex,
+            note: ev.descripcion ?? undefined,
+          });
+        });
+      },
+      error: (err) => {
+        console.error('Error cargando eventos globales:', err);
+        this.showAlert('Error cargando eventos de la semana', 'danger');
+      },
+    });
+  }
+
   /* ===== Bloques libres por día ===== */
 
   private getFreeBlocks(dayKey: DayKey): number[] {
     const used = new Set(
-      this.eventsByDay[dayKey].map(ev => ev.blockIndex)
+      this.eventsByDay[dayKey].map((ev) => ev.blockIndex),
     );
     return this.blocks
       .map((_, i) => i)
-      .filter(i => !used.has(i));
+      .filter((i) => !used.has(i));
   }
 
   hasFreeBlocks(dayKey: DayKey): boolean {
@@ -139,11 +222,11 @@ export class GestionarCalendarioComponent {
   openModal(dayKey: DayKey) {
     const free = this.getFreeBlocks(dayKey);
     if (!free.length) {
-      alert('Todos los bloques de este día ya tienen un evento.');
+      this.showAlert('Todos los bloques de este día ya tienen un evento.', 'warning');
       return;
     }
 
-    const day = this.days.find(d => d.key === dayKey);
+    const day = this.days.find((d) => d.key === dayKey);
     this.modal.open = true;
     this.modal.dayKey = dayKey;
     this.modal.dayLabel = day ? day.label : '';
@@ -167,7 +250,8 @@ export class GestionarCalendarioComponent {
 
     const title = model.title.trim();
     if (!title || model.blockIndex === null) {
-      return; // podrías agregar validación visual si quieres
+      this.showAlert('Completa título y bloque antes de guardar.', 'warning');
+      return;
     }
 
     const ev: ScheduleEvent = {
@@ -177,17 +261,39 @@ export class GestionarCalendarioComponent {
     };
 
     this.eventsByDay[dayKey].push(ev);
+
     this.closeModal();
   }
 
-  /* ===== Guardar semana (demo) ===== */
+  /* ===== Guardar semana (llamando backend) ===== */
 
   guardarSemana() {
-    const payload = {
-      week: this.current,
-      events: this.eventsByDay,
-    };
-    console.log('Guardando eventos transversales de la semana:', payload);
-    alert('Eventos de la semana guardados (demo).');
+    const payload: GlobalEventPayload[] = [];
+
+    (Object.keys(this.eventsByDay) as DayKey[]).forEach((dayKey) => {
+      this.eventsByDay[dayKey].forEach((ev) => {
+        const block = this.blocks[ev.blockIndex];
+        if (!block) return;
+
+        payload.push({
+          dayKey,
+          blockCode: block.code,
+          titulo: ev.title,
+          descripcion: ev.note,
+        });
+      });
+    });
+
+    this.dataService
+      .saveEventosGlobalesSemana(this.current, payload)
+      .subscribe({
+        next: () => {
+          this.showAlert('Eventos de la semana guardados', 'success');
+        },
+        error: (err) => {
+          console.error('Error guardando eventos globales:', err);
+          this.showAlert('Error guardando eventos', 'danger');
+        },
+      });
   }
 }

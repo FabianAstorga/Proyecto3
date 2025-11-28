@@ -30,16 +30,28 @@
           </p>
         </div>
 
+        <!-- Leyenda -->
         <div
-          class="flex items-center gap-2 text-[11px] md:text-xs text-slate-500 dark:text-slate-400"
+          class="flex flex-wrap items-center gap-4 text-[11px] md:text-xs text-slate-500 dark:text-slate-400"
         >
-          <span class="inline-flex h-3 w-3 rounded-full bg-slate-200 mr-1 dark:bg-slate-800"></span>
-          Bloque vacío
-          <span
-            class="ml-3 inline-flex h-3 w-3 rounded-full bg-indigo-500/20 border border-indigo-300 mr-1
-                   dark:bg-indigo-500/40 dark:border-indigo-400"
-          ></span>
-          Bloque con actividad
+          <div class="flex items-center gap-1">
+            <span class="inline-flex h-3 w-3 rounded-full bg-slate-200 dark:bg-slate-800"></span>
+            <span>Bloque vacío</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <span
+              class="inline-flex h-3 w-3 rounded-full bg-indigo-500/20 border border-indigo-300
+                     dark:bg-indigo-500/40 dark:border-indigo-400"
+            ></span>
+            <span>Actividad personal</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <span
+              class="inline-flex h-3 w-3 rounded-full bg-red-100 border border-red-300
+                     dark:bg-red-500/20 dark:border-red-500/60"
+            ></span>
+            <span>Evento global</span>
+          </div>
         </div>
       </header>
 
@@ -55,7 +67,7 @@
               class="bg-slate-100 border border-slate-200 px-3 py-3 text-center font-semibold uppercase tracking-wide text-[11px] text-slate-700
                      dark:bg-slate-950 dark:border-slate-800 dark:text-slate-300"
             >
-              Bloque
+              BLOQUE
             </div>
 
             <!-- Encabezados: días -->
@@ -82,7 +94,9 @@
                   <div class="text-[12px] md:text-sm leading-tight">
                     {{ b.label }}
                   </div>
-                  <div class="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">
+                  <div
+                    class="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400"
+                  >
                     {{ b.code }}
                   </div>
                 </ng-container>
@@ -94,7 +108,7 @@
                 </ng-template>
               </div>
 
-              <!-- Celdas editables (no almuerzo) -->
+              <!-- Celdas (no almuerzo) -->
               <ng-container *ngIf="!b.isLunch; else lunchRow">
                 <div
                   *ngFor="let d of days"
@@ -103,13 +117,26 @@
                   (click)="openModal(d.key, bi)"
                   title="Editar bloque"
                 >
+                  <!-- ⭐️⭐️⭐️ BLOQUE NUEVO CORREGIDO ⭐️⭐️⭐️ -->
                   <div
-                    class="h-20 md:h-24 flex items-center justify-center text-center px-2"
-                    [ngClass]="{
-                      'bg-indigo-50 dark:bg-indigo-500/5':
-                        schedule[d.key][visibleIndexToDataIndex(bi)] !== null
-                    }"
+                    class="relative h-20 md:h-24 flex flex-col items-center justify-center text-center px-2"
+                    [ngClass]="getCellClasses(d.key, visibleIndexToDataIndex(bi))"
                   >
+                    <!-- Evento global -->
+                    <div
+                      *ngIf="hasGlobalEvent(d.key, visibleIndexToDataIndex(bi))"
+                      class="mb-1 text-[10px] md:text-[11px] font-semibold text-red-700 dark:text-red-300"
+                    >
+                      Evento global:
+                      {{
+                        getGlobalEventTitle(
+                          d.key,
+                          visibleIndexToDataIndex(bi)
+                        )
+                      }}
+                    </div>
+
+                    <!-- Contenido del horario personal -->
                     <ng-container
                       [ngTemplateOutlet]="cellTpl"
                       [ngTemplateOutletContext]="{
@@ -120,9 +147,11 @@
                 </div>
               </ng-container>
 
-              <!-- Fila de almuerzo: banda visual en todo el ancho -->
+              <!-- Fila de almuerzo -->
               <ng-template #lunchRow>
-                <div class="col-span-5 border border-slate-200 dark:border-slate-800">
+                <div
+                  class="col-span-5 border border-slate-200 dark:border-slate-800"
+                >
                   <div
                     class="h-10 md:h-12 bg-slate-100 text-slate-500 flex items-center justify-center text-[11px] md:text-xs tracking-wide uppercase
                            dark:bg-slate-900/80 dark:text-slate-400"
@@ -143,25 +172,24 @@
     *ngIf="modal.open"
     class="fixed inset-0 z-50 flex items-center justify-center"
   >
-    <!-- Backdrop -->
     <div
       class="absolute inset-0 bg-black/40 backdrop-blur-sm"
       (click)="closeModal()"
     ></div>
 
-    <!-- Diálogo -->
     <div
       class="relative w-[92%] max-w-md rounded-2xl
              border border-slate-200 bg-white text-slate-900 shadow-2xl
              dark:border-slate-800 dark:bg-slate-950/95 dark:text-slate-100"
     >
-      <!-- Header modal -->
       <div
         class="px-5 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50 rounded-t-2xl
                dark:border-slate-800 dark:bg-slate-900/80"
       >
         <div>
-          <div class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400">
+          <div
+            class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400"
+          >
             Editando bloque
           </div>
           <div class="mt-0.5 text-sm md:text-base font-semibold">
@@ -178,10 +206,10 @@
         </button>
       </div>
 
-      <!-- Formulario -->
       <form (ngSubmit)="saveFromModal()" class="px-5 py-4 space-y-3">
         <div>
-          <label class="text-[11px] font-medium text-slate-700 dark:text-slate-300"
+          <label
+            class="text-[11px] font-medium text-slate-700 dark:text-slate-300"
             >Título *</label
           >
           <input
@@ -198,7 +226,8 @@
         </div>
 
         <div>
-          <label class="text-[11px] font-medium text-slate-700 dark:text-slate-300"
+          <label
+            class="text-[11px] font-medium text-slate-700 dark:text-slate-300"
             >Sala (opcional)</label
           >
           <input
@@ -213,7 +242,8 @@
         </div>
 
         <div>
-          <label class="text-[11px] font-medium text-slate-700 dark:text-slate-300"
+          <label
+            class="text-[11px] font-medium text-slate-700 dark:text-slate-300"
             >Nota (opcional)</label
           >
           <input
@@ -228,7 +258,6 @@
         </div>
 
         <div class="flex items-center gap-2 pt-2">
-          <!-- Botón guardar (ahora guarda en BD directamente) -->
           <button
             type="submit"
             class="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-500/30 hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-950"
@@ -258,7 +287,7 @@
     </div>
   </div>
 
-  <!-- Vista de celda -->
+  <!-- Vista de celda (contenido personal) -->
   <ng-template #cellTpl let-c="c">
     <div *ngIf="c; else empty" class="px-2">
       <div
@@ -266,10 +295,16 @@
       >
         {{ c.title }}
       </div>
-      <div class="text-[11px] text-slate-600 dark:text-slate-300" *ngIf="c.room">
+      <div
+        class="text-[11px] text-slate-600 dark:text-slate-300"
+        *ngIf="c.room"
+      >
         Sala: {{ c.room }}
       </div>
-      <div class="text-[11px] text-slate-500 dark:text-slate-400" *ngIf="c.note">
+      <div
+        class="text-[11px] text-slate-500 dark:text-slate-400"
+        *ngIf="c.note"
+      >
         {{ c.note }}
       </div>
     </div>
@@ -278,12 +313,11 @@
     </ng-template>
   </ng-template>
 
-  <!-- Toast de notificación -->
+  <!-- Toast -->
   <div
     *ngIf="toast.show"
     class="fixed bottom-5 right-5 z-40 rounded-xl px-4 py-3 text-sm shadow-lg
-           flex items-center gap-2
-           text-white"
+           flex items-center gap-2 text-white"
     [ngClass]="{
       'bg-emerald-600': toast.type === 'success',
       'bg-red-600': toast.type === 'error'

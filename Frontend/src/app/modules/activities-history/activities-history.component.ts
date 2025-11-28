@@ -364,236 +364,401 @@ export class ActivitiesHistoryComponent implements OnInit {
     this.rebuildView();
   }
 
-  // ================== PDF POR MES ==================
+  // ================== PDF POR MES (CON LOGOS Y FIRMAS) ==================
 
- // ================== PDF POR MES (CON CENTRADO DE CELDAS) ==================
+  downloadMonthPdf(month: MonthGroup): void {
+    const doc = new jsPDF();
 
-downloadMonthPdf(month: MonthGroup): void {
-    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
 
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
+    const marginX = 14;
+    let y = 20;
 
-    const marginX = 14;
-    let y = 20;
+    // === 0. LOGOS DEPARTAMENTO (PLACEHOLDERS logdim1 / logdim2) ===
+    // Reemplazar estos rectángulos por:
+    // doc.addImage(logdim1, 'PNG/JPEG', x, y, w, h);
+    // doc.addImage(logdim2, 'PNG/JPEG', x, y, w, h);
+    const logoWidth = 30;
+    const logoHeight = 15;
 
-    // Función para formatear la fecha a 'DD-mes' (ej: 21-nov)
-    const formatShort = (iso: string): string => {
-      const [yearStr, monthStr, dayStr] = iso.split('-');
-      const d = Number(dayStr);
-      const m = Number(monthStr); // 1..12
-      const meses = [
-        'ene', 'feb', 'mar', 'abr', 'may', 'jun',
-        'jul', 'ago', 'sept', 'oct', 'nov', 'dic',
-      ];
-      return `${String(d).padStart(2, '0')}-${meses[m - 1] ?? ''}`;
-    };
+    doc.setDrawColor(200, 200, 200);
+    doc.setFillColor(255, 255, 255);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
 
-    // === 1. ENCABEZADO PRINCIPAL (TÍTULO Y SECRETARIA) ===
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(18);
-    doc.setTextColor(0, 0, 0);
-    doc.text('Resumen de actividades', pageWidth / 2, y, { align: 'center' });
-    y += 8;
+    // Logo izquierdo (logdim1)
+    doc.rect(marginX, 10, logoWidth, logoHeight);
+    doc.text(
+      'logdim1',
+      marginX + logoWidth / 2,
+      10 + logoHeight / 2 + 2,
+      { align: 'center' }
+    );
 
-    const secName = this.secretaryName || 'Secretaría (sin identificar)';
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(11);
-    doc.setTextColor(90, 90, 90);
-    doc.text(
-      `${month.monthLabel.toLowerCase()} — Informe creado por ${secName}`,
-      pageWidth / 2,
-      y,
-      { align: 'center' }
-    );
-    y += 10;
+    // Logo derecho (logdim2)
+    const rightLogoX = pageWidth - marginX - logoWidth;
+    doc.rect(rightLogoX, 10, logoWidth, logoHeight);
+    doc.text(
+      'logdim2',
+      rightLogoX + logoWidth / 2,
+      10 + logoHeight / 2 + 2,
+      { align: 'center' }
+    );
 
-    const tableMarginX = marginX;
-    const tableWidth = pageWidth - tableMarginX * 2;
-    const headerHeight = 10;
-    const lineHeight = 8; // Altura base de línea de texto (para calcular salto de línea)
+    // Bajamos un poco más el cursor de escritura para el título
+    y = 32;
 
-    const dateColWidth = 36;
-    const statusColWidth = 42;
-    const activityColWidth = tableWidth - dateColWidth - statusColWidth; // Columna flexible
+    // Función para formatear la fecha a 'DD-mes' (ej: 21-nov)
+    const formatShort = (iso: string): string => {
+      const [_, monthStr, dayStr] = iso.split('-');
+      const d = Number(dayStr);
+      const m = Number(monthStr); // 1..12
+      const meses = [
+        'ene',
+        'feb',
+        'mar',
+        'abr',
+        'may',
+        'jun',
+        'jul',
+        'ago',
+        'sept',
+        'oct',
+        'nov',
+        'dic',
+      ];
+      return `${String(d).padStart(2, '0')}-${meses[m - 1] ?? ''}`;
+    };
 
-    const bottomMargin = 30;
+    // === 1. ENCABEZADO PRINCIPAL (TÍTULO Y SECRETARIA) ===
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(18);
+    doc.setTextColor(0, 0, 0);
+    doc.text('Resumen de actividades', pageWidth / 2, y, {
+      align: 'center',
+    });
+    y += 8;
 
-    // === 2. ITERAR POR FUNCIONARIO Y DIBUJAR TABLA ===
-    month.users.forEach((ug) => {
-      // Verificar espacio y agregar página si es necesario
-      if (y > pageHeight - bottomMargin - 40) {
-        doc.addPage();
-        y = 20;
-      }
+    const secName =
+      this.secretaryName || 'Secretaría (sin identificar)';
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(11);
+    doc.setTextColor(90, 90, 90);
+    doc.text(
+      `${month.monthLabel.toLowerCase()} — Informe creado por ${secName}`,
+      pageWidth / 2,
+      y,
+      { align: 'center' }
+    );
+    y += 10;
 
-      // Nombre del Funcionario
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(14);
-      doc.setTextColor(0, 0, 0);
-      doc.text(ug.userName, tableMarginX, y);
-      y += 6;
+    const tableMarginX = marginX;
+    const tableWidth = pageWidth - tableMarginX * 2;
+    const headerHeight = 10;
+    const lineHeight = 8; // Altura base de línea de texto
 
-      // --- 2.1. Calcular altura de la tabla ---
-      let bodyHeight = 0;
-      const rowHeights: number[] = [];
-      
-      doc.setFontSize(11);
-      ug.activities.forEach((a) => {
-        const lineaBase = `${a.titulo} — ${a.detalle || ''}`.trim();
-        // Cálculo de líneas que ocupará el texto de la actividad
-        const wrapped = doc.splitTextToSize(
-          lineaBase,
-          activityColWidth - 8 // Margen interno de 4px a cada lado
-        );
-        // Altura de la fila: El espacio necesario para el texto multilínea, más un pequeño padding.
-        const minRowHeight = 14; 
-        const rowHeight = Math.max(minRowHeight, wrapped.length * lineHeight + 4); 
-        rowHeights.push(rowHeight);
-        bodyHeight += rowHeight;
-      });
+    const dateColWidth = 36;
+    const statusColWidth = 42;
+    const activityColWidth = tableWidth - dateColWidth - statusColWidth; // Columna flexible
 
-      const tableHeight = headerHeight + bodyHeight + 2; 
-      
-      // Control de salto de página antes de dibujar la tabla del usuario
-      if (y + tableHeight > pageHeight - bottomMargin) {
-        doc.addPage();
-        y = 20;
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(14);
-        doc.setTextColor(0, 0, 0);
-        doc.text(ug.userName, tableMarginX, y);
-        y += 6;
-      }
+    const bottomMargin = 30;
 
-      const tableY = y;
+    // === 2. ITERAR POR FUNCIONARIO Y DIBUJAR TABLA + FIRMA DE FUNCIONARIO ===
+    month.users.forEach((ug) => {
+      // Verificar espacio y agregar página si es necesario
+      if (y > pageHeight - bottomMargin - 40) {
+        doc.addPage();
+        y = 20;
 
-      // --- 2.2. DIBUJO DEL CONTENEDOR DE LA TABLA (RECUADRO) ---
-      doc.setDrawColor(210, 210, 210);
-      doc.setLineWidth(0.6);
-      doc.setFillColor(255, 255, 255);
-      doc.roundedRect(tableMarginX, tableY, tableWidth, tableHeight, 4, 4, 'S');
+        // Volver a dibujar logos en la nueva página
+        const newPageLogoY = 10;
+        doc.setDrawColor(200, 200, 200);
+        doc.setFillColor(255, 255, 255);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
 
-      const innerX = tableMarginX;
-      const innerWidth = tableWidth;
-      const innerTop = tableY;
-      const innerBottom = tableY + tableHeight;
+        doc.rect(marginX, newPageLogoY, logoWidth, logoHeight);
+        doc.text(
+          'logdim1',
+          marginX + logoWidth / 2,
+          newPageLogoY + logoHeight / 2 + 2,
+          { align: 'center' }
+        );
 
-      // --- 2.3. DIBUJO DEL ENCABEZADO DE COLUMNAS ---
-      doc.setFillColor(245, 245, 245);
-      doc.rect(innerX + 1, innerTop + 1, innerWidth - 2, headerHeight, 'F');
+        const newRightLogoX = pageWidth - marginX - logoWidth;
+        doc.rect(newRightLogoX, newPageLogoY, logoWidth, logoHeight);
+        doc.text(
+          'logdim2',
+          newRightLogoX + logoWidth / 2,
+          newPageLogoY + logoHeight / 2 + 2,
+          { align: 'center' }
+        );
 
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(11);
-      doc.setTextColor(0, 0, 0);
+        y = 32;
+      }
 
-      const headerBaseline = innerTop + headerHeight - 2;
-      doc.text('Fecha', innerX + 5, headerBaseline);
-      doc.text('Actividad', innerX + dateColWidth + 5, headerBaseline);
-      doc.text(
-        'Estado',
-        innerX + dateColWidth + activityColWidth + 5,
-        headerBaseline
-      );
+      // Nombre del Funcionario
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(14);
+      doc.setTextColor(0, 0, 0);
+      doc.text(ug.userName, tableMarginX, y);
+      y += 6;
 
-      // Líneas divisorias verticales
-      doc.setDrawColor(230, 230, 230);
-      const v1 = innerX + dateColWidth;
-      const v2 = innerX + dateColWidth + activityColWidth;
-      doc.line(v1, innerTop, v1, innerBottom);
-      doc.line(v2, innerTop, v2, innerBottom);
-      doc.line(innerX, innerTop + headerHeight + 1, innerX + innerWidth, innerTop + headerHeight + 1); // Separador bajo el header
+      // --- 2.1. Calcular altura de la tabla y bloque de firma ---
+      let bodyHeight = 0;
+      const rowHeights: number[] = [];
 
-      let currentY = innerTop + headerHeight + 1; 
+      doc.setFontSize(11);
+      ug.activities.forEach((a) => {
+        const lineaBase = `${a.titulo} — ${a.detalle || ''}`.trim();
+        const wrapped = doc.splitTextToSize(
+          lineaBase,
+          activityColWidth - 8 // margen interno
+        );
+        const minRowHeight = 14;
+        const rowHeight = Math.max(
+          minRowHeight,
+          wrapped.length * lineHeight + 4
+        );
+        rowHeights.push(rowHeight);
+        bodyHeight += rowHeight;
+      });
 
-      // --- 2.4. DIBUJO DE LAS FILAS DE ACTIVIDADES ---
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(11);
-      doc.setTextColor(0, 0, 0);
-      doc.setDrawColor(235, 235, 235);
+      const tableHeight = headerHeight + bodyHeight + 2;
+      const gapBetweenTableAndSignature = 10;
+      const signatureBlockHeight = 14; // espacio para "Firma funcionario" + línea
+      const gapAfterSignature = 6;
 
-      ug.activities.forEach((a, idx) => {
-        const rowHeight = rowHeights[idx];
-        
-        // La posición central vertical (línea base del texto) de la fila.
-        // Se utiliza para centrar Fecha y la píldora de Estado.
-        const centerBaselineY = currentY + rowHeight / 2 + 1.5; 
+      const totalBlockHeight =
+        tableHeight +
+        gapBetweenTableAndSignature +
+        signatureBlockHeight +
+        gapAfterSignature;
 
+      // Control de salto de página antes de dibujar la tabla + firma
+      if (y + totalBlockHeight > pageHeight - bottomMargin) {
+        doc.addPage();
+        y = 20;
 
-        // 1. FECHA (Centrado vertical)
-        const fechaTxt = formatShort(a.fecha);
-        doc.text(
-          fechaTxt,
-          innerX + 5,
-          centerBaselineY
-        );
+        // Logos en la nueva página
+        const newPageLogoY = 10;
+        doc.setDrawColor(200, 200, 200);
+        doc.setFillColor(255, 255, 255);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
 
-        // 2. ACTIVIDAD (Centrado vertical: Usaremos un "pseudo-centrado" vertical)
-        const actividadTxt = `${a.titulo} — ${a.detalle || ''}`.trim();
-        const wrapped = doc.splitTextToSize(
-          actividadTxt,
-          activityColWidth - 8
-        );
-        
-        // Para centrar verticalmente, calculamos el punto de partida Y:
-        const textBlockHeight = wrapped.length * lineHeight;
-        const activityStartPaddingY = (rowHeight - textBlockHeight) / 2;
+        doc.rect(marginX, newPageLogoY, logoWidth, logoHeight);
+        doc.text(
+          'logdim1',
+          marginX + logoWidth / 2,
+          newPageLogoY + logoHeight / 2 + 2,
+          { align: 'center' }
+        );
 
-        doc.text(
-          wrapped,
-          innerX + dateColWidth + 5,
-          currentY + activityStartPaddingY + lineHeight // Sumar lineHeight para la primera línea base
-        );
+        const newRightLogoX = pageWidth - marginX - logoWidth;
+        doc.rect(newRightLogoX, newPageLogoY, logoWidth, logoHeight);
+        doc.text(
+          'logdim2',
+          newRightLogoX + logoWidth / 2,
+          newPageLogoY + logoHeight / 2 + 2,
+          { align: 'center' }
+        );
 
+        y = 32;
 
-        // 3. ESTADO (PÍLDORA SIN COLOR, Centrada vertical y horizontalmente)
-        const estadoLabel = a.estado;
-        // Asignamos el color del texto a negro, ya que no queremos fondo de color
-        const pillFill: [number, number, number] = [255, 255, 255]; 
-        const pillText: [number, number, number] = [0, 0, 0]; 
-        
-        // Cálculo de dimensiones y posición de la píldora
-        const pillTextSize = 11; // Usamos tamaño normal de 11, pero centrado
-        doc.setFontSize(pillTextSize);
-        
-        // Simulación del centrado de la píldora (ahora solo texto)
-        const estadoX = innerX + dateColWidth + activityColWidth;
-        const textWidth = doc.getTextWidth(estadoLabel);
-        
-        // Posición X centrada del texto
-        const pillTextX = estadoX + (statusColWidth - textWidth) / 2;
+        // Volvemos a escribir el nombre del funcionario en la nueva página
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(14);
+        doc.setTextColor(0, 0, 0);
+        doc.text(ug.userName, tableMarginX, y);
+        y += 6;
+      }
 
-        // DIBUJAR TEXTO DEL ESTADO (Centrado Verticalmente)
-        doc.setTextColor(...pillText);
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(pillTextSize);
-        
-        doc.text(
-          estadoLabel,
-          pillTextX,
-          centerBaselineY // Usamos la misma línea base central que la Fecha
-        );
+      const tableY = y;
 
-        // Volver a configuración por defecto para el texto normal
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(11);
-        doc.setTextColor(0, 0, 0);
+      // --- 2.2. DIBUJO DEL CONTENEDOR DE LA TABLA (RECUADRO) ---
+      doc.setDrawColor(210, 210, 210);
+      doc.setLineWidth(0.6);
+      doc.setFillColor(255, 255, 255);
+      doc.roundedRect(
+        tableMarginX,
+        tableY,
+        tableWidth,
+        tableHeight,
+        4,
+        4,
+        'S'
+      );
 
-        // 4. LÍNEA DIVISORIA HORIZONTAL (entre filas, excepto la última)
-        if (idx < ug.activities.length - 1) {
-          const rowBottom = currentY + rowHeight;
-          doc.setDrawColor(235, 235, 235);
-          doc.line(innerX + 1, rowBottom, innerX + innerWidth - 1, rowBottom);
-        }
+      const innerX = tableMarginX;
+      const innerWidth = tableWidth;
+      const innerTop = tableY;
+      const innerBottom = tableY + tableHeight;
 
-        currentY += rowHeight;
-      });
+      // --- 2.3. DIBUJO DEL ENCABEZADO DE COLUMNAS ---
+      doc.setFillColor(245, 245, 245);
+      doc.rect(
+        innerX + 1,
+        innerTop + 1,
+        innerWidth - 2,
+        headerHeight,
+        'F'
+      );
 
-      y = tableY + tableHeight + 10;
-    });
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(0, 0, 0);
 
-    // === 3. GUARDAR EL ARCHIVO ===
-    const cleanKey = month.monthKey.replace('-', '');
-    doc.save(`reporte_actividades_${cleanKey}.pdf`);
-  }
+      const headerBaseline = innerTop + headerHeight - 2;
+      doc.text('Fecha', innerX + 5, headerBaseline);
+      doc.text('Actividad', innerX + dateColWidth + 5, headerBaseline);
+      doc.text(
+        'Estado',
+        innerX + dateColWidth + activityColWidth + 5,
+        headerBaseline
+      );
+
+      // Líneas divisorias verticales
+      doc.setDrawColor(230, 230, 230);
+      const v1 = innerX + dateColWidth;
+      const v2 = innerX + dateColWidth + activityColWidth;
+      doc.line(v1, innerTop, v1, innerBottom);
+      doc.line(v2, innerTop, v2, innerBottom);
+      doc.line(
+        innerX,
+        innerTop + headerHeight + 1,
+        innerX + innerWidth,
+        innerTop + headerHeight + 1
+      ); // Separador bajo el header
+
+      let currentY = innerTop + headerHeight + 1;
+
+      // --- 2.4. DIBUJO DE LAS FILAS DE ACTIVIDADES ---
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(11);
+      doc.setTextColor(0, 0, 0);
+      doc.setDrawColor(235, 235, 235);
+
+      ug.activities.forEach((a, idx) => {
+        const rowHeight = rowHeights[idx];
+
+        // Posición central vertical de la fila
+        const centerBaselineY = currentY + rowHeight / 2 + 1.5;
+
+        // 1. FECHA (centrada verticalmente)
+        const fechaTxt = formatShort(a.fecha);
+        doc.text(fechaTxt, innerX + 5, centerBaselineY);
+
+        // 2. ACTIVIDAD (texto multilínea, pseudo-centrado vertical)
+        const actividadTxt = `${a.titulo} — ${
+          a.detalle || ''
+        }`.trim();
+        const wrapped = doc.splitTextToSize(
+          actividadTxt,
+          activityColWidth - 8
+        );
+
+        const textBlockHeight = wrapped.length * lineHeight;
+        const activityStartPaddingY = (rowHeight - textBlockHeight) / 2;
+
+        doc.text(
+          wrapped,
+          innerX + dateColWidth + 5,
+          currentY + activityStartPaddingY + lineHeight
+        );
+
+        // 3. ESTADO (solo texto centrado en la columna)
+        const estadoLabel = a.estado;
+        const pillTextSize = 11;
+        doc.setFontSize(pillTextSize);
+
+        const estadoX = innerX + dateColWidth + activityColWidth;
+        const textWidth = doc.getTextWidth(estadoLabel);
+        const pillTextX = estadoX + (statusColWidth - textWidth) / 2;
+
+        doc.setTextColor(0, 0, 0);
+        doc.setFont('helvetica', 'bold');
+        doc.text(estadoLabel, pillTextX, centerBaselineY);
+
+        // Volver a configuración por defecto
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(11);
+        doc.setTextColor(0, 0, 0);
+
+        // 4. LÍNEA DIVISORIA HORIZONTAL (entre filas, excepto la última)
+        if (idx < ug.activities.length - 1) {
+          const rowBottom = currentY + rowHeight;
+          doc.setDrawColor(235, 235, 235);
+          doc.line(
+            innerX + 1,
+            rowBottom,
+            innerX + innerWidth - 1,
+            rowBottom
+          );
+        }
+
+        currentY += rowHeight;
+      });
+
+      // --- 2.5. BLOQUE FIRMA FUNCIONARIO BAJO EL RECUADRO ---
+      const signatureY =
+        tableY + tableHeight + gapBetweenTableAndSignature;
+      const lineY = signatureY + 2;
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(11);
+      doc.setTextColor(0, 0, 0);
+
+      doc.text('Firma funcionario:', tableMarginX, signatureY);
+      doc.setDrawColor(0, 0, 0);
+      doc.line(tableMarginX + 35, lineY, tableMarginX + 100, lineY);
+
+      // Avanzar cursor vertical para el siguiente bloque
+      y = tableY + totalBlockHeight;
+    });
+
+    // === 3. FIRMA DIRECTOR AL FINAL DEL DOCUMENTO ===
+    const finalPageNumber = doc.getNumberOfPages();
+    doc.setPage(finalPageNumber);
+
+    const finalPageWidth = doc.internal.pageSize.getWidth();
+    const finalPageHeight = doc.internal.pageSize.getHeight();
+
+    const directorLineWidth = 80;
+    const directorLineY = finalPageHeight - 25;
+    const directorLineXStart =
+      (finalPageWidth - directorLineWidth) / 2;
+
+    // Línea de firma del Director
+    doc.setDrawColor(0, 0, 0);
+    doc.line(
+      directorLineXStart,
+      directorLineY,
+      directorLineXStart + directorLineWidth,
+      directorLineY
+    );
+
+    // Texto bajo la línea
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(11);
+    doc.setTextColor(0, 0, 0);
+
+    doc.text(
+      'Firma Director',
+      finalPageWidth / 2,
+      directorLineY + 6,
+      { align: 'center' }
+    );
+    doc.text(
+      'Departamento Mecánica',
+      finalPageWidth / 2,
+      directorLineY + 12,
+      { align: 'center' }
+    );
+
+    // === 4. GUARDAR EL ARCHIVO ===
+    const cleanKey = month.monthKey.replace('-', '');
+    doc.save(`reporte_actividades_${cleanKey}.pdf`);
+  }
 }
