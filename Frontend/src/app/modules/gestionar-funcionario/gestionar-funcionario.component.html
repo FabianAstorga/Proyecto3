@@ -245,7 +245,7 @@
               </thead>
               <tbody>
                 <tr
-                  *ngFor="let u of usuarios()"
+                  *ngFor="let u of usuariosGestionables()"
                   class="border-t border-slate-100 bg-white hover:bg-slate-50 transition dark:border-slate-800 dark:bg-slate-950/60 dark:hover:bg-slate-900/80"
                 >
                   <td class="px-4 py-3">{{ u.firstName }} {{ u.lastName }}</td>
@@ -270,7 +270,7 @@
                   </td>
                 </tr>
 
-                <tr *ngIf="usuarios().length === 0">
+                <tr *ngIf="usuariosGestionables().length === 0">
                   <td
                     colspan="4"
                     class="px-4 py-8 text-center text-slate-500 dark:text-slate-500"

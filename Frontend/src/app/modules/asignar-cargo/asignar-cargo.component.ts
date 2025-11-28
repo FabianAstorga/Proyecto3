@@ -2,6 +2,8 @@
 import { Component, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { forkJoin } from "rxjs";
+
 import { DataService } from "../../services/data.service";
 import { User } from "../../models/user.model";
 import { Cargo } from "../../models/charge.model";
@@ -27,16 +29,8 @@ export class AsignarCargoComponent implements OnInit {
   filtroRol: string | null = null;
   filtroCargo: number | null = null;
 
-  // Selección actual
-  selectedUser: User | null = null;
-  selectedUserAssignments: {
-    id: number;
-    cargoId: number;
-    ocupacion: string;
-    descripcion?: string;
-  }[] = [];
-
-  // Cargo seleccionado en el panel derecho para agregar / cambiar
+  // Selección múltiple
+  selectedUserIds = new Set<number>();
   selectedCargoId: number | null = null;
 
   // Estado UI
@@ -84,7 +78,8 @@ export class AsignarCargoComponent implements OnInit {
     this.dataService.getEmpleadoCargos().subscribe({
       next: (list) => {
         this.asignaciones = list;
-        this.actualizarCargosUsuarioSeleccionado();
+        // no hace falta recalcular nada más acá,
+        // la tabla usa getCargosResumen()
       },
       error: () => this.showAlert("Error cargando asignaciones", "danger"),
     });
@@ -124,58 +119,88 @@ export class AsignarCargoComponent implements OnInit {
       .map((a) => a.cargo?.ocupacion)
       .filter((x): x is string => !!x);
 
-    if (!cargosUsuario.length) return "Sin cargo asignado";
+    if (!cargosUsuario.length) return "N/A";
     return cargosUsuario.join(", ");
   }
 
-  // ------------------ Selección de usuario ------------------
-  onSelectUser(usuario: User) {
-    this.selectedUser = usuario;
-    this.actualizarCargosUsuarioSeleccionado();
+  // ------------------ Selección múltiple ------------------
+  isUserSelected(id: number): boolean {
+    return this.selectedUserIds.has(id);
   }
 
-  private actualizarCargosUsuarioSeleccionado() {
-    if (!this.selectedUser) {
-      this.selectedUserAssignments = [];
-      return;
+  onUserCheckboxChange(id: number, checked: boolean) {
+    if (checked) {
+      this.selectedUserIds.add(id);
+    } else {
+      this.selectedUserIds.delete(id);
     }
-
-    this.selectedUserAssignments = this.asignaciones
-      .filter((a) => a.usuario?.id === this.selectedUser!.id)
-      .map((a) => ({
-        id: a.id!,
-        cargoId: a.cargo!.id_cargo,
-        ocupacion: a.cargo!.ocupacion,
-        descripcion: a.cargo!.descripcion,
-      }));
-  }
-  cerrarModalUsuario() {
-  this.selectedUser = null;
-  this.selectedUserAssignments = [];
-  this.selectedCargoId = null;
   }
 
-  // ------------------ Gestión de cargos del usuario ------------------
-  agregarCargoAUsuario() {
-    if (!this.selectedUser) {
-      this.showAlert("Primero selecciona un usuario.", "warning");
-      return;
+  get allVisibleSelected(): boolean {
+    return (
+      this.usuariosFiltrados.length > 0 &&
+      this.usuariosFiltrados.every((u) =>
+        u.id ? this.selectedUserIds.has(u.id) : false
+      )
+    );
+  }
+
+  toggleSelectAllVisible() {
+    if (this.allVisibleSelected) {
+      // desmarcar todos los visibles
+      this.usuariosFiltrados.forEach((u) => {
+        if (u.id) this.selectedUserIds.delete(u.id);
+      });
+    } else {
+      // marcar todos los visibles
+      this.usuariosFiltrados.forEach((u) => {
+        if (u.id) this.selectedUserIds.add(u.id);
+      });
     }
+  }
 
+  // ------------------ Asignación múltiple ------------------
+  asignarCargoMultiple() {
     if (!this.selectedCargoId) {
       this.showAlert("Selecciona un cargo para asignar.", "warning");
       return;
     }
 
-    const yaTiene = this.asignaciones.some(
-      (a) =>
-        a.usuario?.id === this.selectedUser!.id &&
-        a.cargo?.id_cargo === this.selectedCargoId
+    const usuariosSeleccionados = this.usuarios.filter(
+      (u) => u.id && this.selectedUserIds.has(u.id)
     );
 
-    if (yaTiene) {
+    if (!usuariosSeleccionados.length) {
+      this.showAlert("Selecciona al menos un usuario.", "warning");
+      return;
+    }
+
+    const peticiones = [];
+    const omitidosPorDuplicado: string[] = [];
+
+    for (const u of usuariosSeleccionados) {
+      const yaTiene = this.asignaciones.some(
+        (a) =>
+          a.usuario?.id === u.id &&
+          a.cargo?.id_cargo === this.selectedCargoId
+      );
+
+      if (yaTiene) {
+        omitidosPorDuplicado.push(`${u.firstName} ${u.lastName}`);
+        continue;
+      }
+
+      peticiones.push(
+        this.dataService.createEmpleadoCargo({
+          usuarioId: u.id!,
+          cargoId: this.selectedCargoId!,
+        })
+      );
+    }
+
+    if (!peticiones.length) {
       this.showAlert(
-        "Este usuario ya tiene asignado ese cargo.",
+        "Todos los usuarios seleccionados ya tienen asignado ese cargo.",
         "warning"
       );
       return;
@@ -183,54 +208,33 @@ export class AsignarCargoComponent implements OnInit {
 
     this.cargando = true;
 
-    this.dataService
-      .createEmpleadoCargo({
-        usuarioId: this.selectedUser.id!,
-        cargoId: this.selectedCargoId,
-      })
-      .subscribe({
-        next: () => {
-          this.cargando = false;
-          this.showAlert("Cargo asignado correctamente.", "success");
-          this.cargarAsignaciones();
-        },
-        error: (err) => {
-          this.cargando = false;
-          console.error("Error asignando cargo:", err);
-          this.showAlert("Ocurrió un error al asignar el cargo.", "danger");
-        },
-      });
+    forkJoin(peticiones).subscribe({
+      next: () => {
+        this.cargando = false;
+        this.showAlert("Cargo asignado correctamente a los usuarios.", "success");
+        this.cargarAsignaciones();
+        // opcional: limpiar selección
+        this.selectedUserIds.clear();
+
+        if (omitidosPorDuplicado.length) {
+          console.log(
+            "Usuarios omitidos por tener ya el cargo:",
+            omitidosPorDuplicado
+          );
+        }
+      },
+      error: (err) => {
+        this.cargando = false;
+        console.error("Error en asignación múltiple:", err);
+        this.showAlert(
+          "Ocurrió un error al asignar el cargo a los usuarios.",
+          "danger"
+        );
+      },
+    });
   }
 
-  cambiarCargoAsignacion(asignacionId: number) {
-    if (!this.selectedCargoId) {
-      this.showAlert(
-        "Selecciona un cargo en el selector para cambiar esta asignación.",
-        "warning"
-      );
-      return;
-    }
-
-    this.cargando = true;
-
-    this.dataService
-      .updateEmpleadoCargo(asignacionId, {
-        cargoId: this.selectedCargoId,
-      })
-      .subscribe({
-        next: () => {
-          this.cargando = false;
-          this.showAlert("Cargo actualizado correctamente.", "success");
-          this.cargarAsignaciones();
-        },
-        error: (err) => {
-          this.cargando = false;
-          console.error("Error actualizando cargo:", err);
-          this.showAlert("Ocurrió un error al actualizar el cargo.", "danger");
-        },
-      });
-  }
-
+  // ------------------ (opcional) eliminación individual ------------------
   eliminarAsignacion(asignacionId: number) {
     if (!confirm("¿Seguro que quieres quitar este cargo del usuario?")) {
       return;
@@ -245,7 +249,6 @@ export class AsignarCargoComponent implements OnInit {
         this.asignaciones = this.asignaciones.filter(
           (a) => a.id !== asignacionId
         );
-        this.actualizarCargosUsuarioSeleccionado();
         this.aplicarFiltros();
       },
       error: (err) => {
