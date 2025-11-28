@@ -4,7 +4,14 @@ import { Router, RouterLink, RouterLinkActive } from "@angular/router";
 import { User } from "../../models/user.model";
 import { AuthService } from "../../services/auth.service";
 
-export type NavIcon = "home" | "plus" | "chart" | "calendar" | "users" | "docs";
+export type NavIcon =
+  | "home"
+  | "plus"
+  | "chart"
+  | "calendar"
+  | "users"
+  | "docs"
+  | "clock";
 
 export type NavItem = {
   label: string;
@@ -78,6 +85,11 @@ export class LayoutComponent implements OnInit {
             label: "Ingresar registro",
             link: `/funcionario/${id}/actividades/nueva`,
             icon: "plus",
+          },
+          {
+            label: "Pendientes",
+            link: `/funcionario/${id}/actividades/pendientes`,
+            icon: "clock",
           },
           {
             label: "Mi historial",

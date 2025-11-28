@@ -49,6 +49,13 @@ export const routes: Routes = [
           ).then((m) => m.MyActivitiesHistoryComponent),
       },
       {
+        path: "actividades/pendientes",
+        loadComponent: () =>
+          import(
+            "./modules/my-activities-pending/my-activities-pending.component"
+          ).then((m) => m.MyActivitiesPendingComponent),
+      },
+      {
         path: "",
         pathMatch: "full",
         redirectTo: "perfil",

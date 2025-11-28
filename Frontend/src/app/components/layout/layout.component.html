@@ -108,6 +108,12 @@
                 <path d="M9 11.5h5" />
                 <path d="M9 15h3" />
               </g>
+
+              <!-- clock (pendientes) -->
+              <g *ngSwitchCase="'clock'">
+                <circle cx="12" cy="12" r="7" />
+                <path d="M12 8v4l2.5 2" />
+              </g>
             </ng-container>
           </svg>
         </div>
@@ -256,6 +262,11 @@
                 <path d="M9 8h5" />
                 <path d="M9 11.5h5" />
                 <path d="M9 15h3" />
+              </g>
+
+              <g *ngSwitchCase="'clock'">
+                <circle cx="12" cy="12" r="7" />
+                <path d="M12 8v4l2.5 2" />
               </g>
             </ng-container>
           </svg>
