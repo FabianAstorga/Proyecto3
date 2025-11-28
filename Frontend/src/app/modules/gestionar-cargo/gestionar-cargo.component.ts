@@ -31,7 +31,7 @@ export class GestionarCargoComponent implements OnInit {
   constructor(private fb: FormBuilder, private cargoService: DataService) {
     this.form = this.fb.group({
       ocupacion: ["", [Validators.required, Validators.maxLength(100)]],
-      descripcion: ["", [Validators.maxLength(255)]],
+      descripcion: ["", [Validators.required]],
     });
   }
 
@@ -69,7 +69,21 @@ export class GestionarCargoComponent implements OnInit {
   crear() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      this.showAlert("Complete correctamente los campos", "danger");
+
+      if (this.f["ocupacion"].errors?.["required"]) {
+        this.showAlert("La ocupación es obligatoria.", "danger");
+        return;
+      }
+
+      if (this.f["ocupacion"].errors?.["maxlength"]) {
+        this.showAlert(
+          "La ocupación no puede superar los 100 caracteres.",
+          "danger"
+        );
+        return;
+      }
+
+      this.showAlert("Complete correctamente los campos.", "danger");
       return;
     }
 
@@ -79,7 +93,13 @@ export class GestionarCargoComponent implements OnInit {
         this.resetForm();
         this.showAlert("Cargo creado correctamente", "success");
       },
-      error: () => this.showAlert("Error creando cargo", "danger"),
+      error: (err) => {
+        const msg =
+          err.error?.message ||
+          err.error ||
+          "Error desconocido al crear el cargo.";
+        this.showAlert(msg, "danger");
+      },
     });
   }
 
