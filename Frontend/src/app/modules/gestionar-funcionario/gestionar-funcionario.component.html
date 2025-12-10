@@ -30,10 +30,10 @@
         class="px-6 py-4 md:px-10 md:py-5 border-b border-slate-200 flex flex-col gap-3 md:flex-row md:items-center md:justify-between bg-white dark:border-slate-800 dark:bg-gradient-to-r dark:from-slate-950 dark:via-slate-900 dark:to-slate-950"
       >
         <div>
-          <h1 class="text-2xl md:text-3xl font-semibold leading-tight">
+          <h1 class="text-3xl md:text-3xl font-semibold leading-tight">
             Gestionar funcionarios
           </h1>
-          <p class="mt-1 text-xs md:text-sm text-slate-500 dark:text-slate-400">
+          <p class="mt-1 text-2xl md:text-2xl text-slate-500 dark:text-slate-400">
             Crea, actualiza y revisa los funcionarios del sistema.
           </p>
         </div>
@@ -44,7 +44,7 @@
           <button
             type="submit"
             form="form-funcionario"
-            class="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-yellow-400 text-[#0D1440] text-xs md:text-sm font-semibold shadow-md shadow-yellow-400/30 hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-900"
+            class="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-yellow-400 text-[#0D1440] text-xl md:text-2xl font-semibold shadow-md shadow-yellow-400/30 hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-900"
           >
             {{
               modo === "crear" ? "Crear funcionario" : "Actualizar funcionario"
@@ -55,7 +55,7 @@
           <button
             type="button"
             (click)="resetForm()"
-            class="inline-flex items-center justify-center px-4 py-2 rounded-xl border border-slate-300 bg-white text-xs md:text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-300 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800 dark:hover:border-slate-400 dark:focus:ring-slate-500"
+            class="inline-flex items-center justify-center px-4 py-2 rounded-xl border border-slate-300 bg-white text-xl md:text-2xl font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-300 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800 dark:hover:border-slate-400 dark:focus:ring-slate-500"
           >
             Limpiar
           </button>
@@ -82,17 +82,17 @@
             <!-- Nombre -->
             <div>
               <label
-                class="block text-xs font-medium text-slate-700 dark:text-slate-300"
+                class="block text-xl font-medium text-slate-700 dark:text-slate-300"
                 >Nombre</label
               >
               <input
                 formControlName="firstName"
                 placeholder="Ingrese el nombre"
-                class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder-slate-500"
+                class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder-slate-500"
               />
               <p
                 *ngIf="f['firstName'].touched && f['firstName'].invalid"
-                class="text-xs text-red-500 dark:text-red-400 mt-1"
+                class="text-xl text-red-500 dark:text-red-400 mt-1"
               >
                 Obligatorio.
               </p>
@@ -101,17 +101,17 @@
             <!-- Apellidos -->
             <div>
               <label
-                class="block text-xs font-medium text-slate-700 dark:text-slate-300"
+                class="block text-xl font-medium text-slate-700 dark:text-slate-300"
                 >Apellidos</label
               >
               <input
                 formControlName="lastName"
                 placeholder="Ingrese los apellidos"
-                class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder-slate-500"
+                class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder-slate-500"
               />
               <p
                 *ngIf="f['lastName'].touched && f['lastName'].invalid"
-                class="text-xs text-red-500 dark:text-red-400 mt-1"
+                class="text-xl text-red-500 dark:text-red-400 mt-1"
               >
                 Obligatorio.
               </p>
@@ -120,18 +120,18 @@
             <!-- Correo -->
             <div>
               <label
-                class="block text-xs font-medium text-slate-700 dark:text-slate-300"
+                class="block text-xl font-medium text-slate-700 dark:text-slate-300"
                 >Correo</label
               >
               <input
                 type="email"
                 formControlName="email"
                 placeholder="ejemplo@uta.cl"
-                class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder-slate-500"
+                class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder-slate-500"
               />
               <p
                 *ngIf="f['email'].touched && f['email'].invalid"
-                class="text-xs text-red-500 dark:text-red-400 mt-1"
+                class="text-xl text-red-500 dark:text-red-400 mt-1"
               >
                 Correo inválido.
               </p>
@@ -140,25 +140,25 @@
             <!-- Teléfono -->
             <div>
               <label
-                class="block text-xs font-medium text-slate-700 dark:text-slate-300"
+                class="block text-xl font-medium text-slate-700 dark:text-slate-300"
                 >Teléfono</label
               >
               <input
                 formControlName="phone"
                 placeholder="Ej: +56 9 1234 5678"
-                class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder-slate-500"
+                class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder-slate-500"
               />
             </div>
 
             <!-- Rol -->
             <div>
-              <label
-                class="block text-xs font-medium text-slate-700 dark:text-slate-300"
+              <label 
+                class="block text-xl font-medium text-slate-700 dark:text-slate-300"
                 >Rol</label
               >
               <select
                 formControlName="role"
-                class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100"
+                class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100"
               >
                 <option *ngFor="let r of roles" [value]="r">{{ r }}</option>
               </select>
@@ -167,14 +167,14 @@
             <!-- Contraseña (opcional al crear) -->
             <div>
               <label
-                class="block text-xs font-medium text-slate-700 dark:text-slate-300"
+                class="block text-xl font-medium text-slate-700 dark:text-slate-300"
                 >Contraseña</label
               >
               <input
                 type="password"
                 formControlName="password"
                 placeholder="Ingrese contraseña (opcional)"
-                class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder-slate-500"
+                class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder-slate-500"
               />
             </div>
 
@@ -183,7 +183,7 @@
               class="col-span-1 md:col-span-2 flex flex-col items-center justify-center gap-2"
             >
               <label
-                class="block text-xs font-medium text-slate-700 dark:text-slate-300"
+                class="block text-xl font-medium text-slate-700 dark:text-slate-300"
               >
                 Foto de Perfil
               </label>
@@ -199,7 +199,7 @@
                   class="w-full h-full object-cover"
                 />
                 <ng-template #placeholder>
-                  <span class="text-slate-400 dark:text-slate-600 text-sm"
+                  <span class="text-slate-400 dark:text-slate-600 text-xl"
                     >Sin foto</span
                   >
                 </ng-template>
@@ -231,16 +231,16 @@
           <div
             class="overflow-x-auto rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950/60"
           >
-            <table class="min-w-full text-xs md:text-sm">
+            <table class="min-w-full text-xs md:text-xl">
               <thead>
                 <tr
                   class="border-b border-slate-200 bg-slate-50 text-slate-600 dark:border-slate-800 dark:bg-slate-900/80 dark:text-slate-300"
                 >
-                  <th class="px-4 py-3 text-left font-semibold">Nombre</th>
-                  <th class="px-4 py-3 text-left font-semibold">Correo</th>
-                  <th class="px-4 py-3 text-left font-semibold">Rol</th>
+                  <th class="px-4 py-3 text-left text-2xl font-semibold">Nombre</th>
+                  <th class="px-4 py-3 text-left text-2xl font-semibold">Correo</th>
+                  <th class="px-4 py-3 text-left text-2xl font-semibold">Rol</th>
                   <!-- NUEVA COLUMNA -->
-                  <th class="px-4 py-3 text-center font-semibold">Acciones</th>
+                  <th class="px-4 py-3 text-center text-2xl font-semibold">Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -248,20 +248,20 @@
                   *ngFor="let u of usuariosGestionables()"
                   class="border-t border-slate-100 bg-white hover:bg-slate-50 transition dark:border-slate-800 dark:bg-slate-950/60 dark:hover:bg-slate-900/80"
                 >
-                  <td class="px-4 py-3">{{ u.firstName }} {{ u.lastName }}</td>
-                  <td class="px-4 py-3">{{ u.email }}</td>
-                  <td class="px-4 py-3">{{ u.role }}</td>
+                  <td class="px-4 py-3 text-xl">{{ u.firstName }} {{ u.lastName }}</td>
+                  <td class="px-4 py-3 text-xl">{{ u.email }}</td>
+                  <td class="px-4 py-3 text-xl">{{ u.role }}</td>
                   <!-- NUEVA COLUMNA -->
                   <td class="px-4 py-3 text-center">
                     <div class="flex gap-2 justify-center">
                       <button
-                        class="btn-secondary px-3 py-1.5 text-[11px] md:text-xs rounded-xl border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
+                        class="btn-secondary px-3 py-1.5 text-[11px] md:text-xl rounded-xl border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
                         (click)="editar(u)"
                       >
                         Editar
                       </button>
                       <button
-                        class="px-3 py-1.5 rounded-xl border text-[11px] md:text-xs border-red-200 bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-50/10 dark:text-red-300 dark:border-red-500/40 dark:hover:bg-red-500/10"
+                        class="px-3 py-1.5 rounded-xl border text-[11px] md:text-xl border-red-200 bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-50/10 dark:text-red-300 dark:border-red-500/40 dark:hover:bg-red-500/10"
                         (click)="eliminar(u.id)"
                       >
                         Eliminar

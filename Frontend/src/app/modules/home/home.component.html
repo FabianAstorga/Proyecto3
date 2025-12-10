@@ -8,7 +8,7 @@
 
 <!-- HERO PRINCIPAL -->
 <section
-  class="relative text-white overflow-hidden transition-all duration-700"
+class="relative text-white transition-all duration-700"
   [ngStyle]="{
     'min-height': '100vh',
     'background-image': 'url(' + currentBg + ')',
@@ -23,19 +23,20 @@
   ></div>
 
   <div
-    class="relative z-10 max-w-6xl mx-auto px-8 md:px-10 py-16 md:py-24 flex flex-col gap-10"
-  >
+  class="relative z-10 max-w-6xl mx-auto px-8 md:px-16 flex flex-col gap-10 justify-center min-h-[85vh]"
+>
+
     <div class="max-w-3xl space-y-4">
-      <p class="text-xs uppercase tracking-[0.2em] text-yellow-300/80">
+      <p class="text-xl uppercase tracking-[0.2em] text-yellow-300/80">
         Universidad de Tarapacá · Módulo académico
       </p>
       <h2
-        class="text-4xl md:text-5xl font-bold leading-tight tracking-tight drop-shadow-xl"
+        class="text-5xl md:text-5xl font-bold leading-tight tracking-tight drop-shadow-xl"
       >
         Registra, monitorea y organiza las actividades académicas en un solo
         lugar.
       </h2>
-      <p class="text-sm md:text-base text-slate-100/90 max-w-xl">
+      <p class="text-2xl md:text-2xl text-slate-100/90 max-w-xl">
         Accede con tu cuenta institucional para registrar clases, reuniones,
         actividades de investigación y mantener tu historial académico siempre
         actualizado.
@@ -46,13 +47,13 @@
       <button
         type="button"
         (click)="toggleLogin()"
-        class="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-yellow-400 text-[#0D1440] text-sm font-semibold shadow-lg shadow-yellow-400/40 hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-300"
+        class="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-yellow-400 text-[#0D1440] text-xl font-semibold shadow-lg shadow-yellow-400/40 hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-300"
       >
         Iniciar sesión
       </button>
 
       <span
-        class="text-xs md:text-sm text-slate-100/80 self-center mt-2 md:mt-0"
+        class="text-xl md:text-xl text-slate-100/80 self-center mt-2 md:mt-0"
       >
         Acceso exclusivo para funcionarios y personal autorizado.
       </span>

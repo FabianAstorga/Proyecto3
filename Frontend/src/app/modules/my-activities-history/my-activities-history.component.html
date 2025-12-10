@@ -74,7 +74,7 @@
                 — {{ month.monthLabel }}
               </span>
             </h1>
-            <p class="mt-1 text-xs md:text-sm text-slate-500 dark:text-slate-400">
+            <p class="mt-1 text-2xl md:text-2xl text-slate-500 dark:text-slate-400">
               Revisa tus actividades registradas, mes a mes.
             </p>
           </div>
@@ -83,7 +83,7 @@
             *ngIf="currentMonthGroup"
             type="button"
             (click)="downloadMonthPdf(currentMonthGroup!)"
-            class="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-2 text-xs md:text-sm font-semibold text-white shadow-md shadow-indigo-500/30 transition hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-900"
+            class="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-2 text-xl md:text-xl font-semibold text-white shadow-md shadow-indigo-500/30 transition hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-900"
           >
             Descargar PDF
           </button>
@@ -94,7 +94,7 @@
           <!-- Sin actividades / sin mes -->
           <div
             *ngIf="!currentMonthGroup"
-            class="py-10 text-center text-sm text-slate-500"
+            class="py-10 text-center text-xl text-slate-500"
           >
             No tienes actividades registradas que coincidan con los filtros.
           </div>
@@ -107,19 +107,19 @@
               <div
                 *ngFor="let a of month.activities"
                 class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between
-                       rounded-2xl border border-slate-100 bg-white px-4 py-3 text-sm md:text-base text-slate-900 hover:bg-slate-50 transition
+                       rounded-2xl border border-slate-100 bg-white px-4 py-3 text-xl md:text-xl text-slate-900 hover:bg-slate-50 transition
                        dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:bg-slate-900"
               >
                 <!-- Izquierda: fecha + título + detalle -->
                 <div class="flex-1 min-w-0">
-                  <p class="font-semibold text-slate-900 dark:text-slate-50">
+                  <p class="font-semibold text-xl text-slate-900 dark:text-slate-50">
                     {{ formatDMY(a.fecha) }}
-                    <span class="font-normal text-slate-600 dark:text-slate-300">
-                      · {{ a.titulo }} · {{ a.horas }} h
+                    <span class="font-normal text-xl text-slate-600 dark:text-slate-300">
+                      · {{ a.titulo }}
                     </span>
                   </p>
                   <p
-                    class="mt-0.5 text-xs md:text-sm text-slate-500 dark:text-slate-400 truncate"
+                    class="mt-0.5 text-xl md:text-xl text-slate-500 dark:text-slate-400 truncate"
                     *ngIf="a.detalle"
                   >
                     {{ a.detalle }}
@@ -128,7 +128,7 @@
 
                 <!-- Derecha: estado -->
                 <span
-                  class="mt-1 inline-flex items-center justify-center rounded-full px-3 py-1.5 text-xs md:text-sm font-medium self-start md:self-auto"
+                  class="mt-1 inline-flex items-center justify-center rounded-full px-3 py-1.5 text-xl md:text-xl font-medium self-start md:self-auto"
                   [ngClass]="statusPillClass(a.estado)"
                 >
                   {{ a.estado }}

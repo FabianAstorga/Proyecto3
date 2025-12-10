@@ -32,7 +32,7 @@
           <h1 class="text-2xl md:text-3xl font-semibold leading-tight">
             Asignar cargos
           </h1>
-          <p class="mt-1 text-xs md:text-sm text-slate-500 dark:text-slate-400">
+          <p class="mt-1 text-2xl md:text-2xl text-slate-500 dark:text-slate-400">
             Marca uno o más usuarios, selecciona un cargo y pulsa
             <strong>Asignar</strong>.
           </p>
@@ -42,7 +42,7 @@
           <!-- Selector de cargo a asignar -->
           <select
             [(ngModel)]="selectedCargoId"
-            class="min-w-[180px] rounded-xl border px-3 py-2 text-sm border-slate-300 bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+            class="min-w-[180px] rounded-xl border px-3 py-2 text-2xl border-slate-300 bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
           >
             <option [ngValue]="null">Seleccionar cargo a asignar</option>
             <option *ngFor="let c of cargos" [ngValue]="c.id_cargo">
@@ -55,16 +55,16 @@
             type="button"
             (click)="asignarCargoMultiple()"
             [disabled]="cargando"
-            class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-yellow-400 text-[#0D1440] text-xs md:text-sm font-semibold shadow-md hover:bg-yellow-300 disabled:opacity-60"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-yellow-400 text-[#0D1440] text-2xl md:text-sm font-semibold shadow-md hover:bg-yellow-300 disabled:opacity-60"
           >
-            <span *ngIf="!cargando">Asignar</span>
+            <span class="text-2xl" *ngIf="!cargando">Asignar</span>
             <span *ngIf="cargando" class="animate-pulse">Procesando…</span>
           </button>
 
           <button
             (click)="cargarAsignaciones()"
             type="button"
-            class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:bg-slate-800"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-2xl border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:bg-slate-800"
           >
             Refrescar asignaciones
           </button>
@@ -76,19 +76,19 @@
         <!-- Filtros -->
         <div class="flex flex-wrap items-center gap-3 mb-4">
           <!-- Filtro por nombre -->
-          <input
+          <input 
             type="text"
             placeholder="Buscar por nombre"
             [(ngModel)]="filtroNombre"
             (input)="aplicarFiltros()"
-            class="flex-1 min-w-[120px] rounded-xl border border-slate-300 px-3 py-2 text-sm bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+            class="flex-1 min-w-[120px] rounded-xl border border-slate-300 px-3 py-2 text-2xl bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
           />
 
           <!-- Filtro por rol -->
           <select
             [(ngModel)]="filtroRol"
             (change)="aplicarFiltros()"
-            class="min-w-[130px] rounded-xl border border-slate-300 px-3 py-2 text-sm bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+            class="min-w-[130px] rounded-xl border border-slate-300 px-3 py-2 text-2xl bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
           >
             <option [ngValue]="null">Todos los roles</option>
             <option value="Funcionario">Funcionario</option>
@@ -100,7 +100,7 @@
           <select
             [(ngModel)]="filtroCargo"
             (change)="aplicarFiltros()"
-            class="min-w-[160px] rounded-xl border border-slate-300 px-3 py-2 text-sm bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+            class="min-w-[160px] rounded-xl border border-slate-300 px-3 py-2 text-2xl bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
           >
             <option [ngValue]="null">Todos los cargos</option>
             <option *ngFor="let c of cargos" [ngValue]="c.id_cargo">
@@ -111,7 +111,7 @@
           <button
             type="button"
             (click)="limpiarFiltros()"
-            class="px-3 py-2 rounded-xl text-xs font-semibold border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
+            class="px-3 py-2 rounded-xl text-2xl font-semibold border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
           >
             Limpiar
           </button>
@@ -131,11 +131,11 @@
                 class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
               />
             </th>
-            <th class="px-4 py-3 text-left w-3/12">Nombre</th>
-            <th class="px-4 py-3 text-left w-3/12">Correo</th>
-            <th class="px-4 py-3 text-left w-2/12">Rol</th>
-            <th class="px-4 py-3 text-left w-3/12">Cargos</th>
-            <th class="px-4 py-3 text-left w-1/12">Acciones</th>
+            <th class="px-4 py-3 text-2xl text-left w-3/12">Nombre</th>
+            <th class="px-4 py-3 text-2xl text-left w-4/12">Correo</th>
+            <th class="px-4 py-3 text-2xl text-left w-2/12">Rol</th>
+            <th class="px-4 py-3 text-2xl text-left w-2/12">Cargos</th>
+            <th class="px-4 py-3 text-2xl text-left w-1/12">Acciones</th>
           </tr>
         </thead>
 
@@ -157,15 +157,15 @@
             </td>
 
             <!-- Nombre -->
-            <td class="px-4 py-3">{{ u.firstName }} {{ u.lastName }}</td>
+            <td class="px-4 py-3 text-2xl">{{ u.firstName }} {{ u.lastName }}</td>
 
             <!-- Email -->
-            <td class="px-4 py-3 truncate" [title]="u.email">{{ u.email }}</td>
+            <td class="px-4 py-3 text-2xl truncate" [title]="u.email">{{ u.email }}</td>
 
             <!-- Rol -->
-            <td class="px-4 py-3">
+            <td class="px-4 py-3 ">
               <span
-                class="px-2 py-1 rounded-md bg-slate-100 text-slate-800 text-xs dark:bg-slate-800 dark:text-slate-200"
+                class="px-2 py-1 rounded-md bg-slate-100 text-slate-800 text-xl dark:bg-slate-800 dark:text-slate-200"
               >
                 {{ u.role }}
               </span>
@@ -178,7 +178,7 @@
                 class="mb-1"
               >
                 <span
-                  class="px-2 py-1 rounded-md bg-slate-200 dark:bg-slate-800 text-xs"
+                  class="px-2 py-1 rounded-md bg-slate-200 dark:bg-slate-800 text-xl"
                 >
                   {{ a.cargo.ocupacion }}
                 </span>
@@ -186,7 +186,7 @@
 
               <span
                 *ngIf="getAsignacionesPorUsuario(u.id!).length === 0"
-                class="px-2 py-1 rounded-full text-[11px] bg-orange-100 text-orange-800 dark:bg-orange-500/20 dark:text-orange-200"
+                class="px-2 py-1 rounded-full text-xl bg-orange-100 text-orange-800 dark:bg-orange-500/20 dark:text-orange-200"
               >
                 N/A
               </span>
@@ -199,7 +199,7 @@
                 class="flex items-center mb-1"
               >
                 <button
-                  class="text-red-500 hover:text-red-700 text-xs"
+                  class="text-red-500 hover:text-red-700 text-xl"
                   (click)="eliminarAsignacion(a.id!)"
                 >
                   Quitar
@@ -208,9 +208,9 @@
 
               <span
                 *ngIf="getAsignacionesPorUsuario(u.id!).length === 0"
-                class="text-slate-400 text-xs"
+                class="text-slate-400 text-xl"
               >
-                —
+                No aplica
               </span>
             </td>
           </tr>

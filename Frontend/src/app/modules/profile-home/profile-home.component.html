@@ -22,16 +22,16 @@
           </div>
 
           <div>
-            <p class="text-3xl font-semibold">
+            <p class="text-4xl font-semibold">
               {{ user?.firstName }} {{ user?.lastName }}
             </p>
             <p
-              class="text-xl text-slate-500 dark:text-slate-300 leading-none m-0"
+              class="text-2xl text-slate-500 dark:text-slate-300 leading-none m-0"
             >
               {{ user?.role }}
             </p>
             <p
-              class="text-sm text-slate-500 dark:text-slate-300 leading-none m-0"
+              class="text-2xl text-slate-500 dark:text-slate-300 leading-none m-0"
             >
               {{ user?.email }}
             </p>
@@ -40,12 +40,12 @@
 
         <div class="flex items-center gap-4">
           <div
-            class="hidden text-sm text-slate-600 dark:text-slate-300 md:block"
+            class="hidden text-2xl text-slate-600 dark:text-slate-300 md:block"
           >
             <p class="font-medium text-slate-900 dark:text-slate-200">
               Última sesión
             </p>
-            <p class="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+            <p class="mt-0.5 text-2xl text-slate-500 dark:text-slate-400">
               {{ lastSession }}
             </p>
           </div>
@@ -53,7 +53,7 @@
           <button
             type="button"
             (click)="openDetails()"
-            class="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-500/30 transition hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-900"
+            class="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-2.5 text-2xl font-semibold text-white shadow-md shadow-indigo-500/30 transition hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-900"
           >
             Ver detalles del cargo
           </button>
@@ -62,7 +62,7 @@
 
       <!-- ================= KPIs POR ROL ================= -->
       <section
-        class="border-b border-slate-200 bg-slate-50 px-6 py-6 lg:px-10 dark:border-slate-800 dark:bg-gradient-to-r dark:from-slate-950 dark:via-slate-900 dark:to-slate-950"
+        class="border-b text-center border-slate-200 bg-slate-50 px-6 py-6 lg:px-10 dark:border-slate-800 dark:bg-gradient-to-r dark:from-slate-950 dark:via-slate-900 dark:to-slate-950"
       >
         <ng-container [ngSwitch]="mode">
           <!-- FUNCIONARIO -->
@@ -72,13 +72,13 @@
               class="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm dark:border-slate-800 dark:bg-slate-950/70"
             >
               <div
-                class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400"
+                class="flex items-center justify-between text-2xl text-slate-500 dark:text-slate-400"
               >
                 <span>Total actividades</span>
                 <span class="inline-flex h-2 w-2 rounded-full bg-sky-400"></span>
               </div>
               <p
-                class="text-3xl font-semibold mt-3 text-slate-900 dark:text-white"
+                class="text-3xl text-center font-semibold mt-3 text-slate-900 dark:text-white"
               >
                 {{ activitiesCount }}
               </p>
@@ -89,7 +89,7 @@
               class="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm dark:border-slate-800 dark:bg-slate-950/70"
             >
               <div
-                class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400"
+                class="flex items-center justify-between text-2xl text-slate-500 dark:text-slate-400"
               >
                 <span>Actividades del mes</span>
                 <span
@@ -108,7 +108,7 @@
               class="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm dark:border-slate-800 dark:bg-slate-950/70"
             >
               <div
-                class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400"
+                class="flex text-center items-center justify-between text-2xl text-slate-500 dark:text-slate-400"
               >
                 <span>Actividades pendientes</span>
                 <span
@@ -127,7 +127,7 @@
               class="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm dark:border-slate-800 dark:bg-slate-950/70"
             >
               <div
-                class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400"
+                class="flex items-center justify-between text-2xl text-slate-500 dark:text-slate-400"
               >
                 <span>Actividades aprobadas</span>
                 <span
@@ -146,10 +146,10 @@
           <div *ngSwitchCase="'Secretaria'" class="grid gap-4 md:grid-cols-4">
             <!-- Total actividades -->
             <div
-              class="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm dark:border-slate-800 dark:bg-slate-950/70"
+              class="rounded-2xl text-center  border border-slate-200 bg-white px-5 py-4 shadow-sm dark:border-slate-800 dark:bg-slate-950/70"
             >
               <div
-                class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400"
+                class="flex items-center justify-between text-2xl text-slate-500 dark:text-slate-400"
               >
                 <span>Total actividades</span>
                 <span class="inline-flex h-2 w-2 rounded-full bg-sky-400"></span>
@@ -166,7 +166,7 @@
               class="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm dark:border-slate-800 dark:bg-slate-950/70"
             >
               <div
-                class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400"
+                class="flex items-center justify-between text-2xl text-slate-500 dark:text-slate-400"
               >
                 <span>Pendientes por revisar</span>
                 <span
@@ -185,7 +185,7 @@
               class="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm dark:border-slate-800 dark:bg-slate-950/70"
             >
               <div
-                class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400"
+                class="flex items-center justify-between text-2xl text-slate-500 dark:text-slate-400"
               >
                 <span>Actividades aprobadas</span>
                 <span
@@ -204,7 +204,7 @@
               class="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm dark:border-slate-800 dark:bg-slate-950/70"
             >
               <div
-                class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400"
+                class="flex items-center justify-between text-2xl text-slate-500 dark:text-slate-400"
               >
                 <span>Eventos próximos</span>
                 <span
@@ -226,7 +226,7 @@
               class="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm dark:border-slate-800 dark:bg-slate-950/70"
             >
               <div
-                class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400"
+                class="flex text-center items-center justify-between text-2xl text-slate-500 dark:text-slate-400"
               >
                 <span>Total actividades</span>
                 <span class="inline-flex h-2 w-2 rounded-full bg-sky-400"></span>
@@ -243,7 +243,7 @@
               class="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm dark:border-slate-800 dark:bg-slate-950/70"
             >
               <div
-                class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400"
+                class="flex items-center justify-between text-2xl text-slate-500 dark:text-slate-400"
               >
                 <span>Actividades del mes</span>
                 <span
@@ -262,7 +262,7 @@
               class="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm dark:border-slate-800 dark:bg-slate-950/70"
             >
               <div
-                class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400"
+                class="flex items-center justify-between text-2xl text-slate-500 dark:text-slate-400"
               >
                 <span>Actividades pendientes</span>
                 <span
@@ -281,7 +281,7 @@
               class="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm dark:border-slate-800 dark:bg-slate-950/70"
             >
               <div
-                class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400"
+                class="flex items-center justify-between text-2xl text-slate-500 dark:text-slate-400"
               >
                 <span>Actividades aprobadas</span>
                 <span
@@ -316,7 +316,7 @@
               <div class="mt-4 flex flex-col gap-3" *ngSwitchCase="'Funcionario'">
                 <a
                   [routerLink]="['/funcionario', user?.id, 'actividades', 'nueva']"
-                  class="inline-flex h-12 items-center justify-center rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-500"
+                  class="inline-flex h-12 items-center justify-center rounded-xl bg-indigo-600 text-white text-2xl font-semibold hover:bg-indigo-500"
                 >
                   Registrar nueva actividad
                 </a>
@@ -328,14 +328,13 @@
                     'actividades',
                     'historial'
                   ]"
-                  class="inline-flex h-12 items-center justify-center rounded-xl border border-slate-300 bg-white text-slate-700 text-sm font-semibold hover:border-slate-400 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-slate-500 dark:hover:bg-slate-800"
+                  class="inline-flex h-12 items-center justify-center rounded-xl border border-slate-300 bg-white text-slate-700  text-2xl font-semibold hover:border-slate-400 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-slate-500 dark:hover:bg-slate-800"
                 >
                   Ver historial completo
                 </a>
-
                 <a
                   routerLink="/reportes"
-                  class="inline-flex h-12 items-center justify-center rounded-xl border border-slate-300 bg-white text-slate-700 text-sm font-semibold hover:border-slate-400 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-slate-500 dark:hover:bg-slate-800"
+                  class="inline-flex h-12 items-center justify-center rounded-xl border border-slate-300 bg-white text-slate-700 text-2xl font-semibold hover:border-slate-400 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-slate-500 dark:hover:bg-slate-800"
                 >
                   Descargar reportes
                 </a>
@@ -350,21 +349,21 @@
                     'actividades',
                     'historial'
                   ]"
-                  class="inline-flex h-12 items-center justify-center rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-500"
+                  class="inline-flex h-12 items-center justify-center rounded-xl bg-indigo-600 text-white text-2xl font-semibold hover:bg-indigo-500"
                 >
                   Ver informe / historial
                 </a>
 
                 <a
                   [routerLink]="['/secretaria', user?.id, 'calendario']"
-                  class="inline-flex h-12 items-center justify-center rounded-xl border border-slate-300 bg-white text-slate-700 text-sm font-semibold hover:border-slate-400 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-slate-500 dark:hover:bg-slate-800"
+                  class="inline-flex h-12 items-center justify-center rounded-xl border border-slate-300 bg-white text-slate-700 text-2xl font-semibold hover:border-slate-400 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-slate-500 dark:hover:bg-slate-800"
                 >
                   Gestionar calendario
                 </a>
 
                 <a
                   [routerLink]="['/secretaria', user?.id, 'horario']"
-                  class="inline-flex h-12 items-center justify-center rounded-xl border border-slate-300 bg-white text-slate-700 text-sm font-semibold hover:border-slate-400 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-slate-500 dark:hover:bg-slate-800"
+                  class="inline-flex h-12 items-center justify-center rounded-xl border border-slate-300 bg-white text-slate-700 text-2xl font-semibold hover:border-slate-400 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-slate-500 dark:hover:bg-slate-800"
                 >
                   Ver horario
                 </a>
@@ -374,23 +373,23 @@
               <div class="mt-4 flex flex-col gap-3" *ngSwitchCase="'Administrador'">
                 <a
                   [routerLink]="['/admin', user?.id, 'funcionarios']"
-                  class="inline-flex h-12 items-center justify-center rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-500"
+                  class="inline-flex h-12 items-center justify-center rounded-xl bg-indigo-600 text-white text-2xl font-semibold hover:bg-indigo-500"
                 >
                   Gestionar funcionarios
                 </a>
 
                 <a
                   [routerLink]="['/admin', user?.id, 'cargos']"
-                  class="inline-flex h-12 items-center justify-center rounded-xl border border-slate-300 bg-white text-slate-700 text-sm font-semibold hover:border-slate-400 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-slate-500 dark:hover:bg-slate-800"
+                  class="inline-flex h-12 items-center justify-center rounded-xl border border-slate-300 bg-white text-slate-700 text-2xl font-semibold hover:border-slate-400 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-slate-500 dark:hover:bg-slate-800"
                 >
                   Gestionar cargos
                 </a>
 
                 <a
                   [routerLink]="['/admin', user?.id, 'calendario']"
-                  class="inline-flex h-12 items-center justify-center rounded-xl border border-slate-300 bg-white text-slate-700 text-sm font-semibold hover:border-slate-400 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-slate-500 dark:hover:bg-slate-800"
+                  class="inline-flex h-12 items-center justify-center rounded-xl border border-slate-300 bg-white text-slate-700 text-2xl font-semibold hover:border-slate-400 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-slate-500 dark:hover:bg-slate-800"
                 >
-                  Gestionar calendario institucional
+                  Gestionar calendario
                 </a>
               </div>
             </ng-container>
@@ -408,11 +407,11 @@
                 <div
                   class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-900/60"
                 >
-                  <p class="text-xs text-slate-500 dark:text-slate-400">
+                  <p class="text-2xl text-slate-500 dark:text-slate-400">
                     Actividades del mes
                   </p>
                   <p
-                    class="text-xl font-semibold text-slate-900 dark:text-white mt-2"
+                    class="text-3xl font-semibold text-slate-900 dark:text-white mt-2"
                   >
                     {{ monthActivitiesCount }}
                   </p>
@@ -421,11 +420,11 @@
                 <div
                   class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-900/60"
                 >
-                  <p class="text-xs text-slate-500 dark:text-slate-400">
+                  <p class="text-2xl text-slate-500 dark:text-slate-400">
                     Actividades pendientes
                   </p>
                   <p
-                    class="text-xl font-semibold text-slate-900 dark:text-white mt-2"
+                    class="text-3xl font-semibold text-slate-900 dark:text-white mt-2"
                   >
                     {{ pendingCount }}
                   </p>
@@ -434,10 +433,10 @@
                 <div
                   class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-900/60"
                 >
-                  <p class="text-xs text-slate-500 dark:text-slate-400">
+                  <p class="text-2xl text-slate-500 dark:text-slate-400">
                     Última actividad registrada
                   </p>
-                  <p class="text-sm text-slate-800 dark:text-slate-200 mt-2">
+                  <p class="text-3xl text-slate-800 dark:text-slate-200 mt-2">
                     {{ lastActivity?.titulo || "Sin actividades registradas" }}
                   </p>
                 </div>
@@ -445,10 +444,10 @@
                 <div
                   class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-900/60"
                 >
-                  <p class="text-xs text-slate-500 dark:text-slate-400">
+                  <p class="text-2xl text-slate-500 dark:text-slate-400">
                     Actividad más frecuente del mes
                   </p>
-                  <p class="text-sm text-slate-800 dark:text-slate-200 mt-2">
+                  <p class="text-3xl text-slate-800 dark:text-slate-200 mt-2">
                     {{ mostFrequentTitle || "No hay registros suficientes" }}
                   </p>
                 </div>
@@ -459,11 +458,11 @@
                 <div
                   class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-900/60"
                 >
-                  <p class="text-xs text-slate-500 dark:text-slate-400">
+                  <p class="text-2xl text-slate-500 dark:text-slate-400">
                     Total actividades a gestionar
                   </p>
                   <p
-                    class="text-xl font-semibold text-slate-900 dark:text-white mt-2"
+                    class="text-3xl font-semibold text-slate-900 dark:text-white mt-2"
                   >
                     {{ secretaryTotalActivities }}
                   </p>
@@ -472,11 +471,11 @@
                 <div
                   class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-900/60"
                 >
-                  <p class="text-xs text-slate-500 dark:text-slate-400">
+                  <p class="text-2xl text-slate-500 dark:text-slate-400">
                     Pendientes por revisar
                   </p>
                   <p
-                    class="text-xl font-semibold text-slate-900 dark:text-white mt-2"
+                    class="text-3xl font-semibold text-slate-900 dark:text-white mt-2"
                   >
                     {{ secretaryPendingCount }}
                   </p>
@@ -488,11 +487,11 @@
                 <div
                   class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-900/60"
                 >
-                  <p class="text-xs text-slate-500 dark:text-slate-400">
+                  <p class="text-2xl text-slate-500 dark:text-slate-400">
                     Cargos definidos en el sistema
                   </p>
                   <p
-                    class="text-xl font-semibold text-slate-900 dark:text-white mt-2"
+                    class="text-3xl text-center font-semibold text-slate-900 dark:text-white mt-2"
                   >
                     {{ adminCargosCount }}
                   </p>
@@ -510,7 +509,7 @@
             </h2>
 
             <ul
-              class="mt-3 space-y-3 text-base text-slate-700 dark:text-slate-200 leading-relaxed"
+              class="mt-3 space-y-3 text-2xl text-slate-700 dark:text-slate-200 leading-relaxed"
             >
               <ng-container [ngSwitch]="mode">
                 <!-- FUNCIONARIO -->
@@ -523,7 +522,7 @@
                   <li class="flex gap-3">
                     <span class="h-2 w-2 rounded-full bg-amber-400"></span>
                     <span>
-                      Tienes <strong>{{ pendingCount }}</strong> actividad(es)
+                      Tienes <strong >{{ pendingCount }}</strong> actividad(es)
                       pendiente(s).
                     </span>
                   </li>
@@ -593,24 +592,24 @@
         class="flex h-[calc(100%-340px)] flex-col bg-slate-50 px-6 py-6 lg:px-10 dark:bg-slate-950/80"
       >
         <div class="mb-4 flex items-center justify-between">
-          <h2 class="text-lg font-semibold text-slate-900 dark:text-white">
+          <h2 class="text-2xl font-semibold text-slate-900 dark:text-white">
             Actividades recientes
           </h2>
 
           <span
-            class="text-xs text-slate-500 dark:text-slate-400"
+            class="text-2xl text-slate-500 dark:text-slate-400"
             *ngIf="mode === 'Funcionario'"
           >
             Últimas 10 actividades
           </span>
           <span
-            class="text-xs text-slate-500 dark:text-slate-400"
+            class="text-2xl text-slate-500 dark:text-slate-400"
             *ngIf="mode === 'Secretaria'"
           >
             Actividades pendientes por funcionario
           </span>
           <span
-            class="text-xs text-slate-500 dark:text-slate-400"
+            class="text-2xl text-slate-500 dark:text-slate-400"
             *ngIf="mode === 'Administrador'"
           >
             Actividades globales recientes
@@ -631,36 +630,35 @@
                   >
                     <div class="min-w-0 flex-1">
                       <p
-                        class="flex items-center gap-2 text-[11px] uppercase text-slate-500 dark:text-slate-500"
+                        class="flex items-center gap-2 text-2xl uppercase text-slate-500 dark:text-slate-500"
                       >
                         <span
-                          class="h-6 w-6 rounded-full bg-slate-100 flex items-center justify-center text-xs text-slate-600 dark:bg-slate-900 dark:text-slate-300"
+                          class="h-6 w-6 rounded-full bg-slate-100 flex items-center justify-center text-2xl text-slate-600 dark:bg-slate-900 dark:text-slate-300"
                         >
                           {{ i + 1 }}
                         </span>
                         Actividad {{ i + 1 }}
                       </p>
                       <p
-                        class="mt-1 text-base font-medium text-slate-900 dark:text-white truncate"
+                        class="mt-1 text-2xl font-bold text-slate-900 dark:text-white truncate"
                       >
                         {{ a.titulo }}
                       </p>
                       <p
-                        class="mt-1 text-xs text-slate-500 dark:text-slate-400 truncate"
+                        class="mt-1 text-2xl text-slate-500 dark:text-slate-400 truncate"
                       >
-                        {{ a.detalle }} · {{ formatDMY(a.fecha) }} ·
-                        {{ a.horas }} h
+                        {{ a.detalle }} · {{ formatDMY(a.fecha) }}
                       </p>
                     </div>
 
                     <div class="flex items-center gap-4">
                       <span
-                        class="text-xs text-slate-500 dark:text-slate-400"
+                        class="text-2xl text-slate-500 dark:text-slate-400"
                       >
                         {{ formatDMY(a.fecha) }}
                       </span>
                       <span
-                        class="text-xs px-3 py-1 rounded-full border font-medium"
+                        class="text-2xl px-3 py-1 rounded-full border font-medium"
                         [ngClass]="{
                           'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/40':
                             a.estado === 'Aprobada',
@@ -736,26 +734,26 @@
                 <ul class="divide-y divide-slate-200 dark:divide-slate-800">
                   <li
                     *ngFor="let a of adminRecentActivities; let i = index"
-                    class="flex flex-col gap-3 px-4 py-4 text-sm text-slate-800 hover:bg-slate-50 transition md:flex-row md:items-center md:justify-between dark:text-slate-100 dark:hover:bg-slate-900/80"
+                    class="flex flex-col gap-3 px-4 py-4 text-2xl text-slate-800 hover:bg-slate-50 transition md:flex-row md:items-center md:justify-between dark:text-slate-100 dark:hover:bg-slate-900/80"
                   >
-                    <div class="min-w-0 flex-1">
+                    <div class="min-w-0 flex-1 ">
                       <p
-                        class="flex items-center gap-2 text-[11px] uppercase text-slate-500 dark:text-slate-500"
+                        class="flex items-center gap-2 text-xl font-bold uppercase text-slate-500 dark:text-slate-500"
                       >
                         <span
-                          class="h-6 w-6 rounded-full bg-slate-100 flex items-center justify-center text-xs text-slate-600 dark:bg-slate-900 dark:text-slate-300"
+                          class="h-6 w-6 rounded-full bg-slate-100 flex items-center justify-center text-2xl text-slate-600 dark:bg-slate-900 dark:text-slate-300"
                         >
                           {{ i + 1 }}
                         </span>
                         {{ a.userName || "Funcionario" }}
                       </p>
                       <p
-                        class="mt-1 text-base font-medium text-slate-900 dark:text-white truncate"
+                        class="mt-1 text-2xl font-bold text-slate-900 dark:text-white truncate"
                       >
                         {{ a.titulo }}
                       </p>
                       <p
-                        class="mt-1 text-xs text-slate-500 dark:text-slate-400 truncate"
+                        class="mt-1 text-2xl text-slate-500 dark:text-slate-400 truncate"
                       >
                         {{ a.detalle }} · {{ formatDMY(a.fecha) }}
                       </p>
@@ -763,12 +761,12 @@
 
                     <div class="flex items-center gap-4">
                       <span
-                        class="text-xs text-slate-500 dark:text-slate-400"
+                        class="text-2xl text-slate-500 dark:text-slate-400"
                       >
                         {{ formatDMY(a.fecha) }}
                       </span>
                       <span
-                        class="text-xs px-3 py-1 rounded-full border font-medium"
+                        class="text-2xl px-3 py-1 rounded-full border font-medium"
                         [ngClass]="{
                           'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/40':
                             a.estado === 'Aprobada',
@@ -789,7 +787,7 @@
             <!-- EMPTY -->
             <ng-template #emptyActivities>
               <div
-                class="h-full flex items-center justify-center text-sm text-slate-500 dark:text-slate-400"
+                class="h-full flex items-center justify-center text-2xl text-slate-500 dark:text-slate-400"
               >
                 No hay actividades para mostrar.
               </div>
@@ -816,7 +814,7 @@
         </div>
 
         <div class="px-6 py-5">
-          <p class="text-sm text-slate-600 dark:text-slate-300 mb-4">
+          <p class="text-2xl text-slate-600 dark:text-slate-300 mb-4">
             Rol y responsabilidades del funcionario:
           </p>
 
@@ -831,7 +829,7 @@
           </ng-container>
 
           <ng-template #noDesc>
-            <p class="text-sm text-slate-500 dark:text-slate-400">
+            <p class="text-2xl text-slate-500 dark:text-slate-400">
               No hay descripción disponible.
             </p>
           </ng-template>

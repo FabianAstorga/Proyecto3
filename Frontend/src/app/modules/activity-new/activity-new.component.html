@@ -10,10 +10,10 @@
         class="flex flex-col gap-4 border-b border-slate-200 px-6 py-4 lg:flex-row lg:items-center lg:justify-between lg:px-8 bg-slate-50 dark:border-slate-800 dark:bg-slate-950/80"
       >
         <div>
-          <h1 class="text-2xl md:text-3xl font-semibold leading-tight">
+          <h1 class="text-3xl md:text-3xl font-semibold leading-tight">
             Registrar nueva actividad
           </h1>
-          <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+          <p class="mt-1 text-2xl text-slate-500 dark:text-slate-400">
             Completa la información de la actividad que deseas registrar.
           </p>
         </div>
@@ -22,7 +22,7 @@
         <button
           type="button"
           (click)="submit()"
-          class="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-500/30 transition hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-900"
+          class="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-2.5 text-2xl font-semibold text-white shadow-md shadow-indigo-500/30 transition hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-900"
         >
           Guardar actividad
         </button>
@@ -36,7 +36,7 @@
             <!-- FECHA PRINCIPAL -->
             <div>
               <label
-                class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1"
+                class="block text-2xl font-medium text-slate-700 dark:text-slate-200 mb-1"
               >
                 Fecha principal *
               </label>
@@ -59,7 +59,7 @@
             <!-- TIPO DE ACTIVIDAD -->
             <div>
               <label
-                class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1"
+                class="block text-2xl font-medium text-slate-700 dark:text-slate-200 mb-1"
               >
                 Tipo de actividad *
               </label>
@@ -78,7 +78,7 @@
                 class="mt-2"
               >
                 <label
-                  class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1"
+                  class="block text-2xlfont-medium text-slate-700 dark:text-slate-200 mb-1"
                 >
                   Especificar tipo *
                 </label>
@@ -94,7 +94,7 @@
             <!-- ESTADO -->
             <div>
               <label
-                class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1"
+                class="block text-2xl font-medium text-slate-700 dark:text-slate-200 mb-1"
               >
                 Estado *
               </label>
@@ -110,12 +110,12 @@
             <!-- MODO FECHAS -->
             <div formGroupName="multi">
               <label
-                class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1"
+                class="block text-2xl font-medium text-slate-700 dark:text-slate-200 mb-1"
               >
                 Modo de fechas
               </label>
               <mat-form-field appearance="outline" class="w-full dark-field">
-                <mat-select formControlName="mode">
+                <mat-select formControlName ="mode">
                   <mat-option value="none">Sin repetir</mat-option>
                   <mat-option value="specific">Fechas específicas</mat-option>
                   <mat-option value="weekly">Repetición semanal</mat-option>
@@ -139,14 +139,14 @@
                 class="space-y-3"
               >
                 <div class="flex items-center justify-between gap-2">
-                  <span class="text-xs text-slate-600 dark:text-slate-300">
+                  <span class="text-2xl text-slate-600 dark:text-slate-300">
                     Se crearán copias en fechas específicas dentro del mes
                     actual (no feriados).
                   </span>
                   <button
                     type="button"
                     (click)="addSpecificDate()"
-                    class="px-3 py-1.5 text-xs rounded-md bg-indigo-600 text-white font-semibold hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-900"
+                    class="px-3 py-1.5 text-2xl rounded-md bg-indigo-600 text-white font-semibold hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-900"
                   >
                     Agregar fecha
                   </button>
@@ -178,7 +178,7 @@
                     <button
                       type="button"
                       (click)="removeSpecificDate(i)"
-                      class="px-2.5 py-1.5 text-xs rounded-md border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-300 dark:hover:bg-red-500/20"
+                      class="px-2.5 py-1.5 text-2xl rounded-md border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-300 dark:hover:bg-red-500/20"
                     >
                       Eliminar
                     </button>
@@ -193,7 +193,7 @@
 
                   <p
                     *ngIf="specificDates.length === 0"
-                    class="text-xs text-slate-500 dark:text-slate-400"
+                    class="text-2xl text-slate-500 dark:text-slate-400"
                   >
                     No hay fechas adicionales; se usará solo la fecha principal.
                   </p>
@@ -206,7 +206,7 @@
                 class="space-y-3"
               >
                 <div formGroupName="weekly" class="space-y-3">
-                  <p class="text-xs text-slate-600 dark:text-slate-300">
+                  <p class="text-2xl text-slate-600 dark:text-slate-300">
                     Se repetirán las fechas seleccionadas por semana dentro del
                     mes actual (no feriados).
                   </p>
@@ -214,7 +214,7 @@
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label
-                        class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1"
+                        class="block text-2xl font-medium text-slate-700 dark:text-slate-200 mb-1"
                       >
                         Desde *
                       </label>
@@ -239,7 +239,7 @@
 
                     <div>
                       <label
-                        class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1"
+                        class="block text-2xl font-medium text-slate-700 dark:text-slate-200 mb-1"
                       >
                         Hasta *
                       </label>
@@ -268,56 +268,56 @@
                     class="flex flex-wrap gap-3 text-xs"
                   >
                     <span
-                      class="w-full text-slate-600 dark:text-slate-300 mb-1"
+                      class="w-full text-slate-600 text-2xl dark:text-slate-300 mb-1"
                     >
                       Selecciona los días de la semana:
                     </span>
 
                     <label
-                      class="inline-flex items-center gap-1 text-slate-700 dark:text-slate-200"
+                      class="inline-flex text-2xl items-center gap-1 text-slate-700 dark:text-slate-200"
                     >
                       <input type="checkbox" formControlName="mon" />
                       <span>Lunes</span>
                     </label>
                     <label
-                      class="inline-flex items-center gap-1 text-slate-700 dark:text-slate-200"
+                      class="inline-flex text-2xl items-center gap-1 text-slate-700 dark:text-slate-200"
                     >
                       <input type="checkbox" formControlName="tue" />
                       <span>Martes</span>
                     </label>
                     <label
-                      class="inline-flex items-center gap-1 text-slate-700 dark:text-slate-200"
+                      class="inline-flex text-2xl items-center gap-1 text-slate-700 dark:text-slate-200"
                     >
                       <input type="checkbox" formControlName="wed" />
                       <span>Miércoles</span>
                     </label>
                     <label
-                      class="inline-flex items-center gap-1 text-slate-700 dark:text-slate-200"
+                      class="inline-flex text-2xl items-center gap-1 text-slate-700 dark:text-slate-200"
                     >
                       <input type="checkbox" formControlName="thu" />
                       <span>Jueves</span>
                     </label>
                     <label
-                      class="inline-flex items-center gap-1 text-slate-700 dark:text-slate-200"
+                      class="inline-flex text-2xl items-center gap-1 text-slate-700 dark:text-slate-200"
                     >
                       <input type="checkbox" formControlName="fri" />
                       <span>Viernes</span>
                     </label>
                     <label
-                      class="inline-flex items-center gap-1 text-slate-700 dark:text-slate-200"
+                      class="inline-flex text-2xl items-center gap-1 text-slate-700 dark:text-slate-200"
                     >
                       <input type="checkbox" formControlName="sat" />
                       <span>Sábado</span>
                     </label>
                     <label
-                      class="inline-flex items-center gap-1 text-slate-700 dark:text-slate-200"
+                      class="inline-flex text-2xl items-center gap-1 text-slate-700 dark:text-slate-200"
                     >
                       <input type="checkbox" formControlName="sun" />
                       <span>Domingo</span>
                     </label>
                   </div>
 
-                  <p class="text-xs text-slate-500 dark:text-slate-400">
+                  <p class="text-2xl text-slate-500 dark:text-slate-400">
                     Solo se considerarán fechas dentro del mes actual y que no
                     sean feriados.
                   </p>
@@ -326,7 +326,7 @@
 
               <p
                 *ngIf="multi.invalid && multi.touched"
-                class="text-xs text-red-500 dark:text-red-400"
+                class="text-2xl text-red-500 dark:text-red-400"
               >
                 Revisa las fechas del bloque multi-día (rango válido y dentro
                 del mes).
@@ -337,25 +337,25 @@
           <!-- DESCRIPCIÓN -->
           <div>
             <label
-              class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-2"
+              class="block text-2xl font-medium text-slate-700 dark:text-slate-200 mb-2"
             >
               Descripción de la actividad *
             </label>
             <textarea
               formControlName="descripcionAct"
               rows="8"
-              class="w-full rounded-2xl border border-slate-300 bg-white text-slate-900 px-4 py-3 text-base placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[260px] dark:border-[#1E2638] dark:bg-[#121A2E] dark:text-slate-100 dark:placeholder-slate-400"
+              class="w-full rounded-2xl border border-slate-300 bg-white text-slate-900 px-4 py-3 text-2xl placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[260px] dark:border-[#1E2638] dark:bg-[#121A2E] dark:text-slate-100 dark:placeholder-slate-400"
               placeholder="Ej.: Participación en taller de actualización docente…"
             ></textarea>
 
             <p
               *ngIf="f.descripcionAct.touched && f.descripcionAct.invalid"
-              class="text-sm text-red-500 dark:text-red-400 mt-1"
+              class="text-2xl text-red-500 dark:text-red-400 mt-1"
             >
               La descripción es obligatoria (máx. 500 caracteres).
             </p>
 
-            <p class="pt-2 text-sm text-slate-500 dark:text-slate-400">
+            <p class="pt-2 text-2xl text-slate-500 dark:text-slate-400">
               Consejo: sé específico en la descripción (objetivo, actividad
               realizada, resultados). Esto ayuda a una mejor evaluación de tu
               registro.

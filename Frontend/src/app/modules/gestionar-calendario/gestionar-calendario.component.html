@@ -23,7 +23,7 @@
           <h1 class="text-2xl md:text-3xl font-semibold leading-tight">
             Gestión de eventos de horario
           </h1>
-          <p class="mt-1 text-xs md:text-sm text-slate-500 dark:text-slate-400">
+          <p class="mt-1 text-xl md:text-2xl text-slate-500 dark:text-slate-400">
             {{ weekLabel() }} · {{ weekIsoLabel() }}
           </p>
         </div>
@@ -32,7 +32,7 @@
         <button
           type="button"
           (click)="guardarSemana()"
-          class="inline-flex items-center justify-center rounded-xl bg-yellow-400 px-4 py-2 text-xs md:text-sm font-semibold text-[#0D1440] shadow-md shadow-yellow-400/30 transition hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-900"
+          class="inline-flex items-center justify-center rounded-xl bg-yellow-400 px-4 py-2 text-xl md:text-2xl font-semibold text-[#0D1440] shadow-md shadow-yellow-400/30 transition hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-900"
         >
           Guardar cambios
         </button>
@@ -44,7 +44,7 @@
           <div
             *ngFor="let d of days"
             class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 md:px-5 md:py-4 flex flex-col gap-4 md:flex-row md:items-start md:justify-between
-                   dark:border-slate-800 dark:bg-slate-900/60"
+                   dark:border-slate-800 dark:bg-slate-900/60 "
           >
             <!-- Columna izquierda: día -->
             <div class="w-full md:w-48">
@@ -53,16 +53,16 @@
                        dark:border-slate-700 dark:bg-slate-950/80"
               >
                 <div
-                  class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-100 text-xs font-semibold text-indigo-700
+                  class="flex h-12 w-16 items-center justify-center rounded-full bg-indigo-100 text-3xl font-semibold text-indigo-700
                          dark:bg-indigo-500/20 dark:text-indigo-300"
                 >
                   {{ d.label | slice:0:1 }}
                 </div>
                 <div class="flex flex-col">
-                  <span class="text-sm font-semibold text-slate-900 dark:text-slate-50">
+                  <span class="text-xl font-semibold text-slate-900 dark:text-slate-50">
                     {{ d.label }}
                   </span>
-                  <span class="text-[11px] text-slate-500 dark:text-slate-400">
+                  <span class="text-xl text-slate-500 dark:text-slate-400">
                     Eventos transversales
                   </span>
                 </div>
@@ -105,7 +105,7 @@
               </ng-container>
 
               <ng-template #noEvents>
-                <p class="text-xs md:text-sm text-slate-500 dark:text-slate-500">
+                <p class="text-xl md:text-xl text-slate-500 dark:text-slate-500">
                   Sin eventos para este día.
                 </p>
               </ng-template>
@@ -119,7 +119,7 @@
                 type="button"
                 (click)="openModal(d.key)"
                 [disabled]="!hasFreeBlocks(d.key)"
-                class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs md:text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:border-slate-400 disabled:opacity-40 disabled:cursor-not-allowed
+                class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs md:text-2xl font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:border-slate-400 disabled:opacity-40 disabled:cursor-not-allowed
                        dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800 dark:hover:border-slate-500"
               >
                 <span class="text-base leading-none">+</span>
