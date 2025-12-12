@@ -309,7 +309,7 @@ export class GestionarCalendarioComponent implements OnInit {
     };
   }
 
-  saveFromModal() {
+    saveFromModal() {
     const { dayKey, dataIndex, model } = this.modal;
     if (!dayKey || dataIndex === -1) return;
 
@@ -321,11 +321,16 @@ export class GestionarCalendarioComponent implements OnInit {
       return;
     }
 
+    // 1) Actualizamos la grilla en memoria
     this.eventsGrid[dayKey][dataIndex] = {
       title,
       note: note || undefined,
     };
 
+    // 2) Guardamos toda la semana en backend (incluyendo este cambio)
+    this.guardarSemana();
+
+    // 3) Cerramos el modal
     this.closeModal();
   }
 
@@ -333,9 +338,16 @@ export class GestionarCalendarioComponent implements OnInit {
     const { dayKey, dataIndex } = this.modal;
     if (!dayKey || dataIndex === -1) return;
 
+    // 1) Limpiamos la celda en memoria
     this.eventsGrid[dayKey][dataIndex] = null;
+
+    // 2) Guardamos toda la semana (esto incluye la eliminación)
+    this.guardarSemana();
+
+    // 3) Cerramos el modal
     this.closeModal();
   }
+
 
   /* ===== Guardar semana en backend ===== */
 
