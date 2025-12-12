@@ -14,15 +14,13 @@ import { DataService } from '../../services/data.service';
 interface Block {
   label: string;
   code: string;
+  isLunch?: boolean;
 }
 
-interface ScheduleEvent {
-  title: string;
-  blockIndex: number; // índice al arreglo blocks[]
-  note?: string;
-}
+// Celda del grid de eventos globales
+type GlobalCell = { title: string; note?: string } | null;
 
-/* ==== Helpers para semana ISO ==== */
+/* ==== Helpers para semana ISO (tus originales) ==== */
 
 function pad(n: number) {
   return n.toString().padStart(2, '0');
@@ -56,12 +54,12 @@ export class GestionarCalendarioComponent implements OnInit {
   // Semana actual (ISO week)
   current = weekKey(new Date());
 
-  // Bloques disponibles para los eventos
+  // Bloques (misma visual que Schedule)
   blocks: Block[] = [
     { label: '08:00 - 09:30', code: '(1 - 2)' },
     { label: '09:40 - 11:10', code: '(3 - 4)' },
     { label: '11:20 - 12:50', code: '(5 - 6)' },
-    { label: '13:00 - 14:30', code: '(7 - 8)' },
+    { label: '13:00 - 14:30', code: '(7 - 8)', isLunch: true },
     { label: '14:45 - 16:15', code: '(9 - 10)' },
     { label: '16:20 - 17:50', code: '(11 - 12)' },
     { label: '17:55 - 19:25', code: '(13 - 14)' },
@@ -76,13 +74,13 @@ export class GestionarCalendarioComponent implements OnInit {
     { key: 'vie', label: 'Viernes' },
   ];
 
-  // Eventos transversales por día (en memoria)
-  eventsByDay: Record<DayKey, ScheduleEvent[]> = {
-    lun: [],
-    mar: [],
-    mie: [],
-    jue: [],
-    vie: [],
+  // Grid de eventos globales: 7 slots por día (todos menos almuerzo)
+  eventsGrid: Record<DayKey, GlobalCell[]> = {
+    lun: this.emptyRow(),
+    mar: this.emptyRow(),
+    mie: this.emptyRow(),
+    jue: this.emptyRow(),
+    vie: this.emptyRow(),
   };
 
   // Estado del modal
@@ -90,25 +88,25 @@ export class GestionarCalendarioComponent implements OnInit {
     open: boolean;
     dayKey: DayKey | null;
     dayLabel: string;
+    blockLabel: string;
+    dataIndex: number;
     model: {
       title: string;
-      blockIndex: number | null;
       note: string;
     };
-    availableBlocks: number[];
   } = {
     open: false,
     dayKey: null,
     dayLabel: '',
+    blockLabel: '',
+    dataIndex: -1,
     model: {
       title: '',
-      blockIndex: null,
       note: '',
     },
-    availableBlocks: [],
   };
 
-  // Alertas sencillas del componente
+  // Alertas sencillas
   alertMessage = '';
   alertType: 'success' | 'danger' | 'warning' = 'success';
 
@@ -118,7 +116,21 @@ export class GestionarCalendarioComponent implements OnInit {
     this.cargarEventosSemana();
   }
 
-  /* ===== Alertas ===== */
+  /* ===== Helpers básicos ===== */
+
+  private emptyRow(): GlobalCell[] {
+    return [null, null, null, null, null, null, null];
+  }
+
+  private resetGrid() {
+    this.eventsGrid = {
+      lun: this.emptyRow(),
+      mar: this.emptyRow(),
+      mie: this.emptyRow(),
+      jue: this.emptyRow(),
+      vie: this.emptyRow(),
+    };
+  }
 
   private showAlert(msg: string, type: 'success' | 'danger' | 'warning') {
     this.alertMessage = msg;
@@ -143,22 +155,17 @@ export class GestionarCalendarioComponent implements OnInit {
     return `año ${anio} - semana ${semana}`;
   }
 
-  /* ===== Helpers para mapear backend -> front ===== */
-
-  private resetEvents() {
-    this.eventsByDay = {
-      lun: [],
-      mar: [],
-      mie: [],
-      jue: [],
-      vie: [],
-    };
-  }
-
-  // convierte "2025-01-01" -> 'mie' (por ejemplo)
+  /* ===== Conversión fecha (YYYY-MM-DD) -> DayKey =====
+     Versión "segura" en local, igual que en Schedule, para evitar
+     desfases por zona horaria que hacían caer el día en domingo. */
   private fechaToDayKey(fecha: string): DayKey | null {
-    const d = new Date(fecha);
-    const day = d.getDay(); // 0-dom, 1-lun, ..., 6-sab
+    const [yearStr, monthStr, dayStr] = fecha.split('-');
+    const year = Number(yearStr);
+    const month = Number(monthStr);
+    const dayNum = Number(dayStr);
+
+    const d = new Date(year, month - 1, dayNum); // local
+    const dayOfWeek = d.getDay(); // 0-dom, 1-lun, ...
 
     const map: Record<number, DayKey> = {
       1: 'lun',
@@ -168,31 +175,73 @@ export class GestionarCalendarioComponent implements OnInit {
       5: 'vie',
     };
 
-    return map[day] ?? null;
+    return map[dayOfWeek] ?? null;
   }
 
-  private blockCodeToIndex(code: string): number | null {
-    const idx = this.blocks.findIndex((b) => b.code === code);
-    return idx === -1 ? null : idx;
+  /* ===== Mapping bloque visible <-> índice de datos (0..6) ===== */
+
+  // índice visible (incluye almuerzo) → índice real (sin almuerzo)
+  visibleIndexToDataIndex(visibleIndex: number): number {
+    let count = -1;
+    for (let i = 0; i < this.blocks.length; i++) {
+      if (this.blocks[i].isLunch) continue;
+      count++;
+      if (i === visibleIndex) return count;
+    }
+    return -1; // almuerzo
+  }
+
+  private blockCodeToDataIndex(code: string): number | null {
+    const codes = [
+      '(1 - 2)',
+      '(3 - 4)',
+      '(5 - 6)',
+      '(7 - 8)',
+      '(9 - 10)',
+      '(11 - 12)',
+      '(13 - 14)',
+      '(15 - 16)',
+    ];
+    const position = codes.indexOf(code);
+    if (position === -1) return null;
+
+    if (code === '(7 - 8)') return null; // almuerzo
+    if (position < 3) return position; // 0,1,2 -> 0,1,2
+    if (position > 3) return position - 1; // 4..7 -> 3..6
+
+    return null;
+  }
+
+  private dataIndexToBlockCode(dataIndex: number): string | null {
+    // Recorremos blocks ignorando almuerzo, avanzando el contador
+    let count = -1;
+    for (let i = 0; i < this.blocks.length; i++) {
+      if (this.blocks[i].isLunch) continue;
+      count++;
+      if (count === dataIndex) {
+        return this.blocks[i].code;
+      }
+    }
+    return null;
   }
 
   /* ===== Cargar eventos globales de la semana ===== */
 
   cargarEventosSemana() {
-    this.resetEvents();
+    this.resetGrid();
 
     this.dataService.getEventosGlobalesSemana(this.current).subscribe({
       next: (items: GlobalEventBackend[]) => {
         items.forEach((ev) => {
-          const dayKey = this.fechaToDayKey(ev.fecha);
-          const blockIndex = this.blockCodeToIndex(ev.blockCode);
-          if (!dayKey || blockIndex === null) return;
+          const dayKey = this.fechaToDayKey(ev.fecha as any);
+          const dataIndex = this.blockCodeToDataIndex(ev.blockCode);
 
-          this.eventsByDay[dayKey].push({
+          if (!dayKey || dataIndex === null) return;
+
+          this.eventsGrid[dayKey][dataIndex] = {
             title: ev.titulo,
-            blockIndex,
             note: ev.descripcion ?? undefined,
-          });
+          };
         });
       },
       error: (err) => {
@@ -202,84 +251,109 @@ export class GestionarCalendarioComponent implements OnInit {
     });
   }
 
-  /* ===== Bloques libres por día ===== */
+  /* ===== Helpers para la tabla ===== */
 
-  private getFreeBlocks(dayKey: DayKey): number[] {
-    const used = new Set(
-      this.eventsByDay[dayKey].map((ev) => ev.blockIndex),
-    );
-    return this.blocks
-      .map((_, i) => i)
-      .filter((i) => !used.has(i));
+  hasEvent(dayKey: DayKey, dataIndex: number): boolean {
+    return !!this.eventsGrid[dayKey]?.[dataIndex];
   }
 
-  hasFreeBlocks(dayKey: DayKey): boolean {
-    return this.getFreeBlocks(dayKey).length > 0;
+  getEventTitle(dayKey: DayKey, dataIndex: number): string | null {
+    return this.eventsGrid[dayKey]?.[dataIndex]?.title ?? null;
+  }
+
+  getEventNote(dayKey: DayKey, dataIndex: number): string | null {
+    return this.eventsGrid[dayKey]?.[dataIndex]?.note ?? null;
+  }
+
+  getCellClasses(dayKey: DayKey, dataIndex: number) {
+    const has = this.hasEvent(dayKey, dataIndex);
+
+    return {
+      'bg-red-50 border border-red-200 dark:bg-red-500/10 dark:border-red-500/40':
+        has,
+      // vacío: sin clases extra
+    };
   }
 
   /* ===== Modal ===== */
 
-  openModal(dayKey: DayKey) {
-    const free = this.getFreeBlocks(dayKey);
-    if (!free.length) {
-      this.showAlert('Todos los bloques de este día ya tienen un evento.', 'warning');
-      return;
-    }
+  openModal(dayKey: DayKey, visibleIndex: number) {
+    const dataIndex = this.visibleIndexToDataIndex(visibleIndex);
+    if (dataIndex === -1) return; // almuerzo
 
     const day = this.days.find((d) => d.key === dayKey);
+    const block = this.blocks[visibleIndex];
+
     this.modal.open = true;
     this.modal.dayKey = dayKey;
     this.modal.dayLabel = day ? day.label : '';
-    this.modal.availableBlocks = free;
+    this.modal.blockLabel = block ? block.label : '';
+    this.modal.dataIndex = dataIndex;
+
+    const current = this.eventsGrid[dayKey][dataIndex];
     this.modal.model = {
-      title: '',
-      blockIndex: null,
-      note: '',
+      title: current?.title ?? '',
+      note: current?.note ?? '',
     };
   }
 
   closeModal() {
     this.modal.open = false;
     this.modal.dayKey = null;
-    this.modal.availableBlocks = [];
+    this.modal.dataIndex = -1;
+    this.modal.dayLabel = '';
+    this.modal.blockLabel = '';
+    this.modal.model = {
+      title: '',
+      note: '',
+    };
   }
 
   saveFromModal() {
-    const { dayKey, model } = this.modal;
-    if (!dayKey) return;
+    const { dayKey, dataIndex, model } = this.modal;
+    if (!dayKey || dataIndex === -1) return;
 
     const title = model.title.trim();
-    if (!title || model.blockIndex === null) {
-      this.showAlert('Completa título y bloque antes de guardar.', 'warning');
+    const note = model.note.trim();
+
+    if (!title) {
+      this.showAlert('El título del evento es obligatorio.', 'warning');
       return;
     }
 
-    const ev: ScheduleEvent = {
+    this.eventsGrid[dayKey][dataIndex] = {
       title,
-      blockIndex: model.blockIndex,
-      note: model.note.trim() || undefined,
+      note: note || undefined,
     };
-
-    this.eventsByDay[dayKey].push(ev);
 
     this.closeModal();
   }
 
-  /* ===== Guardar semana (llamando backend) ===== */
+  clearFromModal() {
+    const { dayKey, dataIndex } = this.modal;
+    if (!dayKey || dataIndex === -1) return;
+
+    this.eventsGrid[dayKey][dataIndex] = null;
+    this.closeModal();
+  }
+
+  /* ===== Guardar semana en backend ===== */
 
   guardarSemana() {
     const payload: GlobalEventPayload[] = [];
 
-    (Object.keys(this.eventsByDay) as DayKey[]).forEach((dayKey) => {
-      this.eventsByDay[dayKey].forEach((ev) => {
-        const block = this.blocks[ev.blockIndex];
-        if (!block) return;
+    (Object.keys(this.eventsGrid) as DayKey[]).forEach((dayKey) => {
+      this.eventsGrid[dayKey].forEach((cell, dataIndex) => {
+        if (!cell) return;
+
+        const blockCode = this.dataIndexToBlockCode(dataIndex);
+        if (!blockCode) return;
 
         payload.push({
           dayKey,
-          blockCode: block.code,
-          titulo: ev.title,
-          descripcion: ev.note,
+          blockCode,
+          titulo: cell.title,
+          descripcion: cell.note,
         });
       });
     });
@@ -289,6 +363,8 @@ export class GestionarCalendarioComponent implements OnInit {
       .subscribe({
         next: () => {
           this.showAlert('Eventos de la semana guardados', 'success');
+          // Opcional: recargar desde backend para asegurar sincronía
+          this.cargarEventosSemana();
         },
         error: (err) => {
           console.error('Error guardando eventos globales:', err);

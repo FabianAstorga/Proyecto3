@@ -5,6 +5,7 @@
            bg-slate-50
            dark:bg-gradient-to-b dark:from-slate-950 dark:via-slate-950 dark:to-slate-900"
   >
+    <!-- CONTENEDOR PRINCIPAL -->
     <div
       class="h-full w-full overflow-hidden rounded-3xl
              border border-slate-200 bg-white text-slate-900
@@ -12,240 +13,288 @@
              dark:border-slate-800 dark:bg-slate-950/80 dark:text-slate-100
              dark:shadow-[0_24px_60px_rgba(15,23,42,0.8)] dark:backdrop-blur-sm"
     >
-      <!-- CABECERA -->
+      <!-- HEADER -->
       <header
-        class="px-6 py-4 md:px-10 md:py-5 border-b border-slate-200
-               flex flex-col gap-3 md:flex-row md:items-center md:justify-between
+        class="flex flex-col gap-3 border-b border-slate-200 px-6 py-4
+               md:flex-row md:items-center md:justify-between md:px-10
                bg-white
-               dark:border-slate-800 dark:bg-gradient-to-r dark:from-slate-950 dark:via-slate-900 dark:to-slate-950"
+               dark:border-slate-800 dark:bg-slate-950/80"
       >
         <div>
           <h1 class="text-2xl md:text-3xl font-semibold leading-tight">
             Gestión de eventos de horario
           </h1>
-          <p class="mt-1 text-xl md:text-2xl text-slate-500 dark:text-slate-400">
+          <p class="mt-1 text-xs md:text-sm text-slate-500 dark:text-slate-400">
             {{ weekLabel() }} · {{ weekIsoLabel() }}
+          </p>
+          <p class="mt-1 text-[11px] md:text-xs text-slate-500 dark:text-slate-400">
+            Haz clic en una celda para agregar, editar o eliminar un evento global de la semana.
           </p>
         </div>
 
-        <!-- BOTÓN PRINCIPAL (amarillo institucional) -->
-        <button
-          type="button"
-          (click)="guardarSemana()"
-          class="inline-flex items-center justify-center rounded-xl bg-yellow-400 px-4 py-2 text-xl md:text-2xl font-semibold text-[#0D1440] shadow-md shadow-yellow-400/30 transition hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-900"
-        >
-          Guardar cambios
-        </button>
+        <div class="flex flex-col items-start gap-3 md:items-end">
+          <!-- Leyenda -->
+          <div
+            class="flex flex-wrap items-center gap-4 text-[11px] md:text-xs text-slate-500 dark:text-slate-400"
+          >
+            <div class="flex items-center gap-1">
+              <span
+                class="inline-flex h-3 w-3 rounded-full bg-slate-200 border border-slate-300
+                       dark:bg-slate-900 dark:border-slate-700"
+              ></span>
+              <span>Sin evento</span>
+            </div>
+            <div class="flex items-center gap-1">
+              <span
+                class="inline-flex h-3 w-3 rounded-full bg-red-50 border border-red-300
+                       dark:bg-red-500/20 dark:border-red-500/60"
+              ></span>
+              <span>Evento global</span>
+            </div>
+          </div>
+
+          <!-- BOTÓN GUARDAR -->
+          <button
+            type="button"
+            (click)="guardarSemana()"
+            class="inline-flex items-center justify-center rounded-xl bg-yellow-400 px-4 py-2 text-sm md:text-base font-semibold text-[#0D1440] shadow-md shadow-yellow-400/30 transition hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-900"
+          >
+            Guardar cambios de la semana
+          </button>
+        </div>
       </header>
 
-      <!-- CONTENIDO -->
-      <div class="px-6 py-5 md:px-10 md:py-6">
-        <div class="space-y-4">
+      <!-- ALERTA SIMPLE -->
+      <div
+        *ngIf="alertMessage"
+        class="mx-6 mt-3 rounded-xl px-4 py-2 text-sm font-medium
+               border
+              "
+        [ngClass]="{
+          'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-200 dark:border-emerald-500/40':
+            alertType === 'success',
+          'bg-red-50 text-red-800 border-red-200 dark:bg-red-500/10 dark:text-red-200 dark:border-red-500/40':
+            alertType === 'danger',
+          'bg-amber-50 text-amber-900 border-amber-200 dark:bg-amber-500/10 dark:text-amber-100 dark:border-amber-500/40':
+            alertType === 'warning'
+        }"
+      >
+        {{ alertMessage }}
+      </div>
+
+      <!-- TABLA DE EVENTOS (VISUAL TIPO HORARIO) -->
+      <div class="px-4 pb-6 pt-4 md:px-6 md:pb-8">
+        <div class="overflow-x-auto">
           <div
-            *ngFor="let d of days"
-            class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 md:px-5 md:py-4 flex flex-col gap-4 md:flex-row md:items-start md:justify-between
-                   dark:border-slate-800 dark:bg-slate-900/60 "
+            class="grid w-full text-xs md:text-sm"
+            [ngStyle]="{ 'grid-template-columns': '160px repeat(5, minmax(0,1fr))' }"
           >
-            <!-- Columna izquierda: día -->
-            <div class="w-full md:w-48">
-              <div
-                class="inline-flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm
-                       dark:border-slate-700 dark:bg-slate-950/80"
-              >
-                <div
-                  class="flex h-12 w-16 items-center justify-center rounded-full bg-indigo-100 text-3xl font-semibold text-indigo-700
-                         dark:bg-indigo-500/20 dark:text-indigo-300"
-                >
-                  {{ d.label | slice:0:1 }}
-                </div>
-                <div class="flex flex-col">
-                  <span class="text-xl font-semibold text-slate-900 dark:text-slate-50">
-                    {{ d.label }}
-                  </span>
-                  <span class="text-xl text-slate-500 dark:text-slate-400">
-                    Eventos transversales
-                  </span>
-                </div>
-              </div>
+            <!-- Encabezado: columna Bloque -->
+            <div
+              class="bg-slate-100 border border-slate-200 px-3 py-3 text-center font-semibold uppercase tracking-wide text-[11px] text-slate-700
+                     dark:bg-slate-950 dark:border-slate-800 dark:text-slate-300"
+            >
+              BLOQUE
             </div>
 
-            <!-- Columna central: eventos del día -->
-            <div class="flex-1 min-w-0">
-              <ng-container *ngIf="eventsByDay[d.key]?.length; else noEvents">
-                <div class="flex flex-wrap gap-3 md:gap-4">
+            <!-- Encabezados: días -->
+            <div
+              *ngFor="let d of days"
+              class="bg-slate-100 border border-slate-200 px-3 py-3 text-center font-semibold uppercase tracking-wide text-[11px] text-slate-700
+                     dark:bg-slate-950 dark:border-slate-800 dark:text-slate-300"
+            >
+              {{ d.label }}
+            </div>
+
+            <!-- Filas por bloque -->
+            <ng-container *ngFor="let b of blocks; let bi = index">
+              <!-- Columna izquierda: info bloque -->
+              <div
+                class="border border-slate-200 px-3 py-3 text-center
+                       dark:border-slate-800"
+                [ngClass]="{
+                  'bg-slate-50 font-semibold text-slate-900 dark:bg-slate-900/80 dark:text-slate-100': !b.isLunch,
+                  'bg-amber-50 text-amber-700 font-semibold dark:bg-slate-900 dark:text-amber-200': b.isLunch
+                }"
+              >
+                <ng-container *ngIf="!b.isLunch; else almuerzoLabel">
+                  <div class="text-[12px] md:text-sm leading-tight">
+                    {{ b.label }}
+                  </div>
                   <div
-                    *ngFor="let ev of eventsByDay[d.key]"
-                    class="max-w-sm rounded-2xl border border-slate-200 bg-white px-4 py-3 text-xs md:text-sm flex flex-col gap-1 shadow-sm
-                           dark:border-slate-700 dark:bg-slate-950/80"
+                    class="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400"
                   >
-                    <div
-                      class="font-semibold text-slate-900 dark:text-slate-50 leading-tight truncate"
-                    >
-                      {{ ev.title }}
-                    </div>
+                    {{ b.code }}
+                  </div>
+                </ng-container>
 
-                    <div class="text-[11px] md:text-xs text-slate-500 dark:text-slate-400">
-                      Bloque:
-                      <span class="font-medium text-slate-800 dark:text-slate-200">
-                        {{ blocks[ev.blockIndex].label }}
-                      </span>
-                      <span class="text-slate-400 dark:text-slate-500">
-                        {{ blocks[ev.blockIndex].code }}
-                      </span>
-                    </div>
+                <ng-template #almuerzoLabel>
+                  <div class="text-xs md:text-sm tracking-wide">
+                    Almuerzo
+                  </div>
+                </ng-template>
+              </div>
 
-                    <div
-                      *ngIf="ev.note"
-                      class="text-[11px] md:text-xs text-slate-500 dark:text-slate-400 truncate"
+              <!-- Celdas de bloques (no almuerzo) -->
+              <ng-container *ngIf="!b.isLunch; else lunchRow">
+                <div
+                  *ngFor="let d of days"
+                  class="border border-slate-200 bg-white hover:bg-slate-50 transition-colors cursor-pointer
+                         dark:border-slate-800 dark:bg-slate-950/70 dark:hover:bg-slate-900/80"
+                  (click)="openModal(d.key, bi)"
+                  title="Editar evento global"
+                >
+                  <div
+                    class="relative h-20 md:h-24 flex flex-col items-center justify-center text-center px-2"
+                    [ngClass]="getCellClasses(d.key, visibleIndexToDataIndex(bi))"
+                  >
+                    <ng-container
+                      *ngIf="hasEvent(d.key, visibleIndexToDataIndex(bi)); else emptyCell"
                     >
-                      {{ ev.note }}
-                    </div>
+                      <div
+                        class="text-[11px] md:text-sm font-semibold text-slate-900 dark:text-slate-50 leading-tight truncate"
+                      >
+                        {{ getEventTitle(d.key, visibleIndexToDataIndex(bi)) }}
+                      </div>
+                      <div
+                        *ngIf="getEventNote(d.key, visibleIndexToDataIndex(bi))"
+                        class="mt-0.5 text-[10px] md:text-[11px] text-slate-500 dark:text-slate-300 line-clamp-2"
+                      >
+                        {{ getEventNote(d.key, visibleIndexToDataIndex(bi)) }}
+                      </div>
+                    </ng-container>
+
+                    <ng-template #emptyCell>
+                      <div
+                        class="text-[11px] text-slate-400 dark:text-slate-500"
+                      >
+                        Sin evento
+                      </div>
+                    </ng-template>
                   </div>
                 </div>
               </ng-container>
 
-              <ng-template #noEvents>
-                <p class="text-xl md:text-xl text-slate-500 dark:text-slate-500">
-                  Sin eventos para este día.
-                </p>
+              <!-- Fila almuerzo (col-span 5) -->
+              <ng-template #lunchRow>
+                <div
+                  class="col-span-5 border border-slate-200 dark:border-slate-800"
+                >
+                  <div
+                    class="h-10 md:h-12 bg-slate-100 text-slate-500 flex items-center justify-center text-[11px] md:text-xs tracking-wide uppercase
+                           dark:bg-slate-900/80 dark:text-slate-400"
+                  >
+                    Pausa de almuerzo
+                  </div>
+                </div>
               </ng-template>
-            </div>
-
-            <!-- Columna derecha: botón agregar -->
-            <div
-              class="w-full md:w-auto flex md:items-center md:justify-end pt-1 md:pt-0"
-            >
-              <button
-                type="button"
-                (click)="openModal(d.key)"
-                [disabled]="!hasFreeBlocks(d.key)"
-                class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs md:text-2xl font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:border-slate-400 disabled:opacity-40 disabled:cursor-not-allowed
-                       dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800 dark:hover:border-slate-500"
-              >
-                <span class="text-base leading-none">+</span>
-                <span>Agregar evento</span>
-              </button>
-            </div>
+            </ng-container>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- MODAL -->
-    <div *ngIf="modal.open" class="fixed inset-0 z-50">
-      <!-- Backdrop -->
-      <div class="absolute inset-0 bg-black/40" (click)="closeModal()"></div>
+    <!-- MODAL EDICIÓN EVENTO GLOBAL -->
+    <div
+      *ngIf="modal.open"
+      class="fixed inset-0 z-50 flex items-center justify-center"
+    >
+      <div
+        class="absolute inset-0 bg-black/40 backdrop-blur-sm"
+        (click)="closeModal()"
+      ></div>
 
-      <!-- Diálogo -->
-      <div class="absolute inset-0 flex items-center justify-center p-4">
+      <div
+        class="relative w-[92%] max-w-md rounded-2xl
+               border border-slate-200 bg-white text-slate-900 shadow-2xl
+               dark:border-slate-800 dark:bg-slate-950/95 dark:text-slate-100"
+      >
         <div
-          class="w-full max-w-4xl rounded-2xl
-                 border border-slate-200 bg-white text-slate-900 shadow-2xl
-                 dark:border-slate-800 dark:bg-slate-950/95 dark:text-slate-100 dark:backdrop-blur-md"
+          class="px-5 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50 rounded-t-2xl
+                 dark:border-slate-800 dark:bg-slate-900/80"
         >
-          <!-- Header modal -->
-          <div
-            class="px-6 py-3 border-b border-slate-200 flex items-center justify-between bg-slate-50 rounded-t-2xl
-                   dark:border-slate-800 dark:bg-slate-900/80"
-          >
-            <div>
-              <div class="text-[11px] text-slate-500 dark:text-slate-400">
-                Nuevo evento
-              </div>
-              <div class="text-sm font-semibold text-slate-900 dark:text-slate-50 leading-tight">
-                {{ modal.dayLabel }}
-              </div>
-            </div>
-            <button
-              class="p-2 rounded-full hover:bg-slate-100 text-slate-500 hover:text-slate-900 transition
-                     dark:hover:bg-slate-800 dark:text-slate-300 dark:hover:text-slate-100"
-              (click)="closeModal()"
-              aria-label="Cerrar"
+          <div>
+            <div
+              class="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400"
             >
-              ✕
-            </button>
+              Evento global
+            </div>
+            <div class="mt-0.5 text-sm md:text-base font-semibold">
+              {{ modal.dayLabel }} — {{ modal.blockLabel }}
+            </div>
+          </div>
+          <button
+            class="p-2 rounded-full hover:bg-slate-100 text-slate-500 hover:text-slate-900 transition
+                   dark:hover:bg-slate-800 dark:text-slate-400 dark:hover:text-slate-100"
+            (click)="closeModal()"
+            aria-label="Cerrar"
+          >
+            ✕
+          </button>
+        </div>
+
+        <form (ngSubmit)="saveFromModal()" class="px-5 py-4 space-y-3">
+          <div>
+            <label
+              class="text-[11px] font-medium text-slate-700 dark:text-slate-300"
+              >Título del evento *</label
+            >
+            <input
+              type="text"
+              class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder-slate-400
+                     focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+                     dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder-slate-500"
+              placeholder="Ej.: Suspensión de clases, reunión general, etc."
+              [(ngModel)]="modal.model.title"
+              name="title"
+              required
+              autofocus
+            />
           </div>
 
-          <!-- Form modal -->
-          <form (ngSubmit)="saveFromModal()" class="px-6 py-4 space-y-3">
-            <div>
-              <label class="text-xs text-slate-700 dark:text-slate-300 mb-1 block">
-                Título *
-              </label>
-              <input
-                type="text"
-                class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder-slate-400
-                       focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
-                       dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder-slate-500"
-                placeholder="Ej.: Cambio de actividades, reunión con decano"
-                [(ngModel)]="modal.model.title"
-                name="title"
-                required
-                autofocus
-              />
-            </div>
+          <div>
+            <label
+              class="text-[11px] font-medium text-slate-700 dark:text-slate-300"
+              >Nota (opcional)</label
+            >
+            <input
+              type="text"
+              class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder-slate-400
+                     focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+                     dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder-slate-500"
+              placeholder="Observaciones…"
+              [(ngModel)]="modal.model.note"
+              name="note"
+            />
+          </div>
 
-            <div>
-              <label class="text-xs text-slate-700 dark:text-slate-300 mb-1 block">
-                Bloque *
-              </label>
-              <select
-                class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900
-                       focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
-                       dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100"
-                [(ngModel)]="modal.model.blockIndex"
-                name="blockIndex"
-                required
-              >
-                <option [ngValue]="null" disabled>
-                  Selecciona un bloque…
-                </option>
-                <option
-                  *ngFor="let i of modal.availableBlocks"
-                  [ngValue]="i"
-                >
-                  {{ blocks[i].label }} {{ blocks[i].code }}
-                </option>
-              </select>
-              <p class="mt-1 text-[11px] text-slate-500 dark:text-slate-500">
-                Sólo se muestran bloques libres para este día.
-              </p>
-            </div>
+          <div class="flex items-center gap-2 pt-2">
+            <button
+              type="submit"
+              class="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-500/30 hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-950"
+            >
+              Guardar
+            </button>
 
-            <div>
-              <label class="text-xs text-slate-700 dark:text-slate-300 mb-1 block">
-                Nota (opcional)
-              </label>
-              <input
-                type="text"
-                class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder-slate-400
-                       focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
-                       dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder-slate-500"
-                placeholder="Observaciones…"
-                [(ngModel)]="modal.model.note"
-                name="note"
-              />
-            </div>
+            <button
+              type="button"
+              class="px-4 py-2 rounded-xl border border-slate-300 bg-white text-sm text-slate-700 hover:bg-slate-50
+                     dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+              (click)="closeModal()"
+            >
+              Cancelar
+            </button>
 
-            <div class="flex items-center gap-2 pt-2">
-              <!-- Botón principal modal (azul) -->
-              <button
-                type="submit"
-                class="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm font-semibold shadow-md shadow-indigo-500/30 hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-950"
-              >
-                Guardar
-              </button>
-              <button
-                type="button"
-                class="px-4 py-2 rounded-xl border border-slate-300 bg-white text-sm text-slate-700 hover:bg-slate-50
-                       dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
-                (click)="closeModal()"
-              >
-                Cancelar
-              </button>
-            </div>
-          </form>
-        </div>
+            <button
+              type="button"
+              class="ml-auto px-4 py-2 rounded-xl border border-red-200 bg-red-50 text-sm text-red-700 hover:bg-red-100
+                     dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-300 dark:hover:bg-red-500/20"
+              (click)="clearFromModal()"
+            >
+              Limpiar evento
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   </section>
