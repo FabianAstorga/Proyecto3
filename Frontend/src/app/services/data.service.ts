@@ -15,7 +15,7 @@ import { LoginResponse } from "./backend/logindata-backend.model";
 import { BackendUser } from "./backend/user-backend.model";
 import { BackendActividad } from "./backend/activity-backend2.model";
 import { EmpleadoCargo } from "./backend/charge-backend.model";
-import { GlobalEventBackend, GlobalEventPayload } from '../models/horario.models';
+import { GlobalEvent, GlobalEventPayload } from "../models/global-event.model";
 export type UserRole = User["role"];
 
 @Injectable({ providedIn: "root" })
@@ -347,21 +347,23 @@ export class DataService {
     );
   }
 
- getEventosGlobalesSemana(isoWeek: string) {
-  return this.http.get<GlobalEventBackend[]>(
+ getEventosGlobalesSemana(isoWeek: string): Observable<GlobalEvent[]> {
+  return this.http.get<GlobalEvent[]>(
     `${this.apiUrl}/eventos-globales/semana/${isoWeek}`,
-    this.getAuthOptions()                    // ← AÑADIDO
+    this.getAuthOptions()
   );
 }
-
 /**
  * Reemplaza TODOS los eventos globales de una semana ISO por los del payload.
  */
-saveEventosGlobalesSemana(isoWeek: string, items: GlobalEventPayload[]) {
-  return this.http.put<GlobalEventBackend[]>(
+saveEventosGlobalesSemana(
+  isoWeek: string,
+  items: GlobalEventPayload[]
+): Observable<GlobalEvent[]> {
+  return this.http.put<GlobalEvent[]>(
     `${this.apiUrl}/eventos-globales/semana/${isoWeek}`,
     items,
-    this.getAuthOptions()                    // ← AÑADIDO
+    this.getAuthOptions()
   );
 }
 

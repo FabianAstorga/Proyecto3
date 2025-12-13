@@ -11,6 +11,8 @@ import { UsuariosModule } from "./modules/usuarios/usuarios.module";
 import { InformesModule } from './modules/informes/informes.module';
 import { HorariosModule } from "./modules/horarios/horarios.module";
 import { EventosGlobalesModule } from './modules/eventos-globales/eventos-globales.module';
+import { FeriadosModule } from './modules/feriados/feriados.module';
+import { TiposActividadModule } from './modules/tipos-actividad/tipos-actividad.module';
 
 @Module({
   imports: [
@@ -23,7 +25,9 @@ import { EventosGlobalesModule } from './modules/eventos-globales/eventos-global
     UsuariosModule,
     InformesModule,
     HorariosModule,
-    EventosGlobalesModule
+    EventosGlobalesModule,
+    FeriadosModule,
+    TiposActividadModule
     // InformesModule
   ],
   controllers: [AppController],

@@ -5,6 +5,7 @@ import { Between, Repository } from 'typeorm';
 
 import { EventoGlobal } from '../../database/entities/evento-global.entity';
 import { GlobalEventDto, DayKey } from './dto/global-event.dto';
+import { GlobalEventOutDto } from './dto/global-event-out.dto';
 
 @Injectable()
 export class EventosGlobalesService {
@@ -13,39 +14,31 @@ export class EventosGlobalesService {
     private readonly eventoRepo: Repository<EventoGlobal>,
   ) {}
 
-  // ---------- Helpers de fechas (ISO week, en HORARIO LOCAL) ----------
+  // ---------- Helpers de fechas (ISO week, horario local) ----------
 
-  /**
-   * Convierte "2025-W10" en el rango [lunes, domingo] en horario local.
-   * No usamos Date.UTC ni setUTCHours para evitar corrimientos de día
-   * cuando se guarda en una columna DATE.
-   */
   private getWeekRangeFromIso(isoWeek: string): { monday: Date; sunday: Date } {
     const year = Number(isoWeek.slice(0, 4));
     const week = Number(isoWeek.slice(6));
 
-    // 4 de enero del año dado (horario local)
     const simple = new Date(year, 0, 4);
-    // getDay(): 0-dom, 1-lun, ..., 6-sab
     const dayOfWeek = simple.getDay() || 7;
 
-    // Lunes de la semana ISO
     const monday = new Date(simple);
     monday.setDate(simple.getDate() - dayOfWeek + 1 + (week - 1) * 7);
-    monday.setHours(0, 0, 0, 0); // inicio del día en local
+    monday.setHours(0, 0, 0, 0);
 
     const sunday = new Date(monday);
     sunday.setDate(monday.getDate() + 6);
-    sunday.setHours(23, 59, 59, 999); // fin del domingo en local
+    sunday.setHours(0, 0, 0, 0);
 
     return { monday, sunday };
   }
 
-  /**
-   * Obtiene la fecha concreta de un dayKey ('lun', 'mar', ...) dentro
-   * de la isoWeek indicada, en horario local.
-   */
-  private getDateByDayKey(isoWeek: string, dayKey: DayKey): Date {
+  private toDateOnlyString(d: Date): string {
+    return d.toISOString().slice(0, 10); // YYYY-MM-DD
+  }
+
+  private getDateByDayKey(isoWeek: string, dayKey: DayKey): string {
     const { monday } = this.getWeekRangeFromIso(isoWeek);
 
     const offsetMap: Record<DayKey, number> = {
@@ -58,21 +51,34 @@ export class EventosGlobalesService {
 
     const d = new Date(monday);
     d.setDate(monday.getDate() + offsetMap[dayKey]);
-    d.setHours(0, 0, 0, 0);
-    return d;
+
+    return this.toDateOnlyString(d);
+  }
+
+  private toOutDto(e: EventoGlobal): GlobalEventOutDto {
+    return {
+      id: e.id,
+      fecha: e.fecha, // ya viene YYYY-MM-DD (string)
+      blockCode: e.blockCode,
+      titulo: e.titulo,
+      descripcion: e.descripcion,
+    };
   }
 
   // ---------- Consultar eventos por semana ----------
 
-  async getByWeek(isoWeek: string): Promise<EventoGlobal[]> {
+  async getByWeek(isoWeek: string): Promise<GlobalEventOutDto[]> {
     const { monday, sunday } = this.getWeekRangeFromIso(isoWeek);
 
-    return this.eventoRepo.find({
-      where: {
-        fecha: Between(monday, sunday),
-      },
+    const from = this.toDateOnlyString(monday);
+    const to = this.toDateOnlyString(sunday);
+
+    const items = await this.eventoRepo.find({
+      where: { fecha: Between(from, to) },
       order: { fecha: 'ASC', blockCode: 'ASC' },
     });
+
+    return items.map((e) => this.toOutDto(e));
   }
 
   // ---------- Reemplazar todos los eventos de una semana ----------
@@ -80,24 +86,29 @@ export class EventosGlobalesService {
   async replaceForWeek(
     isoWeek: string,
     items: GlobalEventDto[],
-  ): Promise<EventoGlobal[]> {
+  ): Promise<GlobalEventOutDto[]> {
     const { monday, sunday } = this.getWeekRangeFromIso(isoWeek);
 
-    // 1) Borrar eventos anteriores de esa semana
-    await this.eventoRepo.delete({
-      fecha: Between(monday, sunday),
+    const from = this.toDateOnlyString(monday);
+    const to = this.toDateOnlyString(sunday);
+
+    const saved = await this.eventoRepo.manager.transaction(async (em) => {
+      // 1) borrar esa semana
+      await em.delete(EventoGlobal, { fecha: Between(from, to) });
+
+      // 2) insertar nuevos
+      const toSave: EventoGlobal[] = items.map((dto) => {
+        const e = new EventoGlobal();
+        e.fecha = this.getDateByDayKey(isoWeek, dto.dayKey); // YYYY-MM-DD
+        e.blockCode = dto.blockCode;
+        e.titulo = dto.titulo;
+        e.descripcion = dto.descripcion ?? null;
+        return e;
+      });
+
+      return em.save(EventoGlobal, toSave);
     });
 
-    // 2) Insertar los nuevos
-    const toSave: EventoGlobal[] = items.map((dto) => {
-      const e = new EventoGlobal();
-      e.fecha = this.getDateByDayKey(isoWeek, dto.dayKey);
-      e.blockCode = dto.blockCode;
-      e.titulo = dto.titulo;
-      e.descripcion = dto.descripcion ?? null;
-      return e;
-    });
-
-    return this.eventoRepo.save(toSave);
+    return saved.map((e) => this.toOutDto(e));
   }
 }

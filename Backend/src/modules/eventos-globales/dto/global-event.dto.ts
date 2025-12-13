@@ -1,9 +1,24 @@
 // src/modules/eventos-globales/dto/global-event.dto.ts
+import { IsIn, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
+
 export type DayKey = 'lun' | 'mar' | 'mie' | 'jue' | 'vie';
 
 export class GlobalEventDto {
-  dayKey: DayKey;     // 'lun', 'mar', 'mie', 'jue', 'vie'
-  blockCode: string;  // "(1 - 2)", "(3 - 4)", etc.
+  @IsIn(['lun', 'mar', 'mie', 'jue', 'vie'])
+  dayKey: DayKey;
+
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(20)
+  blockCode: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(255)
   titulo: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
   descripcion?: string;
 }
