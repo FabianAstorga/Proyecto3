@@ -8,10 +8,10 @@ import {
 } from "typeorm";
 import { Informe } from "./informe.entity";
 import { Usuario } from "./usuario.entity";
+import { TipoActividad } from "./tipo-actividad.entity";
 
 @Entity("actividad")
 export class Actividad {
-  //modifique id
   @PrimaryGeneratedColumn()
   id_actividad: number;
 
@@ -24,8 +24,24 @@ export class Actividad {
   @Column({ type: "date" })
   fecha: Date;
 
+  /**
+   * LEGACY: mantener por compatibilidad con el código actual.
+   * Luego puedes eliminar este campo cuando el front/back use tipoActividad.
+   */
   @Column({ type: "varchar", length: 100 })
   tipo: string;
+
+  /**
+   * Normalizado: FK hacia tipos_actividad
+   * eager:true trae el tipo junto con la actividad (útil para listar sin joins manuales).
+   */
+  @ManyToOne(() => TipoActividad, { eager: true, nullable: true })
+  @JoinColumn({ name: "tipo_actividad_id" })
+  tipoActividad?: TipoActividad;
+
+  /** Texto libre si el tipo lo requiere (por ejemplo: "Otro") */
+  @Column({ type: "varchar", length: 150, nullable: true })
+  tipoActividadDetalle?: string;
 
   // Para el checklist
   @Column({
@@ -41,10 +57,9 @@ export class Actividad {
   @ManyToOne(() => Usuario, (usuario) => usuario.actividades, {
     onDelete: "CASCADE",
   })
-  @JoinColumn({ name: "usuario_id" }) // crea la columna usuario_id en la tabla
+  @JoinColumn({ name: "usuario_id" })
   usuario: Usuario;
 
-  // Relación: Actividad "pertenece a" Formulario
   @ManyToOne(() => Informe, (informe) => informe.actividades, {
     onDelete: "CASCADE",
   })

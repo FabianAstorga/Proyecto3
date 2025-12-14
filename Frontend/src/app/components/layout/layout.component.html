@@ -16,18 +16,12 @@
       <div
         class="h-12 w-12 rounded-2xl bg-indigo-500 flex items-center justify-center overflow-hidden shadow-md shadow-indigo-500/40"
       >
-        <img
-          src="/logouta.png"
-          alt="SRADIM"
-          class="h-16 w-16 object-contain"
-        />
+        <img src="/logouta.png" alt="SRADIM" class="h-16 w-16 object-contain" />
       </div>
 
       <div>
         <div class="text-2xl font-semibold tracking-tight">SRADIM</div>
-        <p class="text-xl text-slate-500 dark:text-slate-400">
-          Panel de Acceso
-        </p>
+        <p class="text-xl text-slate-500 dark:text-slate-400">Panel de Acceso</p>
       </div>
     </div>
 
@@ -109,19 +103,31 @@
                 <path d="M9 15h3" />
               </g>
 
-              <!-- clock (pendientes) -->
+              <!-- clock -->
               <g *ngSwitchCase="'clock'">
                 <circle cx="12" cy="12" r="7" />
                 <path d="M12 8v4l2.5 2" />
+              </g>
+
+              <!-- settings -->
+              <g *ngSwitchCase="'settings'">
+                <circle cx="12" cy="12" r="3" />
+                <path
+                  d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V22a2 2 0 1 1-4 0v-.2a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H2a2 2 0 1 1 0-4h.2a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H8a1.7 1.7 0 0 0 1-1.5V2a2 2 0 1 1 4 0v.2a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V8c0 .7.4 1.3 1.5 1.5H22a2 2 0 1 1 0 4h-.2a1.7 1.7 0 0 0-1.5 1z"
+                />
+              </g>
+
+              <!-- flag -->
+              <g *ngSwitchCase="'flag'">
+                <path d="M5 3v18" />
+                <path d="M5 4h11l-2 4 2 4H5" />
               </g>
             </ng-container>
           </svg>
         </div>
 
         <!-- Texto -->
-        <span class="font-medium truncate">
-          {{ item.label }}
-        </span>
+        <span class="font-medium truncate">{{ item.label }}</span>
       </a>
 
       <div
@@ -152,16 +158,12 @@
                    bg-yellow-300/90 text-yellow-900 text-sm
                    dark:bg-slate-700 dark:text-slate-100"
           >
-            <ng-container *ngIf="currentTheme === 'light'; else moonIcon">
-              ☀
-            </ng-container>
+            <ng-container *ngIf="currentTheme === 'light'; else moonIcon">☀</ng-container>
             <ng-template #moonIcon>🌙</ng-template>
           </span>
           <span class="font-semibold text-xl">Apariencia</span>
         </div>
-        <span
-          class="text-[11px] font-medium text-slate-500 dark:text-slate-400"
-        >
+        <span class="text-[11px] font-medium text-slate-500 dark:text-slate-400">
           {{ currentTheme === 'light' ? 'Claro' : 'Oscuro' }}
         </span>
       </button>
@@ -181,9 +183,7 @@
           stroke-linecap="round"
           stroke-linejoin="round"
         >
-          <path
-            d="M10 5H6.5A1.5 1.5 0 0 0 5 6.5v11A1.5 1.5 0 0 0 6.5 19H10"
-          />
+          <path d="M10 5H6.5A1.5 1.5 0 0 0 5 6.5v11A1.5 1.5 0 0 0 6.5 19H10" />
           <path d="M14 8l4 4-4 4" />
           <path d="M9.5 12H18" />
         </svg>
@@ -199,11 +199,7 @@
         <div
           class="h-10 w-10 rounded-2xl bg-indigo-500 flex items-center justify-center overflow-hidden shadow-md shadow-indigo-500/40"
         >
-          <img
-            src="/logouta.png"
-            alt="SRADIM"
-            class="h-8 w-8 object-contain"
-          />
+          <img src="/logouta.png" alt="SRADIM" class="h-8 w-8 object-contain" />
         </div>
       </div>
 
@@ -255,6 +251,7 @@
                 <circle cx="9" cy="9.5" r="2.5" />
                 <path d="M4.5 17.5C5.3 15.6 7 14.5 9 14.5s3.7 1.1 4.5 3" />
                 <circle cx="16.5" cy="10.5" r="2.2" />
+                <path d="M14.5 15c1.5.2 2.8 1.1 3.5 2.5" />
               </g>
 
               <g *ngSwitchCase="'docs'">
@@ -267,6 +264,20 @@
               <g *ngSwitchCase="'clock'">
                 <circle cx="12" cy="12" r="7" />
                 <path d="M12 8v4l2.5 2" />
+              </g>
+
+              <!-- settings -->
+              <g *ngSwitchCase="'settings'">
+                <circle cx="12" cy="12" r="3" />
+                <path
+                  d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V22a2 2 0 1 1-4 0v-.2a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H2a2 2 0 1 1 0-4h.2a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H8a1.7 1.7 0 0 0 1-1.5V2a2 2 0 1 1 4 0v.2a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V8c0 .7.4 1.3 1.5 1.5H22a2 2 0 1 1 0 4h-.2a1.7 1.7 0 0 0-1.5 1z"
+                />
+              </g>
+
+              <!-- flag -->
+              <g *ngSwitchCase="'flag'">
+                <path d="M5 3v18" />
+                <path d="M5 4h11l-2 4 2 4H5" />
               </g>
             </ng-container>
           </svg>
@@ -281,13 +292,9 @@
                border border-slate-200 bg-slate-50 text-2xl
                hover:bg-slate-100
                dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
-        [attr.title]="
-          currentTheme === 'light' ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro'
-        "
+        [attr.title]="currentTheme === 'light' ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro'"
       >
-        <ng-container *ngIf="currentTheme === 'light'; else moonSmall">
-          ☀
-        </ng-container>
+        <ng-container *ngIf="currentTheme === 'light'; else moonSmall">☀</ng-container>
         <ng-template #moonSmall>🌙</ng-template>
       </button>
 
@@ -307,9 +314,7 @@
             stroke-linecap="round"
             stroke-linejoin="round"
           >
-            <path
-              d="M10 5H6.5A1.5 1.5 0 0 0 5 6.5v11A1.5 1.5 0 0 0 6.5 19H10"
-            />
+            <path d="M10 5H6.5A1.5 1.5 0 0 0 5 6.5v11A1.5 1.5 0 0 0 6.5 19H10" />
             <path d="M14 8l4 4-4 4" />
             <path d="M9.5 12H18" />
           </svg>

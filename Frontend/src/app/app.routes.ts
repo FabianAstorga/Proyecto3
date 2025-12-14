@@ -152,6 +152,23 @@ export const routes: Routes = [
             (m) => m.AsignarCargoComponent
           ),
       },
+
+      // ===== NUEVAS GESTIONES =====
+      {
+        path: "tipos-actividad",
+        loadComponent: () =>
+          import(
+            "./modules/gestionar-tipos-actividad/gestionar-tipos-actividad.component"
+          ).then((m) => m.GestionarTiposActividadComponent),
+      },
+      {
+        path: "feriados",
+        loadComponent: () =>
+          import(
+            "./modules/gestionar-feriados/gestionar-feriados.component"
+          ).then((m) => m.GestionarFeriadosComponent),
+      },
+
       {
         path: "",
         pathMatch: "full",

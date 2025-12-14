@@ -72,9 +72,7 @@
               </mat-form-field>
 
               <div
-                *ngIf="
-                  form.get('tipo_actividad')?.value === 'Otro (especificar)'
-                "
+                *ngIf="requiereDetalleSeleccionado"
                 class="mt-2"
               >
                 <label

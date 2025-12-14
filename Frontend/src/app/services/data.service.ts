@@ -1,6 +1,6 @@
 // src/app/services/data.service.ts
 import { Injectable } from "@angular/core";
-import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 import { Observable, map } from "rxjs";
 import { BackendHorario, SaveHorarioPayload } from "../models/horario.models";
 import { User } from "../models/user.model";
@@ -29,6 +29,8 @@ export class DataService {
   private readonly cargosEndpoint = `${this.apiUrl}/charges`;
   private readonly loginEndpoint = `${this.apiUrl}/auth/login`;
   private readonly informesEndpoint = `${this.apiUrl}/informes`;
+  private readonly feriadosEndpoint = `${this.apiUrl}/feriados`;
+  private readonly tiposActividadEndpoint = `${this.apiUrl}/tipos-actividad`;
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
@@ -365,7 +367,94 @@ saveEventosGlobalesSemana(
     items,
     this.getAuthOptions()
   );
+
 }
+  // ================= FERIADOS - CRUD =================
+
+getFeriados(from: string, to: string, activo?: boolean): Observable<any[]> {
+  let params = new HttpParams().set("from", from).set("to", to);
+  if (activo !== undefined) params = params.set("activo", String(activo));
+
+  return this.http.get<any[]>(
+    this.feriadosEndpoint,
+    { ...this.getAuthOptions(), params }
+  );
+}
+
+createFeriado(payload: any): Observable<any> {
+  return this.http.post(
+    this.feriadosEndpoint,
+    payload,
+    this.getAuthOptions()
+  );
+}
+
+updateFeriado(id: number, payload: any): Observable<any> {
+  return this.http.put(
+    `${this.feriadosEndpoint}/${id}`,
+    payload,
+    this.getAuthOptions()
+  );
+}
+
+disableFeriado(id: number): Observable<any> {
+  return this.http.patch(
+    `${this.feriadosEndpoint}/${id}/disable`,
+    {},
+    this.getAuthOptions()
+  );
+}
+
+deleteFeriado(id: number): Observable<any> {
+  return this.http.delete(
+    `${this.feriadosEndpoint}/${id}`,
+    this.getAuthOptions()
+  );
+}
+
+// ================= TIPOS ACTIVIDAD - CRUD =================
+
+getTiposActividad(activo?: boolean): Observable<any[]> {
+  let params = new HttpParams();
+  if (activo !== undefined) params = params.set("activo", String(activo));
+
+  return this.http.get<any[]>(
+    this.tiposActividadEndpoint,
+    { ...this.getAuthOptions(), params }
+  );
+}
+
+createTipoActividad(payload: any): Observable<any> {
+  return this.http.post(
+    this.tiposActividadEndpoint,
+    payload,
+    this.getAuthOptions()
+  );
+}
+
+updateTipoActividad(id: number, payload: any): Observable<any> {
+  return this.http.put(
+    `${this.tiposActividadEndpoint}/${id}`,
+    payload,
+    this.getAuthOptions()
+  );
+}
+
+disableTipoActividad(id: number): Observable<any> {
+  return this.http.patch(
+    `${this.tiposActividadEndpoint}/${id}/disable`,
+    {},
+    this.getAuthOptions()
+  );
+}
+
+deleteTipoActividad(id: number): Observable<any> {
+  return this.http.delete(
+    `${this.tiposActividadEndpoint}/${id}`,
+    this.getAuthOptions()
+  );
+}
+
 
   // ================= HORARIOS =================
 

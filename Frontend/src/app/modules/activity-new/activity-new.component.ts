@@ -1,4 +1,3 @@
-// src/app/modules/activity-new/activity-new.component.ts
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -93,16 +92,10 @@ export class ActivityNewComponent {
     return id != null ? `/funcionario/perfil/${id}` : '/funcionario/perfil';
   }
 
-  // Catálogos
-  tiposActividad = [
-    'Taller',
-    'Seminario',
-    'Voluntariado',
-    'Investigación',
-    'Deportivo',
-    'Cultural',
-    'Otro (especificar)',
-  ];
+  // Catálogos (desde backend)
+  tiposActividad: string[] = [];
+  private tiposActividadMeta = new Map<string, { requiereDetalle: boolean }>();
+
   estados = ['Pendiente', 'Realizada'];
 
   // Mes actual (para MULTI-DÍA)
@@ -121,28 +114,8 @@ export class ActivityNewComponent {
   readonly monthStartISO = this.toISO(this.firstDay);
   readonly monthEndISO = this.toISO(this.lastDay);
 
-  // Feriados 2025 (Chile) -> usados solo en multi-día
-  private readonly feriadosISO = new Set<string>([
-    '2025-01-01',
-    '2025-04-18',
-    '2025-04-19',
-    '2025-05-01',
-    '2025-05-21',
-    '2025-06-07',
-    '2025-06-20',
-    '2025-06-29',
-    '2025-07-16',
-    '2025-08-15',
-    '2025-09-18',
-    '2025-09-19',
-    '2025-10-12',
-    '2025-10-31',
-    '2025-11-01',
-    '2025-11-16',
-    '2025-12-08',
-    '2025-12-14',
-    '2025-12-25',
-  ]);
+  // Feriados (desde backend) -> usados solo en multi-día
+  private feriadosISO = new Set<string>();
 
   // === Form ===
   form = this.fb.group(
@@ -152,8 +125,9 @@ export class ActivityNewComponent {
       // fecha principal sin restricción de mes
       fecha: [new Date(), Validators.required],
 
-      tipo_actividad: [<string>this.tiposActividad[0], Validators.required],
-      tipo_actividad_otro: [''], // requerido si se elige “Otro (especificar)”
+      // NO usar this.tiposActividad[0] aquí: se carga async
+      tipo_actividad: ['', Validators.required],
+      tipo_actividad_otro: [''], // requerido si el tipo seleccionado requiere detalle
       estado: [<string>this.estados[0], Validators.required],
 
       multi: this.fb.group({
@@ -178,25 +152,35 @@ export class ActivityNewComponent {
   );
 
   constructor() {
-    // Validador condicional para “tipo_actividad_otro”
-    this.form
-      .get('tipo_actividad')!
-      .valueChanges.subscribe((val: string | null) => {
-        const otroCtrl = this.form.get('tipo_actividad_otro')!;
-        if (val === 'Otro (especificar)') {
-          otroCtrl.addValidators([
-            Validators.required,
-            Validators.maxLength(100),
-          ]);
-        } else {
-          otroCtrl.clearValidators();
-          otroCtrl.reset('');
-        }
-        otroCtrl.updateValueAndValidity({ emitEvent: false });
-      });
+    // 1) cargar catálogos desde backend
+    this.loadTiposActividad();
+    this.loadFeriadosMesActual();
 
-    // Validación específica de la sección multi-día
+    // 2) Validador condicional según requiereDetalle del tipo seleccionado
+    this.form.get('tipo_actividad')!.valueChanges.subscribe((val: string | null) => {
+      const detalleCtrl = this.form.get('tipo_actividad_otro')!;
+      const requiere = val
+        ? (this.tiposActividadMeta.get(val)?.requiereDetalle ?? false)
+        : false;
+
+      if (requiere) {
+        detalleCtrl.addValidators([Validators.required, Validators.maxLength(100)]);
+      } else {
+        detalleCtrl.clearValidators();
+        detalleCtrl.reset('');
+      }
+      detalleCtrl.updateValueAndValidity({ emitEvent: false });
+    });
+
+    // 3) Validación específica de la sección multi-día
     this.multi.addValidators(this.validateMultiSection.bind(this));
+  }
+
+  // --------- Getter para el template (mostrar input detalle) ----------
+  get requiereDetalleSeleccionado(): boolean {
+    const tipo = this.form.get('tipo_actividad')?.value as string | null;
+    if (!tipo) return false;
+    return this.tiposActividadMeta.get(tipo)?.requiereDetalle ?? false;
   }
 
   // Getters de conveniencia
@@ -229,9 +213,7 @@ export class ActivityNewComponent {
   };
 
   // ==== Validación MULTI-DÍA ====
-  private validateMultiSection(
-    group: AbstractControl
-  ): ValidationErrors | null {
+  private validateMultiSection(group: AbstractControl): ValidationErrors | null {
     const mode = group.get('mode')?.value as MultiMode;
     if (!mode || mode === 'none') return null;
 
@@ -247,6 +229,7 @@ export class ActivityNewComponent {
       fa.controls.forEach((c) => {
         const v = c.value as Date | null;
         c.setErrors(null);
+
         if (!inMonth(v)) {
           c.setErrors({ outOfMonth: true });
           anyError = true;
@@ -260,6 +243,7 @@ export class ActivityNewComponent {
       const endCtrl = group.get('weekly.end')!;
       const s = startCtrl.value as Date | null;
       const e = endCtrl.value as Date | null;
+
       startCtrl.setErrors(null);
       endCtrl.setErrors(null);
 
@@ -282,33 +266,9 @@ export class ActivityNewComponent {
 
   // ==== Utilidades ====
   private toISO(d: Date): string {
-    return new Date(
-      Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())
-    )
+    return new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()))
       .toISOString()
       .slice(0, 10);
-  }
-
-  private *daysBetween(start: Date, end: Date) {
-    const cur = new Date(start);
-    while (cur <= end) {
-      yield new Date(cur);
-      cur.setDate(cur.getDate() + 1);
-    }
-  }
-
-  private selectedWeekdays(): number[] {
-    const w = this.weekly.get('weekdays')!.value as WeekFlags;
-    const map: [keyof WeekFlags, number][] = [
-      ['sun', 0],
-      ['mon', 1],
-      ['tue', 2],
-      ['wed', 3],
-      ['thu', 4],
-      ['fri', 5],
-      ['sat', 6],
-    ];
-    return map.filter(([k]) => (w as any)[k]).map(([, num]) => num);
   }
 
   private getDiasSemanaNombres(): string[] {
@@ -325,6 +285,69 @@ export class ActivityNewComponent {
     return map.filter(([k]) => (w as any)[k]).map(([, nombre]) => nombre);
   }
 
+  // ==== Carga catálogos desde backend ====
+  private loadTiposActividad(): void {
+    this.dataService.getTiposActividad(true).subscribe({
+      next: (list: any[]) => {
+        const ordenados = (list ?? [])
+          .map((x) => ({
+            nombre: String(x.nombre ?? '').trim(),
+            orden: Number(x.orden ?? 0),
+            requiereDetalle: !!x.requiereDetalle,
+            activo: !!x.activo,
+          }))
+          .filter((x) => x.nombre && x.activo)
+          .sort((a, b) => a.orden - b.orden);
+
+        this.tiposActividad = ordenados.map((x) => x.nombre);
+
+        this.tiposActividadMeta.clear();
+        ordenados.forEach((x) => {
+          this.tiposActividadMeta.set(x.nombre, {
+            requiereDetalle: x.requiereDetalle,
+          });
+        });
+
+        // setear valor inicial válido
+        const actual = this.form.get('tipo_actividad')!.value as string | null;
+        if (!actual || !this.tiposActividad.includes(actual)) {
+          const first = this.tiposActividad[0] ?? '';
+          if (first) this.form.get('tipo_actividad')!.setValue(first, { emitEvent: true });
+        } else {
+          // fuerza recalcular validación detalle
+          this.form.get('tipo_actividad')!.setValue(actual, { emitEvent: true });
+        }
+      },
+      error: (err) => {
+        console.error('Error cargando tipos de actividad:', err);
+        // fallback mínimo para no romper
+        this.tiposActividad = ['Taller'];
+        this.tiposActividadMeta.set('Taller', { requiereDetalle: false });
+        this.form.get('tipo_actividad')!.setValue('Taller', { emitEvent: true });
+      },
+    });
+  }
+
+  private loadFeriadosMesActual(): void {
+    this.dataService.getFeriados(this.monthStartISO, this.monthEndISO, true).subscribe({
+      next: (list: any[]) => {
+        const set = new Set<string>();
+        (list ?? []).forEach((x) => {
+          const fecha = String(x.fecha ?? '').slice(0, 10);
+          if (fecha) set.add(fecha);
+        });
+        this.feriadosISO = set;
+
+        // revalida multi si ya habían fechas seleccionadas
+        this.multi.updateValueAndValidity({ emitEvent: false });
+      },
+      error: (err) => {
+        console.error('Error cargando feriados:', err);
+        this.feriadosISO = new Set<string>();
+      },
+    });
+  }
+
   // ==== Acciones UI MULTI-DÍA ====
   addSpecificDate(value: Date = new Date()) {
     this.specificDates.push(this.fb.control(value, Validators.required));
@@ -339,7 +362,7 @@ export class ActivityNewComponent {
     this.form.reset({
       descripcionAct: '',
       fecha: new Date(),
-      tipo_actividad: this.tiposActividad[0],
+      tipo_actividad: this.tiposActividad[0] ?? '',
       tipo_actividad_otro: '',
       estado: this.estados[0],
       multi: {
@@ -375,8 +398,11 @@ export class ActivityNewComponent {
 
     const base = this.form.value;
 
+    // si el tipo requiere detalle, lo usamos como "tipoFinal"
+    const requiere = this.requiereDetalleSeleccionado;
+
     const tipoFinal =
-      (base.tipo_actividad === 'Otro (especificar)' && base.tipo_actividad_otro
+      (requiere && base.tipo_actividad_otro
         ? base.tipo_actividad_otro
         : base.tipo_actividad) ?? '';
 
