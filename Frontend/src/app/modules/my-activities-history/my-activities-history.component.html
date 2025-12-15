@@ -102,11 +102,13 @@
 
                 <!-- Derecha: estado -->
                 <span
-                  class="mt-1 inline-flex items-center justify-center rounded-full px-3 py-1.5 text-xl md:text-xl font-medium self-start md:self-auto"
-                  [ngClass]="statusPillClass(a.estado)"
-                >
-                  {{ a.estado }}
-                </span>
+  class="mt-1 inline-flex items-center justify-center rounded-full px-3 py-1.5 text-xl md:text-xl font-medium self-start md:self-auto
+         border border-slate-200 text-slate-700 bg-slate-50
+         dark:border-slate-700 dark:text-slate-200 dark:bg-slate-900/40"
+>
+  {{ a.estado || '—' }}
+</span>
+
               </div>
             </div>
           </ng-container>

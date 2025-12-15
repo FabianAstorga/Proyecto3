@@ -27,8 +27,20 @@ export class MyActivitiesHistoryComponent implements OnInit {
   private dataService = inject(DataService);
   private authService = inject(AuthService);
 
-  // Info del funcionario
-  funcionarioName = "";
+  // ===== Datos persona =====
+  funcionarioName = "—";
+  cargo = "—";
+
+  // Datos reales desde BD (sí existen)
+  correo = "";
+  telefono = "";
+
+  // Descripción del cargo (en viñetas)
+  descripcionCargoLines: string[] = ["• —"];
+
+  // ===== Logos (dataURL) =====
+  private logoDimDataUrl: string | null = null;
+  private logoUtaDataUrl: string | null = null;
 
   // Datos
   private allActivities: Activity[] = [];
@@ -37,8 +49,7 @@ export class MyActivitiesHistoryComponent implements OnInit {
   groupedMonths: MonthGroup[] = [];
   currentMonthIndex = 0;
 
-  // ===== Getters de navegación / vista =====
-
+  // ===== Getters =====
   get currentMonthGroup(): MonthGroup | null {
     if (!this.groupedMonths.length) return null;
     return this.groupedMonths[this.currentMonthIndex] ?? null;
@@ -53,29 +64,92 @@ export class MyActivitiesHistoryComponent implements OnInit {
   }
 
   // ===== Ciclo de vida =====
-
   ngOnInit(): void {
     const userId = this.authService.getUserId();
     if (!userId) {
-      // si por algún motivo no hay id, no seguimos
       this.groupedMonths = [];
       return;
     }
 
-    // Nombre del funcionario
-    this.dataService.getUser(userId).subscribe({
-      next: (user) => {
-        if (user) {
-          this.funcionarioName = `${user.firstName} ${user.lastName}`;
+    // Pre-cargar logos
+    this.preloadLogos();
+
+    // 1) Perfil: nombre/apellido, correo, teléfono, rol (fallback de cargo)
+    this.dataService.getMyProfile().subscribe({
+      next: (me) => {
+        if (!me) return;
+
+        this.funcionarioName =
+          `${me.firstName ?? ""} ${me.lastName ?? ""}`.trim() || "—";
+
+        this.correo = me.email ?? "";
+        this.telefono = me.phone ?? "";
+
+        // Si no hay cargo asignado, al menos usa el rol
+        const roleFallback = (me.role ?? "").toString().trim();
+        if (roleFallback && (this.cargo === "—" || !this.cargo)) {
+          this.cargo = roleFallback;
         }
       },
-      error: (err) => console.error("Error cargando usuario:", err),
+      error: (err) => console.error("Error cargando perfil:", err),
     });
 
-    // Cargar actividades solo del funcionario
+    // 2) Cargo asignado por usuario (si existe)
+    this.dataService.getCargosByUsuario(userId).subscribe({
+      next: (cargos) => {
+        const c = cargos?.[0];
+        if (!c) return;
+
+        const nombreCargo =
+          (c as any).nombre ??
+          (c as any).name ??
+          (c as any).titulo ??
+          (c as any).title;
+
+        if (nombreCargo) this.cargo = String(nombreCargo);
+
+        // Descripción del cargo -> viñetas sin numeración
+        const funciones: unknown =
+          (c as any).funciones ??
+          (c as any).functions ??
+          (c as any).descripcionCargo ??
+          null;
+
+        if (Array.isArray(funciones) && funciones.length) {
+          this.descripcionCargoLines = funciones
+            .map((x) => String(x).trim())
+            .filter(Boolean)
+            .map((s) => `• ${this.stripLeadingNumbering(s)}`);
+          return;
+        }
+
+        const texto =
+          (c as any).descripcion ??
+          (c as any).detail ??
+          (c as any).detalle ??
+          (c as any).glosa ??
+          "";
+
+        if (texto && String(texto).trim()) {
+          const raw = String(texto).trim();
+          const parts = raw
+            .split(/\r?\n|;|•/g)
+            .map((s) => s.trim())
+            .filter(Boolean);
+
+          this.descripcionCargoLines =
+            parts.length > 0
+              ? parts.map((p) => `• ${this.stripLeadingNumbering(p)}`)
+              : ["• —"];
+        }
+      },
+      error: (err) => console.warn("No se pudo obtener cargo por usuario:", err),
+    });
+
+    // 3) Actividades del funcionario
     this.dataService.getActivitiesByUser(userId).subscribe({
       next: (acts) => {
-        this.allActivities = acts;
+        this.allActivities = acts ?? [];
         this.rebuildView();
       },
       error: (err) =>
@@ -83,22 +157,21 @@ export class MyActivitiesHistoryComponent implements OnInit {
     });
   }
 
-  // ===== Navegación entre meses =====
+  // ===== Helpers texto =====
+  private stripLeadingNumbering(s: string): string {
+    return s.replace(/^\s*(\d+[\.\)]\s+|-\s+|•\s+)/, "").trim();
+  }
 
+  // ===== Navegación entre meses =====
   goPrevMonth(): void {
-    if (this.hasPrevMonth) {
-      this.currentMonthIndex++;
-    }
+    if (this.hasPrevMonth) this.currentMonthIndex++;
   }
 
   goNextMonth(): void {
-    if (this.hasNextMonth) {
-      this.currentMonthIndex--;
-    }
+    if (this.hasNextMonth) this.currentMonthIndex--;
   }
 
   // ===== Construcción de la vista =====
-
   private rebuildView(): void {
     if (!this.allActivities.length) {
       this.groupedMonths = [];
@@ -106,7 +179,6 @@ export class MyActivitiesHistoryComponent implements OnInit {
       return;
     }
 
-    // Agrupar por mes (YYYY-MM)
     const byMonth = new Map<string, Activity[]>();
 
     for (const a of this.allActivities) {
@@ -119,7 +191,6 @@ export class MyActivitiesHistoryComponent implements OnInit {
     const months: MonthGroup[] = [];
 
     for (const [monthKey, acts] of byMonth.entries()) {
-      // ordenar actividades del mes por fecha desc y luego por título
       acts.sort((a, b) => {
         if (a.fecha < b.fecha) return 1;
         if (a.fecha > b.fecha) return -1;
@@ -133,42 +204,24 @@ export class MyActivitiesHistoryComponent implements OnInit {
       });
     }
 
-    // Ordenar meses: más reciente primero
     months.sort((a, b) =>
       a.monthKey < b.monthKey ? 1 : a.monthKey > b.monthKey ? -1 : 0
     );
 
     this.groupedMonths = months;
-    this.currentMonthIndex = this.groupedMonths.length ? 0 : 0;
+    this.currentMonthIndex = 0;
   }
 
   // ===== Utilidades =====
-
   formatDMY(iso: string): string {
     const [y, m, d] = iso.split("-").map(Number);
-    return `${String(d).padStart(2, "0")}/${String(m).padStart(
-      2,
-      "0"
-    )}/${y}`;
-  }
-
-  statusPillClass(est: "" | Estado): string {
-    switch (est) {
-      case "Aprobada":
-        return "pill-status-aprobada";
-      case "Pendiente":
-        return "pill-status-pendiente";
-      case "Rechazada":
-        return "pill-status-rechazada";
-      default:
-        return "pill-status-default";
-    }
+    return `${String(d).padStart(2, "0")}/${String(m).padStart(2, "0")}/${y}`;
   }
 
   private getMonthLabel(key: string): string {
     const [yearStr, monthStr] = key.split("-");
     const year = Number(yearStr);
-    const month = Number(monthStr); // 1..12
+    const month = Number(monthStr);
     const meses = [
       "enero",
       "febrero",
@@ -187,373 +240,363 @@ export class MyActivitiesHistoryComponent implements OnInit {
     return `${nombre.charAt(0).toUpperCase()}${nombre.slice(1)} ${year}`;
   }
 
-  // ===== PDF por mes (personal, con mismo estilo que el global) =====
+  private monthKeyToUpperLabel(month: MonthGroup): string {
+    const [y, m] = month.monthKey.split("-").map(Number);
+    const mesesUpper = [
+      "ENERO",
+      "FEBRERO",
+      "MARZO",
+      "ABRIL",
+      "MAYO",
+      "JUNIO",
+      "JULIO",
+      "AGOSTO",
+      "SEPTIEMBRE",
+      "OCTUBRE",
+      "NOVIEMBRE",
+      "DICIEMBRE",
+    ];
+    return `MES DE ${mesesUpper[(m ?? 1) - 1] ?? "—"} ${y}`;
+  }
 
-  downloadMonthPdf(month: MonthGroup): void {
+  // ===== Carga de imágenes (logos) =====
+  private async preloadLogos(): Promise<void> {
+    const dimPath = "/logodim.png";
+    const utaPath = "/logouta.png";
+
+    try {
+      this.logoDimDataUrl = await this.loadImageAsDataURL(dimPath);
+    } catch (e) {
+      console.warn("No se pudo cargar logodim:", e);
+      this.logoDimDataUrl = null;
+    }
+
+    try {
+      this.logoUtaDataUrl = await this.loadImageAsDataURL(utaPath);
+    } catch (e) {
+      console.warn("No se pudo cargar logouta:", e);
+      this.logoUtaDataUrl = null;
+    }
+  }
+
+  private loadImageAsDataURL(url: string): Promise<string> {
+    return fetch(url)
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status} cargando ${url}`);
+        return res.blob();
+      })
+      .then(
+        (blob) =>
+          new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onerror = () => reject(new Error("FileReader error"));
+            reader.onload = () => resolve(String(reader.result));
+            reader.readAsDataURL(blob);
+          })
+      );
+  }
+
+  // ===== PDF =====
+  async downloadMonthPdf(month: MonthGroup): Promise<void> {
     const doc = new jsPDF();
 
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
-
     const marginX = 14;
-    let y = 20;
 
-    // === 0. LOGOS DEPARTAMENTO (PLACEHOLDERS logdim1 / logdim2) ===
-    const logoWidth = 30;
-    const logoHeight = 15;
+    // Footer
+    const footerLine1 = "Dirección Av. 18 de Septiembre N° 2222, Arica - Chile";
+    const footerLine2 = "dim@gestion.uta.cl - +56 58-2205282";
+    const footerLine3 = "www.uta.cl";
 
-    doc.setDrawColor(200, 200, 200);
-    doc.setFillColor(255, 255, 255);
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(8);
+    const drawFooter = (pageNum: number, total: number) => {
+      const y = pageHeight - 18;
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      doc.setTextColor(90, 90, 90);
 
-    // Logo izquierdo (logdim1)
-    doc.rect(marginX, 10, logoWidth, logoHeight);
-    doc.text(
-      "logdim1",
-      marginX + logoWidth / 2,
-      10 + logoHeight / 2 + 2,
-      { align: "center" }
-    );
+      doc.text(footerLine1, marginX, y);
+      doc.text(footerLine2, marginX, y + 4);
+      doc.text(footerLine3, marginX, y + 8);
 
-    // Logo derecho (logdim2)
-    const rightLogoX = pageWidth - marginX - logoWidth;
-    doc.rect(rightLogoX, 10, logoWidth, logoHeight);
-    doc.text(
-      "logdim2",
-      rightLogoX + logoWidth / 2,
-      10 + logoHeight / 2 + 2,
-      { align: "center" }
-    );
-
-    // Bajamos un poco más el cursor de escritura para el título
-    y = 32;
-
-    // Función para formatear la fecha a 'DD-mes' (ej: 21-nov)
-    const formatShort = (iso: string): string => {
-      const [_, monthStr, dayStr] = iso.split("-");
-      const d = Number(dayStr);
-      const m = Number(monthStr); // 1..12
-      const meses = [
-        "ene",
-        "feb",
-        "mar",
-        "abr",
-        "may",
-        "jun",
-        "jul",
-        "ago",
-        "sept",
-        "oct",
-        "nov",
-        "dic",
-      ];
-      return `${String(d).padStart(2, "0")}-${meses[m - 1] ?? ""}`;
+      doc.setTextColor(120, 120, 120);
+      doc.text(`${pageNum}/${total}`, pageWidth - marginX, y + 8, {
+        align: "right",
+      });
     };
 
-    // === 1. ENCABEZADO PRINCIPAL (TÍTULO Y FUNCIONARIO) ===
+    const applyFooters = () => {
+      const total = doc.getNumberOfPages();
+      for (let p = 1; p <= total; p++) {
+        doc.setPage(p);
+        drawFooter(p, total);
+      }
+    };
+
+    const dmy = (iso: string) => this.formatDMY(iso);
+
+    // ===== Encabezado =====
+    let y = 20;
+
+    // Logos pequeños
+    const logoW = 26;
+    const logoH = 12;
+    const topY = 12;
+
+    const leftX = marginX;
+    const rightX = pageWidth - marginX - logoW;
+
+    if (this.logoDimDataUrl) {
+      doc.addImage(this.logoDimDataUrl, "PNG", leftX, topY, logoW, logoH);
+    } else {
+      doc.setDrawColor(200, 200, 200);
+      doc.rect(leftX, topY, logoW, logoH);
+    }
+
+    if (this.logoUtaDataUrl) {
+      doc.addImage(this.logoUtaDataUrl, "PNG", rightX, topY, logoW, logoH);
+    } else {
+      doc.setDrawColor(200, 200, 200);
+      doc.rect(rightX, topY, logoW, logoH);
+    }
+
+    y = 40;
+
+    // ===== Marco principal (inicio, excluye firmas) =====
+    const frameX = marginX - 4;
+    const frameY = 36;
+    const frameW = pageWidth - (marginX - 4) * 2;
+    const frameStartY = frameY;
+
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(18);
+    doc.setFontSize(12);
     doc.setTextColor(0, 0, 0);
-    doc.text("Mis actividades", pageWidth / 2, y, {
+    doc.text("DEPARTAMENTO DE INGENIERÍA MECÁNICA", pageWidth / 2, y, {
       align: "center",
     });
     y += 8;
 
-    const funcName =
-      this.funcionarioName || "Funcionario (sin identificar)";
+    doc.setFontSize(14);
+    doc.text("INFORME DE ACTIVIDADES RELEVANTES", pageWidth / 2, y, {
+      align: "center",
+    });
+    y += 8;
+
+    doc.setFontSize(12);
+    doc.text(this.monthKeyToUpperLabel(month), pageWidth / 2, y, {
+      align: "center",
+    });
+    y += 12;
+
+    // ===== Caja identificación =====
+    const boxX = marginX;
+    const boxW = pageWidth - marginX * 2;
+    const boxH = 28;
+
+    doc.setDrawColor(180, 180, 180);
+    doc.roundedRect(boxX, y, boxW, boxH, 2, 2, "S");
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
+    doc.text("NOMBRE", boxX + 4, y + 7);
+    doc.text("CORREO", boxX + 4, y + 16);
+    doc.text("CARGO", boxX + 4, y + 25);
+
     doc.setFont("helvetica", "normal");
+    doc.text(this.funcionarioName || "—", boxX + 28, y + 7);
+    doc.text(this.correo || "—", boxX + 28, y + 16);
+    doc.text(this.cargo || "—", boxX + 28, y + 25);
+
+    y += boxH + 10;
+
+    // ===== Descripción del cargo =====
+    doc.setFont("helvetica", "bold");
     doc.setFontSize(11);
-    doc.setTextColor(90, 90, 90);
-    doc.text(
-      `${month.monthLabel.toLowerCase()} — ${funcName}`,
-      pageWidth / 2,
-      y,
-      { align: "center" }
-    );
-    y += 10;
+    doc.text("Descripción de cargo:", marginX, y);
+    y += 6;
 
-    const tableMarginX = marginX;
-    const tableWidth = pageWidth - tableMarginX * 2;
-    const headerHeight = 10;
-    const lineHeight = 8; // Altura base de línea de texto
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
 
-    const dateColWidth = 36;
-    const statusColWidth = 42;
-    const activityColWidth = tableWidth - dateColWidth - statusColWidth;
+    const descLines = (this.descripcionCargoLines ?? [])
+      .map((s) => String(s).trim())
+      .filter(Boolean);
 
-    const bottomMargin = 30;
-
-    // === 2. TABLA ÚNICA CON LAS ACTIVIDADES DEL FUNCIONARIO ===
-    const activities = month.activities;
-
-    if (!activities.length) {
-      // Si no hay actividades, guardamos un PDF simple
-      const cleanKeyEmpty = month.monthKey.replace("-", "");
-      doc.text(
-        "No hay actividades registradas en este mes.",
-        pageWidth / 2,
-        y + 10,
-        { align: "center" }
-      );
-      doc.save(`mis_actividades_${cleanKeyEmpty}.pdf`);
-      return;
+    if (descLines.length) {
+      for (const line of descLines) {
+        const wrapped = doc.splitTextToSize(line, pageWidth - marginX * 2);
+        doc.text(wrapped, marginX, y);
+        y += wrapped.length * 5;
+      }
+    } else {
+      doc.text("• —", marginX, y);
+      y += 6;
     }
 
-    // --- 2.1. Calcular altura de la tabla y bloque de firma ---
-    let bodyHeight = 0;
-    const rowHeights: number[] = [];
+    y += 6;
 
+    // ===== Tabla mensual =====
+    doc.setFont("helvetica", "bold");
     doc.setFontSize(11);
-    activities.forEach((a) => {
-      const lineaBase = `${a.titulo} — ${a.detalle || ""}`.trim();
-      const wrapped = doc.splitTextToSize(
-        lineaBase,
-        activityColWidth - 8 // margen interno
-      );
-      const minRowHeight = 14;
-      const rowHeight = Math.max(
-        minRowHeight,
-        wrapped.length * lineHeight + 4
-      );
-      rowHeights.push(rowHeight);
-      bodyHeight += rowHeight;
-    });
+    doc.text("Actividades del mes", marginX, y);
+    y += 6;
 
-    const tableHeight = headerHeight + bodyHeight + 2;
-    const gapBetweenTableAndSignature = 10;
-    const signatureBlockHeight = 14; // "Firma funcionario" + línea
-    const gapAfterSignature = 6;
+    const tableX = marginX;
+    const tableW = pageWidth - marginX * 2;
 
-    const totalBlockHeight =
-      tableHeight +
-      gapBetweenTableAndSignature +
-      signatureBlockHeight +
-      gapAfterSignature;
+    const colFecha = 28;
+    const colEstado = 32;
+    const colActividad = tableW - colFecha - colEstado;
 
-    // Si no cabe todo el bloque en la página, lo movemos a una nueva
-    if (y + totalBlockHeight > pageHeight - bottomMargin) {
-      doc.addPage();
+    const headerH = 8;
+    const lineH = 5.5;
+    const bottomSafe = 45; // aire para firmas + footer
 
-      // Logos en la nueva página
-      const newPageLogoY = 10;
+    const drawTableHeader = () => {
+      doc.setFillColor(245, 245, 245);
       doc.setDrawColor(200, 200, 200);
-      doc.setFillColor(255, 255, 255);
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(8);
+      doc.rect(tableX, y, tableW, headerH, "FD");
 
-      doc.rect(marginX, newPageLogoY, logoWidth, logoHeight);
-      doc.text(
-        "logdim1",
-        marginX + logoWidth / 2,
-        newPageLogoY + logoHeight / 2 + 2,
-        { align: "center" }
-      );
-
-      const newRightLogoX = pageWidth - marginX - logoWidth;
-      doc.rect(newRightLogoX, newPageLogoY, logoWidth, logoHeight);
-      doc.text(
-        "logdim2",
-        newRightLogoX + logoWidth / 2,
-        newPageLogoY + logoHeight / 2 + 2,
-        { align: "center" }
-      );
-
-      y = 32;
-
-      // Repetimos encabezado reducido
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(14);
+      doc.setFontSize(10);
+      doc.setTextColor(0, 0, 0);
+
+      doc.text("Fecha", tableX + 3, y + 5.5);
+      doc.text("Actividad", tableX + colFecha + 3, y + 5.5);
+      doc.text("Estado", tableX + colFecha + colActividad + 3, y + 5.5);
+
+      doc.setDrawColor(220, 220, 220);
+      doc.line(tableX + colFecha, y, tableX + colFecha, y + headerH);
+      doc.line(
+        tableX + colFecha + colActividad,
+        y,
+        tableX + colFecha + colActividad,
+        y + headerH
+      );
+
+      y += headerH;
+    };
+
+    const startNewPageForTable = () => {
+      doc.addPage();
+      y = 20;
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
       doc.setTextColor(0, 0, 0);
       doc.text(
-        `Mis actividades - ${month.monthLabel}`,
+        `INFORME DE ACTIVIDADES RELEVANTES — ${this.monthKeyToUpperLabel(month)}`,
         pageWidth / 2,
         y,
         { align: "center" }
       );
-      y += 8;
+      y += 10;
+
+      drawTableHeader();
+    };
+
+    if (y + headerH > pageHeight - bottomSafe) startNewPageForTable();
+    else drawTableHeader();
+
+    const activities = month.activities ?? [];
+
+    if (!activities.length) {
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.setTextColor(80, 80, 80);
+      doc.text("No hay actividades registradas en este mes.", tableX + 3, y + 8);
+      y += 16;
+    } else {
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.setTextColor(0, 0, 0);
+
+      for (const a of activities) {
+        const fechaTxt = dmy(a.fecha);
+        const actividadTxt = `${a.titulo}${a.detalle ? " - " + a.detalle : ""}`.trim();
+        const estadoTxt = a.estado ?? "—";
+
+        const wrappedAct = doc.splitTextToSize(actividadTxt, colActividad - 6);
+        const rowH = Math.max(10, wrappedAct.length * lineH + 4);
+
+        if (y + rowH > pageHeight - bottomSafe) {
+          startNewPageForTable();
+        }
+
+        doc.setDrawColor(230, 230, 230);
+        doc.rect(tableX, y, tableW, rowH, "S");
+
+        doc.line(tableX + colFecha, y, tableX + colFecha, y + rowH);
+        doc.line(
+          tableX + colFecha + colActividad,
+          y,
+          tableX + colFecha + colActividad,
+          y + rowH
+        );
+
+        doc.text(fechaTxt, tableX + 3, y + 7);
+        doc.text(wrappedAct, tableX + colFecha + 3, y + 7);
+
+        doc.setFont("helvetica", "bold");
+        doc.text(estadoTxt, tableX + colFecha + colActividad + 3, y + 7);
+        doc.setFont("helvetica", "normal");
+
+        y += rowH;
+      }
     }
 
-    const tableY = y;
+    // ===== Marco principal (fin, antes de firmas) =====
+    const frameEndY = y + 4;
+    const frameH = frameEndY - frameStartY;
 
-    // --- 2.2. CONTENEDOR DE LA TABLA ---
-    doc.setDrawColor(210, 210, 210);
+    doc.setDrawColor(160, 160, 160);
     doc.setLineWidth(0.6);
-    doc.setFillColor(255, 255, 255);
-    doc.roundedRect(
-      tableMarginX,
-      tableY,
-      tableWidth,
-      tableHeight,
-      4,
-      4,
-      "S"
-    );
+    doc.roundedRect(frameX, frameStartY, frameW, frameH, 3, 3, "S");
 
-    const innerX = tableMarginX;
-    const innerWidth = tableWidth;
-    const innerTop = tableY;
-    const innerBottom = tableY + tableHeight;
+    // ===== Firmas (fuera del marco) =====
+    const signaturesBlockH = 34;
+    if (y + signaturesBlockH > pageHeight - 24) {
+      doc.addPage();
+      y = 30;
+    } else {
+      y += 12;
+    }
 
-    // --- 2.3. ENCABEZADO DE COLUMNAS ---
-    doc.setFillColor(245, 245, 245);
-    doc.rect(
-      innerX + 1,
-      innerTop + 1,
-      innerWidth - 2,
-      headerHeight,
-      "F"
-    );
+    const lineW = 70;
 
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(11);
-    doc.setTextColor(0, 0, 0);
+    // Izquierda: Funcionario
+    const leftSigX = marginX;
+    doc.setDrawColor(0, 0, 0);
+    doc.line(leftSigX, y + 10, leftSigX + lineW, y + 10);
 
-    const headerBaseline = innerTop + headerHeight - 2;
-    doc.text("Fecha", innerX + 5, headerBaseline);
-    doc.text("Actividad", innerX + dateColWidth + 5, headerBaseline);
-    doc.text(
-      "Estado",
-      innerX + dateColWidth + activityColWidth + 5,
-      headerBaseline
-    );
-
-    // Líneas divisorias verticales
-    doc.setDrawColor(230, 230, 230);
-    const v1 = innerX + dateColWidth;
-    const v2 = innerX + dateColWidth + activityColWidth;
-    doc.line(v1, innerTop, v1, innerBottom);
-    doc.line(v2, innerTop, v2, innerBottom);
-    doc.line(
-      innerX,
-      innerTop + headerHeight + 1,
-      innerX + innerWidth,
-      innerTop + headerHeight + 1
-    ); // Separador bajo el header
-
-    let currentY = innerTop + headerHeight + 1;
-
-    // --- 2.4. FILAS DE ACTIVIDADES ---
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(11);
+    doc.setFontSize(10);
     doc.setTextColor(0, 0, 0);
-    doc.setDrawColor(235, 235, 235);
+    doc.text(this.funcionarioName || "Funcionario", leftSigX, y + 16);
 
-    activities.forEach((a, idx) => {
-      const rowHeight = rowHeights[idx];
+    doc.setTextColor(90, 90, 90);
+    doc.text("Funcionario", leftSigX, y + 21);
 
-      // Posición central vertical de la fila
-      const centerBaselineY = currentY + rowHeight / 2 + 1.5;
+    // Derecha: Director
+    const rightSigX = pageWidth - marginX - lineW;
+    doc.setDrawColor(0, 0, 0);
+    doc.line(rightSigX, y + 10, rightSigX + lineW, y + 10);
 
-      // 1. FECHA
-      const fechaTxt = formatShort(a.fecha);
-      doc.text(fechaTxt, innerX + 5, centerBaselineY);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    doc.text("Director", rightSigX + lineW, y + 16, { align: "right" });
 
-      // 2. ACTIVIDAD (multilínea)
-      const actividadTxt = `${a.titulo} — ${a.detalle || ""}`.trim();
-      const wrapped = doc.splitTextToSize(
-        actividadTxt,
-        activityColWidth - 8
-      );
-
-      const textBlockHeight = wrapped.length * lineHeight;
-      const activityStartPaddingY = (rowHeight - textBlockHeight) / 2;
-
-      doc.text(
-        wrapped,
-        innerX + dateColWidth + 5,
-        currentY + activityStartPaddingY + lineHeight
-      );
-
-      // 3. ESTADO (centrado en columna)
-      const estadoLabel = a.estado;
-      const pillTextSize = 11;
-      doc.setFontSize(pillTextSize);
-
-      const estadoX = innerX + dateColWidth + activityColWidth;
-      const textWidth = doc.getTextWidth(estadoLabel);
-      const pillTextX = estadoX + (statusColWidth - textWidth) / 2;
-
-      doc.setTextColor(0, 0, 0);
-      doc.setFont("helvetica", "bold");
-      doc.text(estadoLabel, pillTextX, centerBaselineY);
-
-      // Volver a configuración por defecto
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(11);
-      doc.setTextColor(0, 0, 0);
-
-      // 4. LÍNEA DIVISORIA HORIZONTAL
-      if (idx < activities.length - 1) {
-        const rowBottom = currentY + rowHeight;
-        doc.setDrawColor(235, 235, 235);
-        doc.line(
-          innerX + 1,
-          rowBottom,
-          innerX + innerWidth - 1,
-          rowBottom
-        );
-      }
-
-      currentY += rowHeight;
+    doc.setTextColor(90, 90, 90);
+    doc.text("Departamento de Ingeniería Mecánica", rightSigX + lineW, y + 21, {
+      align: "right",
     });
 
-    // --- 2.5. FIRMA DEL FUNCIONARIO ---
-    const signatureY = tableY + tableHeight + gapBetweenTableAndSignature;
-    const lineY = signatureY + 4;
+    // ===== Footer =====
+    applyFooters();
 
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(11);
-    doc.setTextColor(0, 0, 0);
-
-    doc.text("Firma funcionario:", tableMarginX, signatureY);
-    doc.setDrawColor(0, 0, 0);
-    doc.line(tableMarginX + 40, lineY, tableMarginX + 105, lineY);
-
-    // Actualizamos y para lo que venga después (aunque ya no hay más bloques)
-    y = tableY + totalBlockHeight;
-
-    // === 3. FIRMA DIRECTOR AL FINAL DEL DOCUMENTO ===
-    const finalPageNumber = doc.getNumberOfPages();
-    doc.setPage(finalPageNumber);
-
-    const finalPageWidth = doc.internal.pageSize.getWidth();
-    const finalPageHeight = doc.internal.pageSize.getHeight();
-
-    const directorLineWidth = 80;
-    const directorLineY = finalPageHeight - 25;
-    const directorLineXStart =
-      (finalPageWidth - directorLineWidth) / 2;
-
-    // Línea de firma del Director
-    doc.setDrawColor(0, 0, 0);
-    doc.line(
-      directorLineXStart,
-      directorLineY,
-      directorLineXStart + directorLineWidth,
-      directorLineY
-    );
-
-    // Texto bajo la línea
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(11);
-    doc.setTextColor(0, 0, 0);
-
-    doc.text(
-      "Firma Director",
-      finalPageWidth / 2,
-      directorLineY + 6,
-      { align: "center" }
-    );
-    doc.text(
-      "Departamento Mecánica",
-      finalPageWidth / 2,
-      directorLineY + 12,
-      { align: "center" }
-    );
-
-    // === 4. GUARDAR EL ARCHIVO ===
+    // ===== Guardar =====
     const cleanKey = month.monthKey.replace("-", "");
-    doc.save(`mis_actividades_${cleanKey}.pdf`);
+    doc.save(`informe_actividades_${cleanKey}.pdf`);
   }
 }
