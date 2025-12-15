@@ -64,3 +64,5 @@ pids
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 Backend/.env
 Backend/.env
+Backend/uploads/users/1765771078529-785340624.jpg
+Backend/.env
