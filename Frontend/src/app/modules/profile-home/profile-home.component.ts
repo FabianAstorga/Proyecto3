@@ -373,19 +373,29 @@ export class ProfileHomeComponent implements OnInit {
     this.showDetails = false;
   }
 
-  get userAvatar(): string | null {
-    if (!this.user?.photoUrl || this.user.photoUrl === "/usuario(1).png") {
-      return null;
-    }
+  get userAvatar(): string {
+      const photo = this.user?.photoUrl;
 
-    // Si ya viene como URL completa
-    if (this.user.photoUrl.startsWith("http")) {
-      return this.user.photoUrl;
-    }
+      // 1. Si aún no carga el usuario o el campo es nulo
+      if (!photo) {
+        return '/assets/usuario(1).png';
+      }
 
-    // Si viene como ruta relativa
-    return `${this.API_URL}${this.user.photoUrl}`;
-  }
+      // 2. CORRECCIÓN PRINCIPAL:
+      // Si la base de datos dice que la foto es "usuario(1).png",
+      // ignoramos el API_URL y forzamos la ruta local de assets.
+      if (photo.includes('usuario(1).png')) {
+        return '/assets/usuario(1).png';
+      }
+
+      // 3. Si es una URL externa (ej: Google)
+      if (photo.startsWith('http')) {
+        return photo;
+      }
+
+      // 4. Si es una foto real subida al backend (/uploads/...)
+      return `${this.API_URL}${photo}`;
+    }
 
   openActivity(activity: Activity): void {
     this.selectedActivity = activity;
