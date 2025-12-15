@@ -42,7 +42,7 @@
             Feriados
           </h1>
           <p class="mt-1 text-2xl md:text-2xl text-slate-500 dark:text-slate-400">
-            Administra feriados nacionales (usados para bloquear fechas en multi-día).
+            Administra feriados (nacionales, regionales e institucionales).
           </p>
         </div>
 
@@ -118,7 +118,7 @@
 
           <input
             type="text"
-            placeholder="Buscar por fecha o nombre..."
+            placeholder="Buscar por fecha, nombre, tipo o región..."
             [(ngModel)]="filtroTexto"
             (input)="aplicarFiltrosLocal()"
             class="flex-1 min-w-[220px] rounded-xl border border-slate-300 px-3 py-2 text-2xl
@@ -158,9 +158,11 @@
                        dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
               >
                 <th class="px-4 py-3 text-2xl text-left w-2/12">Fecha</th>
-                <th class="px-4 py-3 text-2xl text-left w-6/12">Nombre</th>
-                <th class="px-4 py-3 text-2xl text-left w-2/12">Estado</th>
-                <th class="px-4 py-3 text-2xl text-left w-2/12">Acciones</th>
+                <th class="px-4 py-3 text-2xl text-left w-4/12">Nombre</th>
+                <th class="px-4 py-3 text-2xl text-left w-2/12">Tipo</th>
+                <th class="px-4 py-3 text-2xl text-left w-2/12">Región</th>
+                <th class="px-4 py-3 text-2xl text-left w-1/12">Estado</th>
+                <th class="px-4 py-3 text-2xl text-left w-1/12">Acciones</th>
               </tr>
             </thead>
 
@@ -178,6 +180,19 @@
                   <span *ngIf="it.nombre; else sinNombre">{{ it.nombre }}</span>
                   <ng-template #sinNombre>
                     <span class="text-slate-400 dark:text-slate-500">Sin nombre</span>
+                  </ng-template>
+                </td>
+
+                <td class="px-4 py-3 text-2xl">
+                  {{ it.tipo }}
+                </td>
+
+                <td class="px-4 py-3 text-2xl">
+                  <span *ngIf="it.tipo !== 'nacional'; else sinRegion">
+                    {{ it.regionCodigo || "—" }}
+                  </span>
+                  <ng-template #sinRegion>
+                    <span class="text-slate-400 dark:text-slate-500">—</span>
                   </ng-template>
                 </td>
 
@@ -199,6 +214,7 @@
                       class="text-indigo-600 hover:text-indigo-800 text-xl font-semibold"
                       (click)="abrirEditar(it)"
                       [disabled]="cargando"
+                      type="button"
                     >
                       Editar
                     </button>
@@ -208,6 +224,7 @@
                       (click)="desactivar(it)"
                       [disabled]="cargando || !it.activo"
                       title="Desactivar"
+                      type="button"
                     >
                       Quitar
                     </button>
@@ -217,6 +234,7 @@
                       (click)="eliminar(it)"
                       [disabled]="cargando"
                       title="Eliminar"
+                      type="button"
                     >
                       Eliminar
                     </button>
@@ -226,7 +244,7 @@
 
               <tr *ngIf="itemsFiltrados.length === 0">
                 <td
-                  colspan="4"
+                  colspan="6"
                   class="px-4 py-10 text-center text-slate-500 dark:text-slate-400"
                 >
                   No hay feriados para mostrar con los filtros actuales.
@@ -262,7 +280,7 @@
               {{ editId ? "Editar feriado" : "Nuevo feriado" }}
             </h2>
             <p class="mt-1 text-2xl text-slate-500 dark:text-slate-400">
-              Define fecha, nombre y estado.
+              Define fecha, nombre, tipo, región y estado.
             </p>
           </div>
 
@@ -278,6 +296,7 @@
         </div>
 
         <div class="px-6 py-6 grid gap-4">
+          <!-- fila 1 -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="block text-2xl font-semibold mb-2">Fecha *</label>
@@ -302,6 +321,7 @@
             </div>
           </div>
 
+          <!-- fila 2 -->
           <div>
             <label class="block text-2xl font-semibold mb-2">Nombre (opcional)</label>
             <input
@@ -312,6 +332,40 @@
                      bg-white text-slate-900
                      dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
             />
+          </div>
+
+          <!-- fila 3 -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-2xl font-semibold mb-2">Tipo *</label>
+              <select
+                [(ngModel)]="formTipo"
+                class="w-full rounded-xl border border-slate-300 px-3 py-2 text-2xl
+                       bg-white text-slate-900
+                       dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+              >
+                <option value="nacional">nacional</option>
+                <option value="regional">regional</option>
+                <option value="institucional">institucional</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-2xl font-semibold mb-2">Región *</label>
+              <input
+                [(ngModel)]="formRegionCodigo"
+                type="text"
+                placeholder="Ej: RM, XV"
+                [disabled]="formTipo === 'nacional'"
+                class="w-full rounded-xl border border-slate-300 px-3 py-2 text-2xl
+                       bg-white text-slate-900
+                       dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100
+                       disabled:opacity-60"
+              />
+              <p class="mt-1 text-xl text-slate-500 dark:text-slate-400">
+                Se usa solo si el tipo no es nacional.
+              </p>
+            </div>
           </div>
 
           <div class="flex items-center justify-end gap-3 pt-2">

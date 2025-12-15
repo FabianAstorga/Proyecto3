@@ -21,7 +21,7 @@ export class Feriado {
 
   /** Nombre descriptivo */
   @Column({ type: 'varchar', length: 120, nullable: true })
-  nombre?: string;
+nombre: string | null;
 
   /** Tipo de feriado */
   @Column({
@@ -33,7 +33,7 @@ export class Feriado {
 
   /** Código región (ej: RM, XV). Null si es nacional */
   @Column({ type: 'varchar', length: 10, nullable: true })
-  regionCodigo?: string;
+regionCodigo: string | null;
 
   /** Permite desactivar sin borrar */
   @Column({ type: 'boolean', default: true })

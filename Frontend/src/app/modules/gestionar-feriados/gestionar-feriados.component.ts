@@ -5,10 +5,14 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { DataService } from "../../services/data.service";
 import { LayoutComponent } from "../../components/layout/layout.component";
 
+type TipoFeriado = "nacional" | "regional" | "institucional";
+
 type Feriado = {
   id: number;
   fecha: string; // YYYY-MM-DD
   nombre?: string | null;
+  tipo: TipoFeriado;
+  regionCodigo?: string | null;
   activo: boolean;
 };
 
@@ -43,6 +47,8 @@ export class GestionarFeriadosComponent implements OnInit {
   editId: number | null = null;
   formFecha = ""; // YYYY-MM-DD
   formNombre = "";
+  formTipo: TipoFeriado = "nacional";
+  formRegionCodigo = ""; // ej: RM, XV (solo si tipo != nacional)
   formActivo = true;
 
   constructor(private dataService: DataService) {}
@@ -69,7 +75,6 @@ export class GestionarFeriadosComponent implements OnInit {
   private iso10(value: any): string {
     const s = String(value ?? "");
     if (!s) return "";
-    // si viene ISO completo, recorta
     return s.length >= 10 ? s.slice(0, 10) : s;
   }
 
@@ -77,7 +82,6 @@ export class GestionarFeriadosComponent implements OnInit {
   cargar() {
     this.cargando = true;
 
-    // si el usuario selecciona filtroActivo !== all, pedimos al backend por ese estado
     const activoParam =
       this.filtroActivo === "all"
         ? undefined
@@ -89,6 +93,8 @@ export class GestionarFeriadosComponent implements OnInit {
           id: x.id,
           fecha: this.iso10(x.fecha),
           nombre: x.nombre ?? null,
+          tipo: (x.tipo ?? "nacional") as TipoFeriado,
+          regionCodigo: x.regionCodigo ?? null,
           activo: !!x.activo,
         }));
         this.aplicarFiltrosLocal();
@@ -109,7 +115,9 @@ export class GestionarFeriadosComponent implements OnInit {
       const matchTexto =
         !q ||
         f.fecha.includes(q) ||
-        (f.nombre ?? "").toLowerCase().includes(q);
+        (f.nombre ?? "").toLowerCase().includes(q) ||
+        (f.tipo ?? "").toLowerCase().includes(q) ||
+        (f.regionCodigo ?? "").toLowerCase().includes(q);
 
       const matchActivo =
         this.filtroActivo === "all"
@@ -133,6 +141,8 @@ export class GestionarFeriadosComponent implements OnInit {
     this.editId = null;
     this.formFecha = "";
     this.formNombre = "";
+    this.formTipo = "nacional";
+    this.formRegionCodigo = "";
     this.formActivo = true;
     this.modalOpen = true;
   }
@@ -141,6 +151,8 @@ export class GestionarFeriadosComponent implements OnInit {
     this.editId = item.id;
     this.formFecha = item.fecha;
     this.formNombre = item.nombre ?? "";
+    this.formTipo = item.tipo ?? "nacional";
+    this.formRegionCodigo = item.regionCodigo ?? "";
     this.formActivo = item.activo;
     this.modalOpen = true;
   }
@@ -153,22 +165,38 @@ export class GestionarFeriadosComponent implements OnInit {
   guardarModal() {
     const fecha = (this.formFecha ?? "").trim();
     const nombre = (this.formNombre ?? "").trim();
+    const tipo = this.formTipo;
+    const regionCodigo = (this.formRegionCodigo ?? "").trim();
 
     if (!fecha) {
       this.showAlert("La fecha es obligatoria.", "warning");
       return;
     }
-    // validación simple YYYY-MM-DD
+
     if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
       this.showAlert("Formato de fecha inválido (YYYY-MM-DD).", "warning");
       return;
     }
 
+    // Validaciones de negocio coherentes con el backend
+    if (tipo === "nacional" && regionCodigo) {
+      this.showAlert("Si el tipo es nacional, no debes indicar región.", "warning");
+      return;
+    }
+
+    if (tipo !== "nacional" && !regionCodigo) {
+      this.showAlert("Si el tipo es regional/institucional, debes indicar región.", "warning");
+      return;
+    }
+
     const payload: any = {
       fecha,
-      nombre: nombre || null,
+      tipo,
       activo: !!this.formActivo,
     };
+
+    if (nombre) payload.nombre = nombre;
+    if (tipo !== "nacional") payload.regionCodigo = regionCodigo;
 
     this.cargando = true;
 

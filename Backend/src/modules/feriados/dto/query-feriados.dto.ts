@@ -1,12 +1,12 @@
-import { IsISO8601, IsOptional, IsString } from 'class-validator';
+import { IsDateString, IsOptional, IsString } from 'class-validator';
 
 export class QueryFeriadosDto {
   @IsOptional()
-  @IsISO8601({ strict: true })
+  @IsDateString()
   from?: string; // YYYY-MM-DD
 
   @IsOptional()
-  @IsISO8601({ strict: true })
+  @IsDateString()
   to?: string; // YYYY-MM-DD
 
   @IsOptional()
