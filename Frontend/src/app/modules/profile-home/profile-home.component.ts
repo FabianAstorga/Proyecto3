@@ -20,6 +20,9 @@ type RoleMode = "Funcionario" | "Secretaria" | "Administrador";
 })
 export class ProfileHomeComponent implements OnInit {
   user: User | undefined;
+  readonly API_URL = "http://localhost:3000";
+  selectedActivity: Activity | null = null;
+  showActivityModal = false;
 
   // ---- MODO / ROL ----
   mode: RoleMode | null = null;
@@ -370,7 +373,27 @@ export class ProfileHomeComponent implements OnInit {
     this.showDetails = false;
   }
 
-  onAvatarError(e: Event): void {
-    (e.target as HTMLImageElement).src = "/avatar-de-usuario.png";
+  get userAvatar(): string | null {
+    if (!this.user?.photoUrl || this.user.photoUrl === "/usuario(1).png") {
+      return null;
+    }
+
+    // Si ya viene como URL completa
+    if (this.user.photoUrl.startsWith("http")) {
+      return this.user.photoUrl;
+    }
+
+    // Si viene como ruta relativa
+    return `${this.API_URL}${this.user.photoUrl}`;
+  }
+
+  openActivity(activity: Activity): void {
+    this.selectedActivity = activity;
+    this.showActivityModal = true;
+  }
+
+  closeActivity(): void {
+    this.showActivityModal = false;
+    this.selectedActivity = null;
   }
 }

@@ -1,6 +1,5 @@
 <aside
-  class="fixed inset-y-0 left-0 z-30 flex flex-col border-r border-slate-200 bg-white/95 text-slate-900 shadow-2xl backdrop-blur-md transition-[width] duration-300 ease-in-out
-         dark:border-slate-800 dark:bg-slate-950/95 dark:text-slate-100"
+  class="fixed inset-y-0 left-0 z-30 flex flex-col border-r border-slate-200 bg-white/95 text-slate-900 shadow-2xl backdrop-blur-md transition-[width] duration-300 ease-in-out dark:border-slate-800 dark:bg-slate-950/95 dark:text-slate-100"
   (mouseenter)="onEnterSidebar()"
   (mouseleave)="onLeaveSidebar()"
   [ngClass]="isCollapsed ? 'w-20' : 'w-72'"
@@ -9,18 +8,13 @@
   <ng-container *ngIf="!isCollapsed; else collapsedRail">
     <!-- Header -->
     <div
-      class="flex items-center gap-3 px-4 py-4 border-b border-slate-200/80 transition-opacity duration-200
-             dark:border-slate-800/70"
+      class="flex items-center gap-3 px-4 py-4 border-b border-slate-200/80 transition-opacity duration-200 dark:border-slate-800/70"
       [ngClass]="showMenu ? 'opacity-100' : 'opacity-0'"
     >
       <div
         class="h-12 w-12 rounded-2xl bg-indigo-500 flex items-center justify-center overflow-hidden shadow-md shadow-indigo-500/40"
       >
-        <img
-          src="/logouta.png"
-          alt="SRADIM"
-          class="h-16 w-16 object-contain"
-        />
+        <img src="/logouta.png" alt="SRADIM" class="h-16 w-16 object-contain" />
       </div>
 
       <div>
@@ -41,17 +35,11 @@
         [routerLink]="item.link"
         routerLinkActive="bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-white"
         [routerLinkActiveOptions]="{ exact: true }"
-        class="group flex items-center gap-3 px-3 py-2.5 rounded-xl
-               text-slate-600 hover:bg-slate-100 hover:text-slate-900
-               transition-colors duration-200
-               dark:text-slate-300 dark:hover:bg-slate-800/80 dark:hover:text-white"
+        class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors duration-200 dark:text-slate-300 dark:hover:bg-slate-800/80 dark:hover:text-white"
       >
         <!-- Icono -->
         <div
-          class="flex h-16 w-16 items-center justify-center rounded-xl bg-slate-100
-                 group-hover:bg-indigo-500/10
-                 dark:bg-slate-900 dark:group-hover:bg-indigo-500/60
-                 transition-colors duration-200"
+          class="flex h-16 w-16 items-center justify-center rounded-xl bg-slate-100 group-hover:bg-indigo-500/10 dark:bg-slate-900 dark:group-hover:bg-indigo-500/60 transition-colors duration-200"
         >
           <svg
             class="w-12 h-12"
@@ -125,8 +113,7 @@
       </a>
 
       <div
-        class="mt-4 pt-3 border-t border-slate-200/80 text-xl text-slate-500
-               dark:border-slate-800/70 dark:text-slate-400"
+        class="mt-4 pt-3 border-t border-slate-200/80 text-xl text-slate-500 dark:border-slate-800/70 dark:text-slate-400"
       >
         Navegación
       </div>
@@ -141,16 +128,11 @@
       <button
         type="button"
         (click)="toggleTheme()"
-        class="w-full flex items-center justify-between px-3 py-2 rounded-xl
-               border border-slate-200 bg-slate-50 text-xs text-slate-700
-               hover:bg-slate-100
-               dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+        class="w-full flex items-center justify-between px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
       >
         <div class="flex items-center gap-2">
           <span
-            class="inline-flex h-6 w-6 items-center justify-center rounded-full
-                   bg-yellow-300/90 text-yellow-900 text-sm
-                   dark:bg-slate-700 dark:text-slate-100"
+            class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-yellow-300/90 text-yellow-900 text-sm dark:bg-slate-700 dark:text-slate-100"
           >
             <ng-container *ngIf="currentTheme === 'light'; else moonIcon">
               ☀
@@ -162,7 +144,7 @@
         <span
           class="text-[11px] font-medium text-slate-500 dark:text-slate-400"
         >
-          {{ currentTheme === 'light' ? 'Claro' : 'Oscuro' }}
+          {{ currentTheme === "light" ? "Claro" : "Oscuro" }}
         </span>
       </button>
 
@@ -181,9 +163,7 @@
           stroke-linecap="round"
           stroke-linejoin="round"
         >
-          <path
-            d="M10 5H6.5A1.5 1.5 0 0 0 5 6.5v11A1.5 1.5 0 0 0 6.5 19H10"
-          />
+          <path d="M10 5H6.5A1.5 1.5 0 0 0 5 6.5v11A1.5 1.5 0 0 0 6.5 19H10" />
           <path d="M14 8l4 4-4 4" />
           <path d="M9.5 12H18" />
         </svg>
@@ -199,11 +179,7 @@
         <div
           class="h-10 w-10 rounded-2xl bg-indigo-500 flex items-center justify-center overflow-hidden shadow-md shadow-indigo-500/40"
         >
-          <img
-            src="/logouta.png"
-            alt="SRADIM"
-            class="h-8 w-8 object-contain"
-          />
+          <img src="/logouta.png" alt="SRADIM" class="h-8 w-8 object-contain" />
         </div>
       </div>
 
@@ -212,10 +188,7 @@
           *ngFor="let item of navItems"
           [routerLink]="item.link"
           routerLinkActive="bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-white"
-          class="flex items-center justify-center h-10 w-10 rounded-2xl
-                 hover:bg-slate-100 text-slate-600
-                 dark:hover:bg-slate-800/80 dark:text-slate-300
-                 transition-all"
+          class="flex items-center justify-center h-10 w-10 rounded-2xl hover:bg-slate-100 text-slate-600 dark:hover:bg-slate-800/80 dark:text-slate-300 transition-all"
           [attr.title]="item.label"
         >
           <svg
@@ -277,12 +250,11 @@
       <button
         type="button"
         (click)="toggleTheme()"
-        class="mb-3 flex items-center justify-center h-10 w-10 rounded-2xl
-               border border-slate-200 bg-slate-50 text-2xl
-               hover:bg-slate-100
-               dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
+        class="mb-3 flex items-center justify-center h-10 w-10 rounded-2xl border border-slate-200 bg-slate-50 text-2xl hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
         [attr.title]="
-          currentTheme === 'light' ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro'
+          currentTheme === 'light'
+            ? 'Cambiar a modo oscuro'
+            : 'Cambiar a modo claro'
         "
       >
         <ng-container *ngIf="currentTheme === 'light'; else moonSmall">
@@ -320,8 +292,7 @@
 </aside>
 
 <main
-  class="min-h-screen bg-slate-50 text-slate-900 transition-[margin,background-color,color] duration-300 ease-in-out
-         dark:bg-gradient-to-b dark:from-slate-950 dark:via-slate-950 dark:to-slate-900 dark:text-slate-100"
+  class="min-h-screen bg-slate-50 text-slate-900 transition-[margin,background-color,color] duration-300 ease-in-out dark:bg-gradient-to-b dark:from-slate-950 dark:via-slate-950 dark:to-slate-900 dark:text-slate-100"
   [ngClass]="isCollapsed ? 'ml-20' : 'ml-72'"
 >
   <section class="w-full h-full">

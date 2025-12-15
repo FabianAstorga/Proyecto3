@@ -5,7 +5,7 @@ import {
   IsPhoneNumber,
   IsString,
   MinLength,
-} from 'class-validator';
+} from "class-validator";
 
 export class UpdateUsuarioDto {
   @IsOptional()
@@ -37,7 +37,11 @@ export class UpdateUsuarioDto {
   @IsString()
   foto_url?: string;
 
-  @IsIn(['funcionario', 'secretaria', 'administrador'])
-  @IsOptional() 
+  @IsIn(["funcionario", "secretaria", "administrador"])
+  @IsOptional()
   rol?: string;
+
+  @IsOptional()
+  @IsString()
+  removePhoto?: string; // 👈 CLAVE
 }

@@ -3,20 +3,21 @@
     class="min-h-[calc(100vh-32px)] px-4 py-6 md:px-8 md:py-8 bg-slate-50 dark:bg-gradient-to-b dark:from-slate-950 dark:via-slate-950 dark:to-slate-900"
   >
     <!-- ALERTA FLOTANTE -->
+    <!-- ALERTA FLOTANTE CENTRADA -->
     <div
       *ngIf="alertMessage"
-      class="fixed inset-0 flex items-start justify-center z-50 pointer-events-none"
+      class="fixed inset-0 flex items-center justify-center z-50 pointer-events-none"
     >
       <div
-        class="mt-10 backdrop-blur-md px-6 py-4 rounded-lg shadow-lg max-w-lg w-full text-center pointer-events-auto animate-fadeIn"
+        class="backdrop-blur-md px-6 py-4 rounded-lg shadow-lg max-w-lg w-full text-center pointer-events-auto animate-fadeIn"
         [ngClass]="{
           'bg-green-500/80 text-white': alertType === 'success',
           'bg-red-500/80 text-white': alertType === 'danger',
           'bg-yellow-400/80 text-black': alertType === 'warning'
         }"
       >
-        <span class="font-semibold">{{ alertType | titlecase }}! </span>
-        {{ alertMessage }}
+        <span class="font-bold text-3xl">{{ alertType | titlecase }}! </span>
+        <span class="text-2xl">{{ alertMessage }}</span>
       </div>
     </div>
 
@@ -32,7 +33,9 @@
           <h1 class="text-2xl md:text-3xl font-semibold leading-tight">
             Asignar cargos
           </h1>
-          <p class="mt-1 text-2xl md:text-2xl text-slate-500 dark:text-slate-400">
+          <p
+            class="mt-1 text-2xl md:text-2xl text-slate-500 dark:text-slate-400"
+          >
             Marca uno o más usuarios, selecciona un cargo y pulsa
             <strong>Asignar</strong>.
           </p>
@@ -55,9 +58,9 @@
             type="button"
             (click)="asignarCargoMultiple()"
             [disabled]="cargando"
-            class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-yellow-400 text-[#0D1440] text-2xl md:text-sm font-semibold shadow-md hover:bg-yellow-300 disabled:opacity-60"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 text-white text-2xl md:text-sm font-semibold shadow-md shadow-indigo-500/30 hover:bg-indigo-500 disabled:opacity-60 transition"
           >
-            <span class="text-2xl" *ngIf="!cargando">Asignar</span>
+            <span class="text-2xl" *ngIf="!cargando">Asignar Cargo</span>
             <span *ngIf="cargando" class="animate-pulse">Procesando…</span>
           </button>
 
@@ -76,7 +79,7 @@
         <!-- Filtros -->
         <div class="flex flex-wrap items-center gap-3 mb-4">
           <!-- Filtro por nombre -->
-          <input 
+          <input
             type="text"
             placeholder="Buscar por nombre"
             [(ngModel)]="filtroNombre"
@@ -113,7 +116,7 @@
             (click)="limpiarFiltros()"
             class="px-3 py-2 rounded-xl text-2xl font-semibold border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
           >
-            Limpiar
+            Descartar
           </button>
         </div>
 
@@ -157,13 +160,17 @@
             </td>
 
             <!-- Nombre -->
-            <td class="px-4 py-3 text-2xl">{{ u.firstName }} {{ u.lastName }}</td>
+            <td class="px-4 py-3 text-2xl">
+              {{ u.firstName }} {{ u.lastName }}
+            </td>
 
             <!-- Email -->
-            <td class="px-4 py-3 text-2xl truncate" [title]="u.email">{{ u.email }}</td>
+            <td class="px-4 py-3 text-2xl truncate" [title]="u.email">
+              {{ u.email }}
+            </td>
 
             <!-- Rol -->
-            <td class="px-4 py-3 ">
+            <td class="px-4 py-3">
               <span
                 class="px-2 py-1 rounded-md bg-slate-100 text-slate-800 text-xl dark:bg-slate-800 dark:text-slate-200"
               >
@@ -200,7 +207,7 @@
               >
                 <button
                   class="text-red-500 hover:text-red-700 text-xl"
-                  (click)="eliminarAsignacion(a.id!)"
+                  (click)="abrirConfirmacionQuitar(u, a)"
                 >
                   Quitar
                 </button>
@@ -225,6 +232,51 @@
             </td>
           </tr>
         </tbody>
+      </div>
+    </div>
+    <!-- ================= MODAL QUITAR CARGO ================= -->
+    <div
+      *ngIf="mostrarConfirmacionQuitarCargo"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+    >
+      <div
+        class="bg-white dark:bg-slate-900 rounded-2xl shadow-xl max-w-md w-full p-6 animate-fadeIn"
+      >
+        <h3
+          class="text-2xl font-semibold text-slate-900 dark:text-slate-100 mb-3"
+        >
+          Confirmar acción
+        </h3>
+
+        <p class="text-xl text-slate-600 dark:text-slate-400 mb-6">
+          ¿Estás seguro de que deseas
+          <span class="font-semibold text-red-500">quitar</span>
+          el cargo
+          <span class="font-semibold">{{
+            cargoSeleccionadoParaQuitar?.cargo.ocupacion
+          }}</span>
+          al usuario
+          <span class="font-semibold"
+            >{{ usuarioSeleccionadoParaQuitar?.firstName }}
+            {{ usuarioSeleccionadoParaQuitar?.lastName }}</span
+          >?
+        </p>
+
+        <div class="flex justify-end gap-3">
+          <button
+            (click)="cancelarQuitarCargo()"
+            class="px-4 py-2 rounded-xl border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
+          >
+            Cancelar
+          </button>
+
+          <button
+            (click)="confirmarQuitarCargo()"
+            class="px-4 py-2 rounded-xl bg-red-600 text-white hover:bg-red-500"
+          >
+            Quitar
+          </button>
+        </div>
       </div>
     </div>
   </section></app-layout

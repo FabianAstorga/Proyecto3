@@ -11,11 +11,11 @@
       >
         <div class="flex items-center gap-4">
           <div
-            class="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 ring-2 ring-slate-200 overflow-hidden dark:bg-slate-900 dark:ring-slate-700"
+            class="flex h-28 w-28 items-center justify-center rounded-full bg-slate-100 ring-4 ring-slate-200 overflow-hidden dark:bg-slate-900 dark:ring-slate-700"
           >
             <img
-              [src]="user?.photoUrl"
-              (error)="onAvatarError($event)"
+              *ngIf="userAvatar"
+              [src]="userAvatar"
               alt="avatar"
               class="h-full w-full object-cover"
             />
@@ -75,7 +75,9 @@
                 class="flex items-center justify-between text-2xl text-slate-500 dark:text-slate-400"
               >
                 <span>Total actividades</span>
-                <span class="inline-flex h-2 w-2 rounded-full bg-sky-400"></span>
+                <span
+                  class="inline-flex h-2 w-2 rounded-full bg-sky-400"
+                ></span>
               </div>
               <p
                 class="text-3xl text-center font-semibold mt-3 text-slate-900 dark:text-white"
@@ -146,13 +148,15 @@
           <div *ngSwitchCase="'Secretaria'" class="grid gap-4 md:grid-cols-4">
             <!-- Total actividades -->
             <div
-              class="rounded-2xl text-center  border border-slate-200 bg-white px-5 py-4 shadow-sm dark:border-slate-800 dark:bg-slate-950/70"
+              class="rounded-2xl text-center border border-slate-200 bg-white px-5 py-4 shadow-sm dark:border-slate-800 dark:bg-slate-950/70"
             >
               <div
                 class="flex items-center justify-between text-2xl text-slate-500 dark:text-slate-400"
               >
                 <span>Total actividades</span>
-                <span class="inline-flex h-2 w-2 rounded-full bg-sky-400"></span>
+                <span
+                  class="inline-flex h-2 w-2 rounded-full bg-sky-400"
+                ></span>
               </div>
               <p
                 class="text-3xl font-semibold mt-3 text-slate-900 dark:text-white"
@@ -220,7 +224,10 @@
           </div>
 
           <!-- ADMINISTRADOR -->
-          <div *ngSwitchCase="'Administrador'" class="grid gap-4 md:grid-cols-4">
+          <div
+            *ngSwitchCase="'Administrador'"
+            class="grid gap-4 md:grid-cols-4"
+          >
             <!-- Total actividades -->
             <div
               class="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm dark:border-slate-800 dark:bg-slate-950/70"
@@ -229,7 +236,9 @@
                 class="flex text-center items-center justify-between text-2xl text-slate-500 dark:text-slate-400"
               >
                 <span>Total actividades</span>
-                <span class="inline-flex h-2 w-2 rounded-full bg-sky-400"></span>
+                <span
+                  class="inline-flex h-2 w-2 rounded-full bg-sky-400"
+                ></span>
               </div>
               <p
                 class="text-3xl font-semibold mt-3 text-slate-900 dark:text-white"
@@ -313,9 +322,17 @@
 
             <ng-container [ngSwitch]="mode">
               <!-- FUNCIONARIO -->
-              <div class="mt-4 flex flex-col gap-3" *ngSwitchCase="'Funcionario'">
+              <div
+                class="mt-4 flex flex-col gap-3"
+                *ngSwitchCase="'Funcionario'"
+              >
                 <a
-                  [routerLink]="['/funcionario', user?.id, 'actividades', 'nueva']"
+                  [routerLink]="[
+                    '/funcionario',
+                    user?.id,
+                    'actividades',
+                    'nueva'
+                  ]"
                   class="inline-flex h-12 items-center justify-center rounded-xl bg-indigo-600 text-white text-2xl font-semibold hover:bg-indigo-500"
                 >
                   Registrar nueva actividad
@@ -328,7 +345,7 @@
                     'actividades',
                     'historial'
                   ]"
-                  class="inline-flex h-12 items-center justify-center rounded-xl border border-slate-300 bg-white text-slate-700  text-2xl font-semibold hover:border-slate-400 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-slate-500 dark:hover:bg-slate-800"
+                  class="inline-flex h-12 items-center justify-center rounded-xl border border-slate-300 bg-white text-slate-700 text-2xl font-semibold hover:border-slate-400 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-slate-500 dark:hover:bg-slate-800"
                 >
                   Ver historial completo
                 </a>
@@ -341,7 +358,10 @@
               </div>
 
               <!-- SECRETARÍA -->
-              <div class="mt-4 flex flex-col gap-3" *ngSwitchCase="'Secretaria'">
+              <div
+                class="mt-4 flex flex-col gap-3"
+                *ngSwitchCase="'Secretaria'"
+              >
                 <a
                   [routerLink]="[
                     '/secretaria',
@@ -370,7 +390,10 @@
               </div>
 
               <!-- ADMINISTRADOR -->
-              <div class="mt-4 flex flex-col gap-3" *ngSwitchCase="'Administrador'">
+              <div
+                class="mt-4 flex flex-col gap-3"
+                *ngSwitchCase="'Administrador'"
+              >
                 <a
                   [routerLink]="['/admin', user?.id, 'funcionarios']"
                   class="inline-flex h-12 items-center justify-center rounded-xl bg-indigo-600 text-white text-2xl font-semibold hover:bg-indigo-500"
@@ -403,7 +426,10 @@
 
             <ng-container [ngSwitch]="mode">
               <!-- FUNCIONARIO -->
-              <div class="grid gap-4 sm:grid-cols-2" *ngSwitchCase="'Funcionario'">
+              <div
+                class="grid gap-4 sm:grid-cols-2"
+                *ngSwitchCase="'Funcionario'"
+              >
                 <div
                   class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-900/60"
                 >
@@ -454,7 +480,10 @@
               </div>
 
               <!-- SECRETARÍA -->
-              <div class="grid gap-4 sm:grid-cols-2" *ngSwitchCase="'Secretaria'">
+              <div
+                class="grid gap-4 sm:grid-cols-2"
+                *ngSwitchCase="'Secretaria'"
+              >
                 <div
                   class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-900/60"
                 >
@@ -483,7 +512,10 @@
               </div>
 
               <!-- ADMINISTRADOR -->
-              <div *ngSwitchCase="'Administrador'" class="grid gap-4 sm:grid-cols-1">
+              <div
+                *ngSwitchCase="'Administrador'"
+                class="grid gap-4 sm:grid-cols-1"
+              >
                 <div
                   class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-900/60"
                 >
@@ -522,7 +554,7 @@
                   <li class="flex gap-3">
                     <span class="h-2 w-2 rounded-full bg-amber-400"></span>
                     <span>
-                      Tienes <strong >{{ pendingCount }}</strong> actividad(es)
+                      Tienes <strong>{{ pendingCount }}</strong> actividad(es)
                       pendiente(s).
                     </span>
                   </li>
@@ -626,7 +658,7 @@
                 <ul class="divide-y divide-slate-200 dark:divide-slate-800">
                   <li
                     *ngFor="let a of recent; let i = index"
-                    class="flex flex-col gap-3 px-4 py-4 text-sm text-slate-800 hover:bg-slate-50 transition md:flex-row md:items-center md:justify-between dark:text-slate-100 dark:hover:bg-slate-900/80"
+                    class="flex flex-col gap-3 px-4 py-4 text-2xl text-slate-800 hover:bg-slate-50 transition md:flex-row md:items-center md:justify-between dark:text-slate-100 dark:hover:bg-slate-900/80"
                   >
                     <div class="min-w-0 flex-1">
                       <p
@@ -652,9 +684,14 @@
                     </div>
 
                     <div class="flex items-center gap-4">
-                      <span
-                        class="text-2xl text-slate-500 dark:text-slate-400"
+                      <button
+                        (click)="openActivity(a)"
+                        class="w-24 rounded-lg border border-indigo-300 px-4 py-1.5 text-2xl font-medium text-indigo-600 hover:bg-indigo-50 dark:border-indigo-500 dark:text-indigo-300 dark:hover:bg-indigo-500/10"
                       >
+                        Ver
+                      </button>
+
+                      <span class="text-2xl text-slate-500 dark:text-slate-400">
                         {{ formatDMY(a.fecha) }}
                       </span>
                       <span
@@ -679,44 +716,52 @@
             <!-- SECRETARÍA: sólo pendientes por funcionario -->
             <ng-container *ngSwitchCase="'Secretaria'">
               <ng-container
-                *ngIf="secretaryPendingActivities.length > 0; else emptyActivities"
+                *ngIf="
+                  secretaryPendingActivities.length > 0;
+                  else emptyActivities
+                "
               >
                 <ul class="divide-y divide-slate-200 dark:divide-slate-800">
                   <li
                     *ngFor="let a of secretaryPendingActivities; let i = index"
-                    class="flex flex-col gap-3 px-4 py-4 text-sm text-slate-800 hover:bg-slate-50 transition md:flex-row md:items-center md:justify-between dark:text-slate-100 dark:hover:bg-slate-900/80"
+                    class="flex flex-col gap-3 px-4 py-4 text-2xl text-slate-800 hover:bg-slate-50 transition md:flex-row md:items-center md:justify-between dark:text-slate-100 dark:hover:bg-slate-900/80"
                   >
                     <div class="min-w-0 flex-1">
                       <p
-                        class="flex items-center gap-2 text-[11px] uppercase text-slate-500 dark:text-slate-500"
+                        class="flex items-center font-bold gap-2 text-2xl uppercase text-slate-500 dark:text-slate-500"
                       >
                         <span
-                          class="h-6 w-6 rounded-full bg-slate-100 flex items-center justify-center text-xs text-slate-600 dark:bg-slate-900 dark:text-slate-300"
+                          class="h-6 w-6 rounded-full bg-slate-100 flex items-center justify-center text-2xl text-slate-600 dark:bg-slate-900 dark:text-slate-300"
                         >
                           {{ i + 1 }}
                         </span>
                         {{ a.userName || "Funcionario" }}
                       </p>
                       <p
-                        class="mt-1 text-base font-medium text-slate-900 dark:text-white truncate"
+                        class="mt-1 text-2xl font-medium text-slate-900 dark:text-white truncate"
                       >
                         {{ a.titulo }}
                       </p>
                       <p
-                        class="mt-1 text-xs text-slate-500 dark:text-slate-400 truncate"
+                        class="mt-1 text-2xl text-slate-500 dark:text-slate-400 truncate"
                       >
                         {{ a.detalle }} · {{ formatDMY(a.fecha) }}
                       </p>
                     </div>
 
                     <div class="flex items-center gap-4">
-                      <span
-                        class="text-xs text-slate-500 dark:text-slate-400"
+                      <button
+                        (click)="openActivity(a)"
+                        class="w-24 rounded-lg border border-indigo-300 px-4 py-1.5 text-2xl font-medium text-indigo-600 hover:bg-indigo-50 dark:border-indigo-500 dark:text-indigo-300 dark:hover:bg-indigo-500/10"
                       >
+                        Ver
+                      </button>
+
+                      <span class="text-2xl text-slate-500 dark:text-slate-400">
                         {{ formatDMY(a.fecha) }}
                       </span>
                       <span
-                        class="text-xs px-3 py-1 rounded-full border font-medium bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/15 dark:text-amber-200 dark:border-amber-500/40"
+                        class="text-2xl px-3 py-1 rounded-full border font-medium bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/15 dark:text-amber-200 dark:border-amber-500/40"
                       >
                         Pendiente
                       </span>
@@ -736,7 +781,7 @@
                     *ngFor="let a of adminRecentActivities; let i = index"
                     class="flex flex-col gap-3 px-4 py-4 text-2xl text-slate-800 hover:bg-slate-50 transition md:flex-row md:items-center md:justify-between dark:text-slate-100 dark:hover:bg-slate-900/80"
                   >
-                    <div class="min-w-0 flex-1 ">
+                    <div class="min-w-0 flex-1">
                       <p
                         class="flex items-center gap-2 text-xl font-bold uppercase text-slate-500 dark:text-slate-500"
                       >
@@ -760,9 +805,14 @@
                     </div>
 
                     <div class="flex items-center gap-4">
-                      <span
-                        class="text-2xl text-slate-500 dark:text-slate-400"
+                      <button
+                        (click)="openActivity(a)"
+                        class="w-24 rounded-lg border border-indigo-300 px-4 py-1.5 text-2xl font-medium text-indigo-600 hover:bg-indigo-50 dark:border-indigo-500 dark:text-indigo-300 dark:hover:bg-indigo-500/10"
                       >
+                        Ver
+                      </button>
+
+                      <span class="text-2xl text-slate-500 dark:text-slate-400">
                         {{ formatDMY(a.fecha) }}
                       </span>
                       <span
@@ -839,6 +889,89 @@
           <button
             (click)="closeDetails()"
             class="w-full inline-flex items-center justify-center px-4 py-2.5 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-indigo-500"
+          >
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= MODAL VER ACTIVIDAD ================= -->
+    <div
+      *ngIf="showActivityModal && selectedActivity"
+      class="fixed inset-0 z-[120] flex items-center justify-center"
+    >
+      <!-- Fondo -->
+      <div
+        class="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        (click)="closeActivity()"
+      ></div>
+
+      <!-- Contenedor -->
+      <div
+        class="relative w-[90%] max-w-4xl rounded-2xl border border-slate-200 bg-white text-slate-900 shadow-2xl dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
+      >
+        <!-- Header -->
+        <div
+          class="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/80"
+        >
+          <h3 class="text-xl font-semibold">Detalle de la actividad</h3>
+          <button
+            (click)="closeActivity()"
+            class="text-slate-500 hover:text-slate-900 dark:hover:text-white text-2xl"
+          >
+            ✕
+          </button>
+        </div>
+
+        <!-- Body horizontal -->
+        <div class="px-6 py-5 grid grid-cols-2 gap-6 text-lg">
+          <!-- Columna izquierda -->
+          <div class="space-y-4">
+            <div>
+              <p class="font-semibold">Título</p>
+              <p class="text-slate-600 dark:text-slate-300">
+                {{ selectedActivity.titulo }}
+              </p>
+            </div>
+
+            <div>
+              <p class="font-semibold">Detalle</p>
+              <p class="text-slate-600 dark:text-slate-300">
+                {{ selectedActivity.detalle }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Columna derecha -->
+          <div class="space-y-4">
+            <div>
+              <p class="font-semibold">Fecha</p>
+              <p>{{ formatDMY(selectedActivity.fecha) }}</p>
+            </div>
+
+            <div>
+              <p class="font-semibold">Estado</p>
+              <p>{{ selectedActivity.estado }}</p>
+            </div>
+
+            <div *ngIf="selectedActivity.tipo">
+              <p class="font-semibold">Tipo</p>
+              <p>{{ selectedActivity.tipo }}</p>
+            </div>
+
+            <div *ngIf="selectedActivity.userName">
+              <p class="font-semibold">Funcionario</p>
+              <p>{{ selectedActivity.userName }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="px-6 pb-6 flex justify-end">
+          <button
+            (click)="closeActivity()"
+            class="rounded-xl bg-indigo-600 px-8 py-2 text-lg font-semibold text-white hover:bg-indigo-500"
           >
             Cerrar
           </button>
