@@ -24,6 +24,11 @@ export class AsignarCargoComponent implements OnInit {
   cargos: Cargo[] = [];
   asignaciones: EmpleadoCargo[] = [];
 
+  // Modal confirmacion
+  mostrarConfirmacionQuitarCargo = false;
+  usuarioSeleccionadoParaQuitar?: any;
+  cargoSeleccionadoParaQuitar?: any;
+
   // Filtros
   filtroNombre: string = "";
   filtroRol: string | null = null;
@@ -242,10 +247,6 @@ export class AsignarCargoComponent implements OnInit {
 
   // ------------------ (opcional) eliminación individual ------------------
   eliminarAsignacion(asignacionId: number) {
-    if (!confirm("¿Seguro que quieres quitar este cargo del usuario?")) {
-      return;
-    }
-
     this.cargando = true;
 
     this.dataService.deleteEmpleadoCargo(asignacionId).subscribe({
@@ -263,5 +264,30 @@ export class AsignarCargoComponent implements OnInit {
         this.showAlert("Ocurrió un error al quitar el cargo.", "danger");
       },
     });
+  }
+
+  abrirConfirmacionQuitar(usuario: any, cargo: any) {
+    this.usuarioSeleccionadoParaQuitar = usuario;
+    this.cargoSeleccionadoParaQuitar = cargo;
+    this.mostrarConfirmacionQuitarCargo = true;
+  }
+
+  cancelarQuitarCargo() {
+    this.usuarioSeleccionadoParaQuitar = undefined;
+    this.cargoSeleccionadoParaQuitar = undefined;
+    this.mostrarConfirmacionQuitarCargo = false;
+  }
+
+  confirmarQuitarCargo() {
+    if (
+      !this.usuarioSeleccionadoParaQuitar ||
+      !this.cargoSeleccionadoParaQuitar
+    )
+      return;
+
+    // Llama a tu función real de backend para eliminar la asignación
+    this.eliminarAsignacion(this.cargoSeleccionadoParaQuitar.id);
+
+    this.cancelarQuitarCargo();
   }
 }

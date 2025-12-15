@@ -1,10 +1,8 @@
-
 <app-layout [logoutLink]="'/login'">
   <section
-    class="relative min-h-[calc(100vh-32px)] px-4 py-6 md:px-8 md:py-8
-           bg-slate-50 dark:bg-transparent"
+    class="relative min-h-[calc(100vh-32px)] px-4 py-6 md:px-8 md:py-8 bg-slate-50 dark:bg-transparent"
   >
-    <div class="relative max-w-6xl mx-auto">
+    <div class="relative w-full">
       <!-- Flecha izquierda -->
       <button
         type="button"
@@ -12,17 +10,7 @@
         [ngClass]="{ 'nav-arrow-disabled': !hasPrevMonth }"
         aria-label="Mes anterior"
         [disabled]="!hasPrevMonth"
-        class="
-          nav-arrow nav-arrow-left
-          absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full
-          z-20 flex h-12 w-12 items-center justify-center
-          rounded-full border border-slate-300 bg-white text-slate-700 text-3xl font-light
-          shadow-xl transition
-          hover:bg-slate-50 hover:border-slate-400 hover:text-slate-900 hover:scale-110
-          disabled:opacity-40 disabled:cursor-not-allowed
-          dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-200
-          dark:hover:bg-slate-800 dark:hover:border-slate-500 dark:hover:text-white
-        "
+        class="nav-arrow nav-arrow-left absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full z-20 flex h-12 w-12 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-700 text-3xl font-light shadow-xl transition hover:bg-slate-50 hover:border-slate-400 hover:text-slate-900 hover:scale-110 disabled:opacity-40 disabled:cursor-not-allowed dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:border-slate-500 dark:hover:text-white"
       >
         ‹
       </button>
@@ -34,39 +22,26 @@
         [ngClass]="{ 'nav-arrow-disabled': !hasNextMonth }"
         aria-label="Mes siguiente"
         [disabled]="!hasNextMonth"
-        class="
-          nav-arrow nav-arrow-right
-          absolute right-0 top-1/2 -translate-y-1/2 translate-x-full
-          z-20 flex h-12 w-12 items-center justify-center
-          rounded-full border border-slate-300 bg-white text-slate-700 text-3xl font-light
-          shadow-xl transition
-          hover:bg-slate-50 hover:border-slate-400 hover:text-slate-900 hover:scale-110
-          disabled:opacity-40 disabled:cursor-not-allowed
-          dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-200
-          dark:hover:bg-slate-800 dark:hover:border-slate-500 dark:hover:text-white
-        "
+        class="nav-arrow nav-arrow-right absolute right-0 top-1/2 -translate-y-1/2 translate-x-full z-20 flex h-12 w-12 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-700 text-3xl font-light shadow-xl transition hover:bg-slate-50 hover:border-slate-400 hover:text-slate-900 hover:scale-110 disabled:opacity-40 disabled:cursor-not-allowed dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:border-slate-500 dark:hover:text-white"
       >
         ›
       </button>
 
       <!-- CARD PRINCIPAL ANCHA -->
       <div
-        class="h-full w-full overflow-hidden
-               rounded-3xl border border-slate-200 bg-white text-slate-900
-               shadow-[0_24px_60px_rgba(15,23,42,0.08)]
-               dark:border-slate-800 dark:bg-slate-950/80 dark:text-slate-100
-               dark:shadow-[0_24px_60px_rgba(15,23,42,0.8)] dark:backdrop-blur-sm"
+        class="h-full w-full overflow-hidden rounded-3xl border border-slate-200 bg-white text-slate-900 shadow-[0_24px_60px_rgba(15,23,42,0.08)] dark:border-slate-800 dark:bg-slate-950/80 dark:text-slate-100 dark:shadow-[0_24px_60px_rgba(15,23,42,0.8)] dark:backdrop-blur-sm"
       >
         <!-- HEADER -->
         <header
-          class="px-6 md:px-10 py-6 border-b border-slate-200 bg-white
-                 dark:border-slate-800 dark:bg-gradient-to-r dark:from-slate-950 dark:via-slate-900 dark:to-slate-950"
+          class="px-6 md:px-10 py-6 border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-gradient-to-r dark:from-slate-950 dark:via-slate-900 dark:to-slate-950"
         >
           <div
             class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between"
           >
-            <ng-container *ngIf="currentMonthGroup as month; else tituloGenerico">
-              <h1 class="text-3xl font-semibold leading-tight">
+            <ng-container
+              *ngIf="currentMonthGroup as month; else tituloGenerico"
+            >
+              <h1 class="text-3xl md:text-4xl font-semibold leading-tight">
                 Historial —
                 <span class="text-indigo-600 dark:text-indigo-300">
                   {{ month.monthLabel }}
@@ -76,23 +51,24 @@
               <button
                 type="button"
                 (click)="downloadMonthPdf(month)"
-                class="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-2
-                       text-sm font-semibold text-white shadow-md shadow-indigo-500/30
-                       transition hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                class="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-2 text-xl md:text-2xl font-semibold text-white shadow-md shadow-indigo-500/30 transition hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
                 Descargar PDF
               </button>
             </ng-container>
 
             <ng-template #tituloGenerico>
-              <h1 class="text-3xl font-semibold leading-tight">
+              <h1 class="text-3xl md:text-4xl font-semibold leading-tight">
                 Historial de actividades
               </h1>
             </ng-template>
           </div>
 
-          <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            Revisa las actividades registradas por usuario, con filtros por texto, mes y estado.
+          <p
+            class="mt-1 text-xl md:text-2xl text-slate-500 dark:text-slate-400"
+          >
+            Revisa las actividades registradas por usuario, con filtros por
+            texto, mes y estado.
           </p>
 
           <!-- FILTROS -->
@@ -103,32 +79,26 @@
             <!-- Buscar -->
             <div class="col-span-1 md:col-span-2">
               <label
-                class="text-xs text-slate-600 dark:text-slate-300 mb-1 block"
+                class="text-xl text-slate-600 dark:text-slate-300 mb-1 block"
                 >Buscar Usuario / Actividad</label
               >
               <input
                 type="text"
                 formControlName="q"
                 placeholder="Ej: Juan Pérez, Taller…"
-                class="h-[48px] w-full rounded-xl border border-slate-300 bg-white
-                       px-3 py-2 text-sm text-slate-900 placeholder-slate-400
-                       focus:outline-none focus:ring-2 focus:ring-indigo-500
-                       dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder-slate-500"
+                class="h-[48px] w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder-slate-500"
               />
             </div>
 
             <!-- Mes (lista de meses) -->
             <div>
               <label
-                class="text-xs text-slate-600 dark:text-slate-300 mb-1 block"
+                class="text-xl text-slate-600 dark:text-slate-300 mb-1 block"
                 >Mes</label
               >
               <select
                 formControlName="mes"
-                class="h-[48px] w-full rounded-xl border border-slate-300 bg-white
-                       px-3 py-2 text-sm text-slate-900
-                       focus:outline-none focus:ring-2 focus:ring-indigo-500
-                       dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100"
+                class="h-[48px] w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100"
               >
                 <option value="">Todos</option>
                 <option *ngFor="let m of meses" [value]="m.value">
@@ -140,15 +110,12 @@
             <!-- Estado -->
             <div>
               <label
-                class="text-xs text-slate-600 dark:text-slate-300 mb-1 block"
+                class="text-xl text-slate-600 dark:text-slate-300 mb-1 block"
                 >Estado</label
               >
               <select
                 formControlName="estado"
-                class="h-[48px] w-full rounded-xl border border-slate-300 bg-white
-                       px-3 py-2 text-sm text-slate-900
-                       focus:outline-none focus:ring-2 focus:ring-indigo-500
-                       dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100"
+                class="h-[48px] w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100"
               >
                 <option value="">Todos</option>
                 <option value="Aprobada">Aprobada</option>
@@ -161,9 +128,7 @@
               <button
                 type="button"
                 (click)="clearFilters()"
-                class="rounded-xl border border-slate-300 bg-white px-4 py-2
-                       text-sm font-semibold text-slate-700 hover:bg-slate-50
-                       dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
+                class="rounded-xl border border-slate-300 bg-white px-4 py-2 text-xl md:text-2xl font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
               >
                 Limpiar filtros
               </button>
@@ -175,15 +140,14 @@
         <div class="px-6 md:px-10 py-6">
           <div
             *ngIf="!currentMonthGroup"
-            class="py-10 text-center text-sm text-slate-500 dark:text-slate-400"
+            class="py-10 text-center text-xl md:text-2xl text-slate-500 dark:text-slate-400"
           >
             No hay actividades que coincidan con los filtros.
           </div>
 
           <ng-container *ngIf="currentMonthGroup as month">
             <div
-              class="divide-y divide-slate-200 dark:divide-slate-800
-                     h-[560px] overflow-y-auto pr-2"
+              class="divide-y divide-slate-200 dark:divide-slate-800 h-[560px] overflow-y-auto pr-2"
             >
               <div
                 *ngFor="let ug of month.users"
@@ -192,14 +156,12 @@
                 <!-- AVATAR / NOMBRE USUARIO -->
                 <div class="flex flex-col items-center min-w-[120px]">
                   <div
-                    class="h-12 w-12 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center
-                           text-sm font-semibold
-                           dark:bg-indigo-600/20 dark:text-indigo-300"
+                    class="h-12 w-12 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-2xl font-semibold dark:bg-indigo-600/20 dark:text-indigo-300"
                   >
-                    {{ ug.userName[0] || 'U' }}
+                    {{ ug.userName[0] || "U" }}
                   </div>
                   <p
-                    class="mt-2 text-sm font-medium text-slate-800 dark:text-slate-200 text-center leading-tight"
+                    class="mt-2 text-2xl font-medium text-slate-800 dark:text-slate-200 text-center leading-tight"
                   >
                     {{ ug.userName }}
                   </p>
@@ -210,21 +172,19 @@
                   <ul class="space-y-2">
                     <li
                       *ngFor="let a of ug.activities"
-                      class="rounded-xl bg-slate-50 px-5 py-4 shadow-sm border border-slate-200
-                             flex flex-col md:flex-row md:items-center md:justify-between gap-3
-                             dark:bg-slate-900/40 dark:border-slate-800"
+                      class="rounded-xl bg-slate-50 px-5 py-4 shadow-sm border border-slate-200 flex flex-col md:flex-row md:items-center md:justify-between gap-3 dark:bg-slate-900/40 dark:border-slate-800"
                     >
                       <div
-                        class="text-sm text-slate-700 dark:text-slate-300 leading-snug"
+                        class="text-xl text-slate-700 dark:text-slate-300 leading-snug"
                       >
                         <span
-                          class="font-semibold text-slate-900 dark:text-slate-100"
+                          class="font-semibold text-2xl text-slate-900 dark:text-slate-100"
                         >
                           {{ formatDMY(a.fecha) }}
                         </span>
-                        — {{ a.titulo }} · {{ a.horas }} h
+                        — {{ a.titulo }}
                         <span
-                          class="text-xs text-slate-500 dark:text-slate-400"
+                          class="text-lg text-slate-500 dark:text-slate-400"
                           *ngIf="a.detalle"
                         >
                           — {{ a.detalle }}
@@ -233,7 +193,7 @@
 
                       <!-- ESTADO -->
                       <span
-                        class="px-3 py-1.5 text-xs rounded-full font-semibold"
+                        class="px-3 py-1.5 text-lg rounded-full font-semibold"
                         [ngClass]="statusPillClass(a.estado)"
                       >
                         {{ a.estado }}

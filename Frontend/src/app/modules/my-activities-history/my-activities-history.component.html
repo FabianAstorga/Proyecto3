@@ -1,9 +1,7 @@
 <app-layout [logoutLink]="'/login'">
   <!-- Fondo tipo dashboard -->
   <section
-    class="min-h-[calc(100vh-32px)] px-4 py-6 md:px-8 md:py-8
-           bg-slate-50
-           dark:bg-gradient-to-b dark:from-slate-950 dark:via-slate-950 dark:to-slate-900"
+    class="min-h-[calc(100vh-32px)] px-4 py-6 md:px-8 md:py-8 bg-slate-50 dark:bg-gradient-to-b dark:from-slate-950 dark:via-slate-950 dark:to-slate-900"
   >
     <div class="relative max-w-6xl mx-auto">
       <!-- Flecha izquierda -->
@@ -13,17 +11,7 @@
         [ngClass]="{ 'nav-arrow-disabled': !hasPrevMonth }"
         aria-label="Mes anterior"
         [disabled]="!hasPrevMonth"
-        class="
-          nav-arrow nav-arrow-left
-          absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full
-          z-20 flex h-12 w-12 items-center justify-center
-          rounded-full border border-slate-300 bg-white text-slate-700 text-3xl font-light
-          shadow-xl transition
-          hover:bg-slate-50 hover:border-slate-400 hover:text-slate-900 hover:scale-110
-          disabled:opacity-40 disabled:cursor-not-allowed
-          dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-200
-          dark:hover:bg-slate-800 dark:hover:border-slate-500 dark:hover:text-white
-        "
+        class="nav-arrow nav-arrow-left absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full z-20 flex h-12 w-12 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-700 text-3xl font-light shadow-xl transition hover:bg-slate-50 hover:border-slate-400 hover:text-slate-900 hover:scale-110 disabled:opacity-40 disabled:cursor-not-allowed dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:border-slate-500 dark:hover:text-white"
       >
         ‹
       </button>
@@ -35,34 +23,18 @@
         [ngClass]="{ 'nav-arrow-disabled': !hasNextMonth }"
         aria-label="Mes siguiente"
         [disabled]="!hasNextMonth"
-        class="
-          nav-arrow nav-arrow-right
-          absolute right-0 top-1/2 -translate-y-1/2 translate-x-full
-          z-20 flex h-12 w-12 items-center justify-center
-          rounded-full border border-slate-300 bg-white text-slate-700 text-3xl font-light
-          shadow-xl transition
-          hover:bg-slate-50 hover:border-slate-400 hover:text-slate-900 hover:scale-110
-          disabled:opacity-40 disabled:cursor-not-allowed
-          dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-200
-          dark:hover:bg-slate-800 dark:hover:border-slate-500 dark:hover:text-white
-        "
+        class="nav-arrow nav-arrow-right absolute right-0 top-1/2 -translate-y-1/2 translate-x-full z-20 flex h-12 w-12 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-700 text-3xl font-light shadow-xl transition hover:bg-slate-50 hover:border-slate-400 hover:text-slate-900 hover:scale-110 disabled:opacity-40 disabled:cursor-not-allowed dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:border-slate-500 dark:hover:text-white"
       >
         ›
       </button>
 
       <!-- CARD PRINCIPAL -->
       <div
-        class="h-full w-full overflow-hidden rounded-3xl
-               border border-slate-200 bg-white text-slate-900
-               shadow-[0_24px_60px_rgba(15,23,42,0.08)]
-               dark:border-slate-800 dark:bg-slate-950/80 dark:text-slate-100
-               dark:shadow-[0_24px_60px_rgba(15,23,42,0.8)] dark:backdrop-blur-sm"
+        class="h-full w-full overflow-hidden rounded-3xl border border-slate-200 bg-white text-slate-900 shadow-[0_24px_60px_rgba(15,23,42,0.08)] dark:border-slate-800 dark:bg-slate-950/80 dark:text-slate-100 dark:shadow-[0_24px_60px_rgba(15,23,42,0.8)] dark:backdrop-blur-sm"
       >
         <!-- Cabecera -->
         <div
-          class="px-6 py-4 md:px-10 md:py-5 border-b border-slate-200 flex flex-col gap-3 md:flex-row md:items-center md:justify-between
-                 bg-white
-                 dark:border-slate-800 dark:bg-gradient-to-r dark:from-slate-950 dark:via-slate-900 dark:to-slate-950"
+          class="px-6 py-4 md:px-10 md:py-5 border-b border-slate-200 flex flex-col gap-3 md:flex-row md:items-center md:justify-between bg-white dark:border-slate-800 dark:bg-gradient-to-r dark:from-slate-950 dark:via-slate-900 dark:to-slate-950"
         >
           <div>
             <h1 class="text-2xl md:text-3xl font-semibold leading-tight">
@@ -74,7 +46,9 @@
                 — {{ month.monthLabel }}
               </span>
             </h1>
-            <p class="mt-1 text-2xl md:text-2xl text-slate-500 dark:text-slate-400">
+            <p
+              class="mt-1 text-2xl md:text-2xl text-slate-500 dark:text-slate-400"
+            >
               Revisa tus actividades registradas, mes a mes.
             </p>
           </div>
@@ -101,20 +75,20 @@
 
           <!-- Con mes seleccionado -->
           <ng-container *ngIf="currentMonthGroup as month">
-            <div
-              class="h-[540px] overflow-y-auto pr-1 md:pr-2 space-y-3"
-            >
+            <div class="h-[540px] overflow-y-auto pr-1 md:pr-2 space-y-3">
               <div
                 *ngFor="let a of month.activities"
-                class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between
-                       rounded-2xl border border-slate-100 bg-white px-4 py-3 text-xl md:text-xl text-slate-900 hover:bg-slate-50 transition
-                       dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:bg-slate-900"
+                class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between rounded-2xl border border-slate-100 bg-white px-4 py-3 text-xl md:text-xl text-slate-900 hover:bg-slate-50 transition dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:bg-slate-900"
               >
                 <!-- Izquierda: fecha + título + detalle -->
                 <div class="flex-1 min-w-0">
-                  <p class="font-semibold text-xl text-slate-900 dark:text-slate-50">
+                  <p
+                    class="font-semibold text-xl text-slate-900 dark:text-slate-50"
+                  >
                     {{ formatDMY(a.fecha) }}
-                    <span class="font-normal text-xl text-slate-600 dark:text-slate-300">
+                    <span
+                      class="font-normal text-xl text-slate-600 dark:text-slate-300"
+                    >
                       · {{ a.titulo }}
                     </span>
                   </p>

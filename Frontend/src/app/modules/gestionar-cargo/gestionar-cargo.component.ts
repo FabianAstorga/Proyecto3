@@ -23,6 +23,9 @@ export class GestionarCargoComponent implements OnInit {
   form: FormGroup;
   modo: "crear" | "editar" = "crear";
   editId: number | null = null;
+  // Propiedades
+  modalCargoVisible = false;
+  modalCargo: any = { ocupacion: "", descripcion: "" };
 
   // Alertas
   alertMessage = "";
@@ -155,5 +158,17 @@ export class GestionarCargoComponent implements OnInit {
       descripcion: "",
     });
     this.editId = null;
+  }
+
+  // Abrir modal
+  verCargo(cargo: any) {
+    this.modalCargo = cargo;
+    this.modalCargoVisible = true;
+  }
+
+  // Cerrar modal
+  cerrarModalCargo() {
+    this.modalCargoVisible = false;
+    this.modalCargo = { ocupacion: "", descripcion: "" };
   }
 }
