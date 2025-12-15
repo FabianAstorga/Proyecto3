@@ -60,34 +60,51 @@ export class DataService {
   }
 
   // ------- mapeo actividad backend -> front -------
-  private mapBackendActividad(a: BackendActividad): Activity {
-    // El backend ahora devuelve estado como string directamente
-    const estadoMap: Record<string, Activity["estado"]> = {
-      Pendiente: "Pendiente",
-      "En Progreso": "Pendiente", // o ajusta según tu modelo front
-      Realizada: "Aprobada",
-      Cancelada: "Rechazada",
-    };
+  // ------- mapeo actividad backend -> front -------
+private mapBackendActividad(a: BackendActividad): Activity {
+  const estadoMap: Record<string, Activity["estado"]> = {
+    Pendiente: "Pendiente",
+    "En Progreso": "Pendiente",
+    Realizada: "Aprobada",
+    Cancelada: "Rechazada",
+  };
 
-    const estado = estadoMap[a.estado] || "Pendiente";
+  const estado = estadoMap[a.estado] || "Pendiente";
 
-    const userId = a.usuario ? a.usuario.id : null;
-    const userName = a.usuario
-      ? `${a.usuario.nombre} ${a.usuario.apellido}`
-      : "Usuario sin asignar";
+  const userId = a.usuario ? a.usuario.id : null;
+  const userName = a.usuario
+    ? `${a.usuario.nombre} ${a.usuario.apellido}`
+    : "Usuario sin asignar";
 
-    return {
-      id: a.id_actividad,
-      titulo: a.titulo,
-      detalle: a.descripcion ?? "",
-      fecha: a.fecha,
-      tipo: a.tipo,
-      horas: 0,
-      estado,
-      userId,
-      userName,
-    };
-  }
+  // TIPO (nombre) con fallback si no vino la relación
+  const tipoNombre =
+    a.tipoActividad?.nombre ||
+    (a.tipo_actividad_id ? `Tipo #${a.tipo_actividad_id}` : "Actividad");
+
+  // Si quieres reflejar el detalle del tipo en el historial:
+  // - detalle = descripcion + (tipoActividadDetalle)
+  const detalleExtra = (a.tipoActividadDetalle ?? "").trim();
+  const desc = (a.descripcion ?? "").trim();
+
+  const detalleFinal =
+    detalleExtra && desc ? `${desc} — (${detalleExtra})`
+    : detalleExtra ? `(${detalleExtra})`
+    : desc;
+
+  return {
+    id: a.id_actividad,
+    titulo: tipoNombre,   // el historial ordena por esto
+    tipo: tipoNombre,     // por si lo usas en otras vistas
+    detalle: detalleFinal,
+    fecha: (a.fecha ?? "").slice(0, 10),
+    horas: 0,
+    estado,
+    userId,
+    userName,
+  };
+}
+
+
 
   // ================= USUARIO - CRUD =================
 

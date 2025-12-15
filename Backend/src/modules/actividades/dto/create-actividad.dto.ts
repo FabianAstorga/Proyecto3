@@ -8,13 +8,15 @@ import {
   IsArray,
   ValidateNested,
   IsIn,
-} from 'class-validator';
-import { Type } from 'class-transformer';
+  IsInt,
+  Min,
+} from "class-validator";
+import { Type } from "class-transformer";
 
 export enum ModoCreacion {
-  SIMPLE = 'simple',
-  FECHAS_ESPECIFICAS = 'fechas_especificas',
-  REPETICION_SEMANAL = 'repeticion_semanal',
+  SIMPLE = "simple",
+  FECHAS_ESPECIFICAS = "fechas_especificas",
+  REPETICION_SEMANAL = "repeticion_semanal",
 }
 
 class FechaEspecificaDto {
@@ -27,21 +29,26 @@ export class CreateActividadDto {
   @IsNotEmpty()
   modo: ModoCreacion;
 
-  @IsString()
-  @IsNotEmpty()
-  titulo: string;
+  // ❌ QUITADO: titulo
 
   @IsString()
   @IsNotEmpty()
   descripcion: string;
 
-  @IsString()
+  /** FK al tipo */
+  @IsInt()
+  @Min(1)
   @IsNotEmpty()
-  tipo: string;
+  tipo_actividad_id: number;
+
+  /** Solo si el tipo lo requiere */
+  @IsString()
+  @IsOptional()
+  tipoActividadDetalle?: string;
 
   @IsString()
   @IsOptional()
-  @IsIn(['Pendiente', 'En Progreso', 'Realizada', 'Cancelada'])
+  @IsIn(["Pendiente", "En Progreso", "Realizada", "Cancelada"])
   estado?: string;
 
   @IsBoolean()

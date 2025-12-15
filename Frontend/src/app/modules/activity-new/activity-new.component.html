@@ -56,36 +56,46 @@
               </mat-form-field>
             </div>
 
-            <!-- TIPO DE ACTIVIDAD -->
+            <!-- TIPO DE ACTIVIDAD (ID) -->
             <div>
               <label
                 class="block text-2xl font-medium text-slate-700 dark:text-slate-200 mb-1"
               >
                 Tipo de actividad *
               </label>
+
               <mat-form-field appearance="outline" class="w-full dark-field">
-                <mat-select formControlName="tipo_actividad">
-                  <mat-option *ngFor="let t of tiposActividad" [value]="t">
-                    {{ t }}
+                <mat-select formControlName="tipo_actividad_id">
+                  <mat-option
+                    *ngFor="let t of tiposActividad"
+                    [value]="t.id"
+                  >
+                    {{ t.nombre }}
                   </mat-option>
                 </mat-select>
               </mat-form-field>
 
-              <div
-                *ngIf="requiereDetalleSeleccionado"
-                class="mt-2"
-              >
+              <!-- DETALLE (si el tipo lo requiere) -->
+              <div *ngIf="requiereDetalleSeleccionado" class="mt-2">
                 <label
-                  class="block text-2xlfont-medium text-slate-700 dark:text-slate-200 mb-1"
+                  class="block text-2xl font-medium text-slate-700 dark:text-slate-200 mb-1"
                 >
                   Especificar tipo *
                 </label>
+
                 <input
                   type="text"
-                  formControlName="tipo_actividad_otro"
+                  formControlName="tipoActividadDetalle"
                   class="w-full rounded-md border border-slate-300 bg-white text-slate-900 px-3 py-2 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:border-[#1E2638] dark:bg-[#121A2E] dark:text-slate-100 dark:placeholder-slate-400"
                   placeholder="Ej.: Actividad de vinculación…"
                 />
+
+                <p
+                  *ngIf="form.get('tipoActividadDetalle')?.touched && form.get('tipoActividadDetalle')?.invalid"
+                  class="text-2xl text-red-500 dark:text-red-400 mt-1"
+                >
+                  Este campo es obligatorio para el tipo seleccionado (máx. 100 caracteres).
+                </p>
               </div>
             </div>
 
@@ -113,7 +123,7 @@
                 Modo de fechas
               </label>
               <mat-form-field appearance="outline" class="w-full dark-field">
-                <mat-select formControlName ="mode">
+                <mat-select formControlName="mode">
                   <mat-option value="none">Sin repetir</mat-option>
                   <mat-option value="specific">Fechas específicas</mat-option>
                   <mat-option value="weekly">Repetición semanal</mat-option>
@@ -138,8 +148,7 @@
               >
                 <div class="flex items-center justify-between gap-2">
                   <span class="text-2xl text-slate-600 dark:text-slate-300">
-                    Se crearán copias en fechas específicas dentro del mes
-                    actual (no feriados).
+                    Se crearán copias en fechas específicas dentro del mes actual (no feriados).
                   </span>
                   <button
                     type="button"
@@ -155,10 +164,7 @@
                     *ngFor="let c of specificDates.controls; let i = index"
                     class="flex flex-col md:flex-row md:items-center gap-2"
                   >
-                    <mat-form-field
-                      appearance="outline"
-                      class="flex-1 dark-field"
-                    >
+                    <mat-form-field appearance="outline" class="flex-1 dark-field">
                       <input
                         matInput
                         [matDatepicker]="dpSpec"
@@ -166,10 +172,7 @@
                         [matDatepickerFilter]="dateFilterMulti"
                         placeholder="dd/mm/aaaa"
                       />
-                      <mat-datepicker-toggle
-                        matSuffix
-                        [for]="dpSpec"
-                      ></mat-datepicker-toggle>
+                      <mat-datepicker-toggle matSuffix [for]="dpSpec"></mat-datepicker-toggle>
                       <mat-datepicker #dpSpec></mat-datepicker>
                     </mat-form-field>
 
@@ -205,21 +208,15 @@
               >
                 <div formGroupName="weekly" class="space-y-3">
                   <p class="text-2xl text-slate-600 dark:text-slate-300">
-                    Se repetirán las fechas seleccionadas por semana dentro del
-                    mes actual (no feriados).
+                    Se repetirán las fechas seleccionadas por semana dentro del mes actual (no feriados).
                   </p>
 
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label
-                        class="block text-2xl font-medium text-slate-700 dark:text-slate-200 mb-1"
-                      >
+                      <label class="block text-2xl font-medium text-slate-700 dark:text-slate-200 mb-1">
                         Desde *
                       </label>
-                      <mat-form-field
-                        appearance="outline"
-                        class="w-full dark-field"
-                      >
+                      <mat-form-field appearance="outline" class="w-full dark-field">
                         <input
                           matInput
                           [matDatepicker]="dpFrom"
@@ -227,24 +224,16 @@
                           [matDatepickerFilter]="dateFilterMulti"
                           placeholder="dd/mm/aaaa"
                         />
-                        <mat-datepicker-toggle
-                          matSuffix
-                          [for]="dpFrom"
-                        ></mat-datepicker-toggle>
+                        <mat-datepicker-toggle matSuffix [for]="dpFrom"></mat-datepicker-toggle>
                         <mat-datepicker #dpFrom></mat-datepicker>
                       </mat-form-field>
                     </div>
 
                     <div>
-                      <label
-                        class="block text-2xl font-medium text-slate-700 dark:text-slate-200 mb-1"
-                      >
+                      <label class="block text-2xl font-medium text-slate-700 dark:text-slate-200 mb-1">
                         Hasta *
                       </label>
-                      <mat-form-field
-                        appearance="outline"
-                        class="w-full dark-field"
-                      >
+                      <mat-form-field appearance="outline" class="w-full dark-field">
                         <input
                           matInput
                           [matDatepicker]="dpTo"
@@ -252,72 +241,49 @@
                           [matDatepickerFilter]="dateFilterMulti"
                           placeholder="dd/mm/aaaa"
                         />
-                        <mat-datepicker-toggle
-                          matSuffix
-                          [for]="dpTo"
-                        ></mat-datepicker-toggle>
+                        <mat-datepicker-toggle matSuffix [for]="dpTo"></mat-datepicker-toggle>
                         <mat-datepicker #dpTo></mat-datepicker>
                       </mat-form-field>
                     </div>
                   </div>
 
-                  <div
-                    formGroupName="weekdays"
-                    class="flex flex-wrap gap-3 text-xs"
-                  >
-                    <span
-                      class="w-full text-slate-600 text-2xl dark:text-slate-300 mb-1"
-                    >
+                  <div formGroupName="weekdays" class="flex flex-wrap gap-3 text-xs">
+                    <span class="w-full text-slate-600 text-2xl dark:text-slate-300 mb-1">
                       Selecciona los días de la semana:
                     </span>
 
-                    <label
-                      class="inline-flex text-2xl items-center gap-1 text-slate-700 dark:text-slate-200"
-                    >
+                    <label class="inline-flex text-2xl items-center gap-1 text-slate-700 dark:text-slate-200">
                       <input type="checkbox" formControlName="mon" />
                       <span>Lunes</span>
                     </label>
-                    <label
-                      class="inline-flex text-2xl items-center gap-1 text-slate-700 dark:text-slate-200"
-                    >
+                    <label class="inline-flex text-2xl items-center gap-1 text-slate-700 dark:text-slate-200">
                       <input type="checkbox" formControlName="tue" />
                       <span>Martes</span>
                     </label>
-                    <label
-                      class="inline-flex text-2xl items-center gap-1 text-slate-700 dark:text-slate-200"
-                    >
+                    <label class="inline-flex text-2xl items-center gap-1 text-slate-700 dark:text-slate-200">
                       <input type="checkbox" formControlName="wed" />
                       <span>Miércoles</span>
                     </label>
-                    <label
-                      class="inline-flex text-2xl items-center gap-1 text-slate-700 dark:text-slate-200"
-                    >
+                    <label class="inline-flex text-2xl items-center gap-1 text-slate-700 dark:text-slate-200">
                       <input type="checkbox" formControlName="thu" />
                       <span>Jueves</span>
                     </label>
-                    <label
-                      class="inline-flex text-2xl items-center gap-1 text-slate-700 dark:text-slate-200"
-                    >
+                    <label class="inline-flex text-2xl items-center gap-1 text-slate-700 dark:text-slate-200">
                       <input type="checkbox" formControlName="fri" />
                       <span>Viernes</span>
                     </label>
-                    <label
-                      class="inline-flex text-2xl items-center gap-1 text-slate-700 dark:text-slate-200"
-                    >
+                    <label class="inline-flex text-2xl items-center gap-1 text-slate-700 dark:text-slate-200">
                       <input type="checkbox" formControlName="sat" />
                       <span>Sábado</span>
                     </label>
-                    <label
-                      class="inline-flex text-2xl items-center gap-1 text-slate-700 dark:text-slate-200"
-                    >
+                    <label class="inline-flex text-2xl items-center gap-1 text-slate-700 dark:text-slate-200">
                       <input type="checkbox" formControlName="sun" />
                       <span>Domingo</span>
                     </label>
                   </div>
 
                   <p class="text-2xl text-slate-500 dark:text-slate-400">
-                    Solo se considerarán fechas dentro del mes actual y que no
-                    sean feriados.
+                    Solo se considerarán fechas dentro del mes actual y que no sean feriados.
                   </p>
                 </div>
               </div>
@@ -326,19 +292,17 @@
                 *ngIf="multi.invalid && multi.touched"
                 class="text-2xl text-red-500 dark:text-red-400"
               >
-                Revisa las fechas del bloque multi-día (rango válido y dentro
-                del mes).
+                Revisa las fechas del bloque multi-día (rango válido y dentro del mes).
               </p>
             </div>
           </div>
 
           <!-- DESCRIPCIÓN -->
           <div>
-            <label
-              class="block text-2xl font-medium text-slate-700 dark:text-slate-200 mb-2"
-            >
+            <label class="block text-2xl font-medium text-slate-700 dark:text-slate-200 mb-2">
               Descripción de la actividad *
             </label>
+
             <textarea
               formControlName="descripcionAct"
               rows="8"
@@ -354,9 +318,8 @@
             </p>
 
             <p class="pt-2 text-2xl text-slate-500 dark:text-slate-400">
-              Consejo: sé específico en la descripción (objetivo, actividad
-              realizada, resultados). Esto ayuda a una mejor evaluación de tu
-              registro.
+              Consejo: sé específico en la descripción (objetivo, actividad realizada, resultados).
+              Esto ayuda a una mejor evaluación de tu registro.
             </p>
           </div>
         </form>

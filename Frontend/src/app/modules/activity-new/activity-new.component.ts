@@ -27,7 +27,6 @@ import { AuthService } from '../../services/auth.service';
 import {
   DataService,
   CreateActividadPayload,
-  ModoCreacion,
 } from '../../services/data.service';
 
 type WeekFlags = {
@@ -58,6 +57,12 @@ export const ES_DATE_FORMATS = {
     dateA11yLabel: 'dd/MM/yyyy',
     monthYearA11yLabel: 'MMMM yyyy',
   },
+};
+
+type TipoActividadLite = {
+  id: number;
+  nombre: string;
+  requiereDetalle: boolean;
 };
 
 @Component({
@@ -93,8 +98,7 @@ export class ActivityNewComponent {
   }
 
   // Catálogos (desde backend)
-  tiposActividad: string[] = [];
-  private tiposActividadMeta = new Map<string, { requiereDetalle: boolean }>();
+  tiposActividad: TipoActividadLite[] = [];
 
   estados = ['Pendiente', 'Realizada'];
 
@@ -125,9 +129,12 @@ export class ActivityNewComponent {
       // fecha principal sin restricción de mes
       fecha: [new Date(), Validators.required],
 
-      // NO usar this.tiposActividad[0] aquí: se carga async
-      tipo_actividad: ['', Validators.required],
-      tipo_actividad_otro: [''], // requerido si el tipo seleccionado requiere detalle
+      // ✅ ahora guardamos el ID del tipo
+      tipo_actividad_id: [null as number | null, Validators.required],
+
+      // ✅ detalle libre solo si el tipo lo requiere
+      tipoActividadDetalle: [''],
+
       estado: [<string>this.estados[0], Validators.required],
 
       multi: this.fb.group({
@@ -156,12 +163,11 @@ export class ActivityNewComponent {
     this.loadTiposActividad();
     this.loadFeriadosMesActual();
 
-    // 2) Validador condicional según requiereDetalle del tipo seleccionado
-    this.form.get('tipo_actividad')!.valueChanges.subscribe((val: string | null) => {
-      const detalleCtrl = this.form.get('tipo_actividad_otro')!;
-      const requiere = val
-        ? (this.tiposActividadMeta.get(val)?.requiereDetalle ?? false)
-        : false;
+    // 2) Validador condicional según requiereDetalle del tipo seleccionado (por ID)
+    this.form.get('tipo_actividad_id')!.valueChanges.subscribe((val: number | null) => {
+      const detalleCtrl = this.form.get('tipoActividadDetalle')!;
+      const tipo = this.tiposActividad.find((t) => t.id === val);
+      const requiere = !!tipo?.requiereDetalle;
 
       if (requiere) {
         detalleCtrl.addValidators([Validators.required, Validators.maxLength(100)]);
@@ -178,9 +184,9 @@ export class ActivityNewComponent {
 
   // --------- Getter para el template (mostrar input detalle) ----------
   get requiereDetalleSeleccionado(): boolean {
-    const tipo = this.form.get('tipo_actividad')?.value as string | null;
-    if (!tipo) return false;
-    return this.tiposActividadMeta.get(tipo)?.requiereDetalle ?? false;
+    const id = this.form.get('tipo_actividad_id')?.value as number | null;
+    if (!id) return false;
+    return this.tiposActividad.find((t) => t.id === id)?.requiereDetalle ?? false;
   }
 
   // Getters de conveniencia
@@ -291,39 +297,37 @@ export class ActivityNewComponent {
       next: (list: any[]) => {
         const ordenados = (list ?? [])
           .map((x) => ({
+            id: Number(x.id),
             nombre: String(x.nombre ?? '').trim(),
             orden: Number(x.orden ?? 0),
             requiereDetalle: !!x.requiereDetalle,
             activo: !!x.activo,
           }))
-          .filter((x) => x.nombre && x.activo)
+          .filter((x) => x.id > 0 && x.nombre && x.activo)
           .sort((a, b) => a.orden - b.orden);
 
-        this.tiposActividad = ordenados.map((x) => x.nombre);
-
-        this.tiposActividadMeta.clear();
-        ordenados.forEach((x) => {
-          this.tiposActividadMeta.set(x.nombre, {
-            requiereDetalle: x.requiereDetalle,
-          });
-        });
+        this.tiposActividad = ordenados.map((x) => ({
+          id: x.id,
+          nombre: x.nombre,
+          requiereDetalle: x.requiereDetalle,
+        }));
 
         // setear valor inicial válido
-        const actual = this.form.get('tipo_actividad')!.value as string | null;
-        if (!actual || !this.tiposActividad.includes(actual)) {
-          const first = this.tiposActividad[0] ?? '';
-          if (first) this.form.get('tipo_actividad')!.setValue(first, { emitEvent: true });
+        const actual = this.form.get('tipo_actividad_id')!.value as number | null;
+        const first = this.tiposActividad[0]?.id ?? null;
+
+        if (!actual || !this.tiposActividad.some((t) => t.id === actual)) {
+          if (first) this.form.get('tipo_actividad_id')!.setValue(first, { emitEvent: true });
         } else {
           // fuerza recalcular validación detalle
-          this.form.get('tipo_actividad')!.setValue(actual, { emitEvent: true });
+          this.form.get('tipo_actividad_id')!.setValue(actual, { emitEvent: true });
         }
       },
       error: (err) => {
         console.error('Error cargando tipos de actividad:', err);
         // fallback mínimo para no romper
-        this.tiposActividad = ['Taller'];
-        this.tiposActividadMeta.set('Taller', { requiereDetalle: false });
-        this.form.get('tipo_actividad')!.setValue('Taller', { emitEvent: true });
+        this.tiposActividad = [{ id: 1, nombre: 'Taller', requiereDetalle: false }];
+        this.form.get('tipo_actividad_id')!.setValue(1, { emitEvent: true });
       },
     });
   }
@@ -362,8 +366,8 @@ export class ActivityNewComponent {
     this.form.reset({
       descripcionAct: '',
       fecha: new Date(),
-      tipo_actividad: this.tiposActividad[0] ?? '',
-      tipo_actividad_otro: '',
+      tipo_actividad_id: this.tiposActividad[0]?.id ?? null,
+      tipoActividadDetalle: '',
       estado: this.estados[0],
       multi: {
         mode: 'none' as MultiMode,
@@ -389,7 +393,7 @@ export class ActivityNewComponent {
     }
   }
 
-  // ==== Envío (modo-compatible con backend del equipo) ====
+  // ==== Envío (alineado con backend nuevo) ====
   submit() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -398,13 +402,13 @@ export class ActivityNewComponent {
 
     const base = this.form.value;
 
-    // si el tipo requiere detalle, lo usamos como "tipoFinal"
+    const tipoId = base.tipo_actividad_id as number;
     const requiere = this.requiereDetalleSeleccionado;
 
-    const tipoFinal =
-      (requiere && base.tipo_actividad_otro
-        ? base.tipo_actividad_otro
-        : base.tipo_actividad) ?? '';
+    const detalle =
+      requiere && base.tipoActividadDetalle
+        ? String(base.tipoActividadDetalle).trim()
+        : undefined;
 
     const multi = base.multi!;
     const mode = multi.mode as MultiMode | undefined;
@@ -412,41 +416,38 @@ export class ActivityNewComponent {
     let payload: CreateActividadPayload;
 
     if (!mode || mode === 'none') {
-      // MODO SIMPLE
       payload = {
-        modo: 'simple' as ModoCreacion,
-        titulo: tipoFinal,
+        modo: 'simple',
         descripcion: base.descripcionAct ?? '',
-        tipo: tipoFinal,
-        estado: base.estado ?? 'Pendiente',
+        estado: (base.estado as any) ?? 'Pendiente',
+        tipo_actividad_id: tipoId,
+        tipoActividadDetalle: detalle,
         fecha: this.toISO(base.fecha as Date),
       };
     } else if (mode === 'specific') {
-      // MODO FECHAS ESPECÍFICAS
       const fechas_especificas = this.specificDates.controls.map((c) => ({
         fecha: this.toISO(c.value as Date),
       }));
 
       payload = {
-        modo: 'fechas_especificas' as ModoCreacion,
-        titulo: tipoFinal,
+        modo: 'fechas_especificas',
         descripcion: base.descripcionAct ?? '',
-        tipo: tipoFinal,
-        estado: base.estado ?? 'Pendiente',
+        estado: (base.estado as any) ?? 'Pendiente',
+        tipo_actividad_id: tipoId,
+        tipoActividadDetalle: detalle,
         fechas_especificas,
       };
     } else {
-      // MODO REPETICIÓN SEMANAL
       const s = multi.weekly!.start as Date;
       const e = multi.weekly!.end as Date;
       const dias_semana = this.getDiasSemanaNombres();
 
       payload = {
-        modo: 'repeticion_semanal' as ModoCreacion,
-        titulo: tipoFinal,
+        modo: 'repeticion_semanal',
         descripcion: base.descripcionAct ?? '',
-        tipo: tipoFinal,
-        estado: base.estado ?? 'Pendiente',
+        estado: (base.estado as any) ?? 'Pendiente',
+        tipo_actividad_id: tipoId,
+        tipoActividadDetalle: detalle,
         fecha_desde: this.toISO(s),
         fecha_hasta: this.toISO(e),
         dias_semana,

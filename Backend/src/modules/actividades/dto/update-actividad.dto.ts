@@ -4,13 +4,12 @@ import {
   IsDateString,
   IsBoolean,
   IsIn,
-} from 'class-validator';
+  IsInt,
+  Min,
+} from "class-validator";
 
 export class UpdateActividadDto {
-
-  @IsString()
-  @IsOptional()
-  titulo?: string;
+  // ❌ QUITADO: titulo
 
   @IsString()
   @IsOptional()
@@ -20,17 +19,21 @@ export class UpdateActividadDto {
   @IsOptional()
   fecha?: string;
 
-  @IsString()
+  @IsInt()
+  @Min(1)
   @IsOptional()
-  tipo?: string;
+  tipo_actividad_id?: number;
 
   @IsString()
   @IsOptional()
-  @IsIn(['Pendiente', 'En Progreso', 'Realizada', 'Cancelada'])
+  tipoActividadDetalle?: string;
+
+  @IsString()
+  @IsOptional()
+  @IsIn(["Pendiente", "En Progreso", "Realizada", "Cancelada"])
   estado?: string;
 
   @IsBoolean()
   @IsOptional()
   esRepetitiva?: boolean;
-
 }

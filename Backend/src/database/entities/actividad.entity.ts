@@ -15,8 +15,7 @@ export class Actividad {
   @PrimaryGeneratedColumn()
   id_actividad: number;
 
-  @Column({ type: "varchar", length: 50 })
-  titulo: string;
+  // ❌ QUITADO: titulo
 
   @Column({ type: "varchar", length: 255 })
   descripcion: string;
@@ -24,26 +23,17 @@ export class Actividad {
   @Column({ type: "date" })
   fecha: Date;
 
-  /**
-   * LEGACY: mantener por compatibilidad con el código actual.
-   * Luego puedes eliminar este campo cuando el front/back use tipoActividad.
-   */
-  @Column({ type: "varchar", length: 100 })
-  tipo: string;
+  // ❌ QUITADO: tipo (string legacy)
 
-  /**
-   * Normalizado: FK hacia tipos_actividad
-   * eager:true trae el tipo junto con la actividad (útil para listar sin joins manuales).
-   */
-  @ManyToOne(() => TipoActividad, { eager: true, nullable: true })
+  /** Normalizado: FK hacia tipo_actividad */
+  @ManyToOne(() => TipoActividad, { eager: true, nullable: false })
   @JoinColumn({ name: "tipo_actividad_id" })
-  tipoActividad?: TipoActividad;
+  tipoActividad: TipoActividad;
 
   /** Texto libre si el tipo lo requiere (por ejemplo: "Otro") */
   @Column({ type: "varchar", length: 150, nullable: true })
   tipoActividadDetalle?: string;
 
-  // Para el checklist
   @Column({
     type: "enum",
     enum: ["Pendiente", "En Progreso", "Realizada", "Cancelada"],
@@ -63,5 +53,6 @@ export class Actividad {
   @ManyToOne(() => Informe, (informe) => informe.actividades, {
     onDelete: "CASCADE",
   })
+  @JoinColumn({ name: "informeIdInforme" })
   informe: Informe;
 }
